@@ -77,27 +77,27 @@ public class Server implements RMI {
 
 
     @Override
-    public String backup() throws RemoteException {
-        return "DEI BACKUP";
+    public String backup(String filename, Integer replication_degree) throws RemoteException {
+        return null;
     }
 
     @Override
-    public String restore() throws RemoteException {
-        return "DEI RESTORE";
+    public String restore(String filename) throws RemoteException {
+        return null;
     }
 
     @Override
-    public String delete() throws RemoteException {
-        return "DEI DELETE";
+    public String delete(String filename) throws RemoteException {
+        return null;
     }
 
     @Override
-    public String reclaim() throws RemoteException {
-        return "DEI RECLAIM";
+    public String reclaim(Integer disk_space) throws RemoteException {
+        return null;
     }
 
     @Override
     public String state() throws RemoteException {
-        return "DEI STATE";
+        return null;
     }
 }

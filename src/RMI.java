@@ -2,9 +2,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface RMI extends Remote {
-    String backup() throws RemoteException;
-    String restore() throws RemoteException;
-    String delete() throws RemoteException;
-    String reclaim() throws RemoteException;
+    String backup(String filename, Integer replication_degree) throws RemoteException;
+    String restore(String filename) throws RemoteException;
+    String delete(String filename) throws RemoteException;
+    String reclaim(Integer disk_space) throws RemoteException;
     String state() throws RemoteException;
 }

@@ -1,16 +1,29 @@
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class Client {
 
     /**
-     * Service access point
+     * Operation to be executed: BACKUP, RESTORE, DELETE, RECLAIM, STATE
      */
-    private static String STUB_NAME;
-
     private static String OPERATION;
+
+    /**
+     * First operator: filename or disk_space depending on the operation type
+     */
     private static String OPND_1;
-    private static String OPND_2;
+
+    /**
+     * Second operator: replication degree
+     */
+    private static Integer OPND_2;
+
+    /**
+     * RMI object used to communicate with peers
+     */
+    private static RMI STUB;
 
     /**
      * Default Constructor
@@ -18,10 +31,10 @@ public class Client {
     private Client() {}
 
     /**
-     *
-     * @param args
+     * Initializes the client program to execute a certain operation
+     * @param args Contains all needed variables for setup the client program
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RemoteException, NotBoundException {
         // Check arguments
         if (args.length < 2) {
             System.out.println("Usage: java Client <peer_ap> <operation> <opnd_1> [<opnd_2>]");
@@ -29,52 +42,52 @@ public class Client {
         }
 
         // Initialize class variables
-        STUB_NAME = args[0];
+        String STUB_NAME = args[0];
         OPERATION = args[1];
         OPND_1 = args.length > 2 ? args[2] : null;
-        OPND_2 = args.length > 3 ? args[3] : null;
+        OPND_2 = args.length > 3 ? Integer.parseInt(args[3]) : null;
 
+        // Check arguments validity
+        if((OPERATION.equals("BACKUP") & OPND_2 == null) || (!OPERATION.equals("STATE") && OPND_1 == null)) {
+            System.out.println("Arguments passed incorrectly !");
+            return;
+        }
+
+        // Get registry in order to find remote object to establish communication
+        Registry registry = LocateRegistry.getRegistry(null);
+        STUB = (RMI) registry.lookup(STUB_NAME);
 
         //Initialize operation
         init_operation();
     }
 
     /**
-     *
+     * Initialize operation having into account the information passed by as parameter
      */
     private static void init_operation() {
         try {
-            Registry registry = LocateRegistry.getRegistry(null);
-            RMI stub = (RMI) registry.lookup(STUB_NAME);
-
-            String response = null;
-
             switch(OPERATION) {
                 case "BACKUP":
-                    response = stub.backup();
+                    STUB.backup(OPND_1, OPND_2);
                     break;
                 case "RESTORE":
-                    response = stub.restore();
+                    STUB.restore(OPND_1);
                     break;
                 case "DELETE":
-                    response = stub.delete();
+                    STUB.delete(OPND_1);
                     break;
                 case "RECLAIM":
-                    response = stub.reclaim();
+                    STUB.reclaim(Integer.parseInt(OPND_1));
                     break;
                 case "STATE":
-                    response = stub.state();
+                    STUB.state();
                     break;
                 default:
-                    response = "BAD OPERATION";
-                    break;
+                    System.out.println("Such operation is not available: " + OPERATION + " !");
             }
-
-            System.out.println("Response: " + response);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
         }
     }
-
 }
