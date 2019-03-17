@@ -75,10 +75,12 @@ public class Server implements RMI {
         }
     }
 
-
     @Override
     public String backup(String filename, Integer replication_degree) throws RemoteException {
-        return null;
+
+
+
+        return "Backup of " + filename + " has been done with success !";
     }
 
     @Override
