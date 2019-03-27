@@ -1,9 +1,11 @@
+package App;
+
+import Peer.RMI;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
-public class Client {
+public class TestApp {
 
     /**
      * Operation to be executed: BACKUP, RESTORE, DELETE, RECLAIM, STATE
@@ -28,16 +30,16 @@ public class Client {
     /**
      * Default Constructor
      */
-    private Client() {}
+    private TestApp() {}
 
     /**
      * Initializes the client program to execute a certain operation
      * @param args Contains all needed variables for setup the client program
      */
-    public static void main(String[] args) throws RemoteException, NotBoundException {
+    public static <string> void main(String[] args) throws RemoteException, NotBoundException {
         // Check arguments
         if (args.length < 2) {
-            System.out.println("Usage: java Client <peer_ap> <operation> <opnd_1> [<opnd_2>]");
+            System.out.println("Usage: java App.TestApp <peer_ap> <operation> <opnd_1> [<opnd_2>]");
             return;
         }
 
@@ -54,11 +56,11 @@ public class Client {
         }
 
         // Get registry in order to find remote object to establish communication
-        Registry registry = LocateRegistry.getRegistry(null);
-        STUB = (RMI) registry.lookup(STUB_NAME);
+//        Registry registry = LocateRegistry.getRegistry(null);
+//        STUB = (RMI) registry.lookup(STUB_NAME);
 
-        //Initialize operation
-        init_operation();
+       //Initialize operation
+//        init_operation();
     }
 
     /**
@@ -68,7 +70,7 @@ public class Client {
         try {
             switch(OPERATION) {
                 case "BACKUP":
-                    STUB.backup(OPND_1, OPND_2);
+                    System.out.println(STUB.backup(OPND_1, OPND_2));
                     break;
                 case "RESTORE":
                     STUB.restore(OPND_1);
@@ -86,7 +88,7 @@ public class Client {
                     System.out.println("Such operation is not available: " + OPERATION + " !");
             }
         } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("App.TestApp exception: " + e.toString());
             e.printStackTrace();
         }
     }
