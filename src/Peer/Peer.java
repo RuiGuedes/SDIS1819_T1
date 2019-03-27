@@ -72,8 +72,8 @@ public class Peer implements RMI {
         // Initialize remote object
         init_remote_object();
 
-        Thread mc = new Thread(new MC());
-        Thread mdb = new Thread(new MDB());
+        Thread mc = new Thread(new MC(MULTICAST.get("MC")[0],MULTICAST.get("MC")[1]));
+        Thread mdb = new Thread(new MDB(MULTICAST.get("MDB")[0],MULTICAST.get("MDB")[1]));
         mc.start();
         mdb.start();
     }
@@ -124,13 +124,11 @@ public class Peer implements RMI {
         // Socket creation
         InetAddress mdb_group = InetAddress.getByName(MULTICAST.get("MDB")[0]);
         int mdb_port = Integer.parseInt(MULTICAST.get("MDB")[1]);
-        MulticastSocket mdb_socket = new MulticastSocket(mdb_port);
-        mdb_socket.joinGroup(mdb_group);
+        MulticastSocket mdb_socket = create_socket(mdb_port, mdb_group);
 
         InetAddress mc_group = InetAddress.getByName(MULTICAST.get("MC")[0]);
         int mc_port = Integer.parseInt(MULTICAST.get("MC")[1]);
-        MulticastSocket mc_socket = new MulticastSocket(mc_port);
-        mc_socket.joinGroup(mc_group);
+        MulticastSocket mc_socket = create_socket(mc_port, mc_group);
 
         byte[] chunk = new byte[64000];
         int bytes_readed = 0;
@@ -192,17 +190,6 @@ public class Peer implements RMI {
         }
     }
 
-    private String[] clean_array(String[] list) {
-        List<String> cleaned = new ArrayList<>();
-
-        for (String s: list) {
-            if (s.length() > 0)
-                cleaned.add(s);
-        }
-
-        return cleaned.toArray(new String[0]);
-    }
-
     @Override
     public String restore(String filename) throws RemoteException {
 
@@ -236,5 +223,29 @@ public class Peer implements RMI {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public String[] clean_array(String[] list) {
+        List<String> cleaned = new ArrayList<>();
+
+        for (String s: list) {
+            if (s.length() > 0)
+                cleaned.add(s);
+        }
+
+        return cleaned.toArray(new String[0]);
+    }
+
+    public static MulticastSocket create_socket(int port, InetAddress group) {
+        MulticastSocket socket = null;
+
+        try {
+            socket = new MulticastSocket(port);
+            socket.joinGroup(group);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return socket;
     }
 }
