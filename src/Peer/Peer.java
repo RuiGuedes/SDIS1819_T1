@@ -72,6 +72,7 @@ public class Peer implements RMI {
         // Initialize remote object
         init_remote_object();
 
+        // Create thread
         Thread mc = new Thread(new MC(MULTICAST.get("MC")[0],MULTICAST.get("MC")[1]));
         Thread mdb = new Thread(new MDB(MULTICAST.get("MDB")[0],MULTICAST.get("MDB")[1]));
         mc.start();
@@ -131,33 +132,32 @@ public class Peer implements RMI {
         MulticastSocket mc_socket = create_socket(mc_port, mc_group);
 
         byte[] chunk = new byte[64000];
-        int bytes_readed = 0;
-        int chunk_id = 0;
+        int bytes_readed;
+        int chunk_no = 0;
 
         DatagramPacket packet;
-        Timer timer = new Timer();
 
-        while((bytes_readed = file_stream.readNBytes(chunk,chunk_id*64000, 64000)) >= 0) {
-            String header_chunk = header + " " + chunk_id + " " + replication_degree + " " + header_end;
+        while((bytes_readed = file_stream.readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
+            String header_chunk = header + " " + chunk_no + " " + replication_degree + " " + header_end;
 
             byte[] message = (header_chunk + chunk.toString()).getBytes();
             packet = new DatagramPacket(message,message.length, mdb_group, mdb_port);
 
-            send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_id, packet, timer);
+            send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
 
-            chunk_id++;
+            chunk_no++;
 
             if (bytes_readed < 64000) {
                 break;
             }
         }
 
-        timer.cancel();
-
         return "Backup of " + filename + " has been done with success !";
     }
 
-    private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet, Timer timer) throws IOException {
+    private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet) throws IOException {
+        Timer timer = new Timer();
+
         for (int j = 1; j <= 5; j++) {
             mdb_socket.send(packet);
             final int[] stored_count = {0};
@@ -188,6 +188,8 @@ public class Peer implements RMI {
             if (stored_count[0] >= replication_degree)
                 break;
         }
+
+        timer.cancel();
     }
 
     @Override
@@ -225,7 +227,7 @@ public class Peer implements RMI {
         return hexString.toString();
     }
 
-    public String[] clean_array(String[] list) {
+    public static String[] clean_array(String[] list) {
         List<String> cleaned = new ArrayList<>();
 
         for (String s: list) {

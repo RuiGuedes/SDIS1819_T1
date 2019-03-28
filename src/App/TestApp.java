@@ -4,6 +4,8 @@ import Peer.RMI;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class TestApp {
 
@@ -56,11 +58,11 @@ public class TestApp {
         }
 
         // Get registry in order to find remote object to establish communication
-//        Registry registry = LocateRegistry.getRegistry(null);
-//        STUB = (RMI) registry.lookup(STUB_NAME);
+        Registry registry = LocateRegistry.getRegistry(null);
+        STUB = (RMI) registry.lookup(STUB_NAME);
 
        //Initialize operation
-//        init_operation();
+        init_operation();
     }
 
     /**
