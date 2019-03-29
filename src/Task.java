@@ -11,7 +11,7 @@ public class Task {
 
 }
 
-public class PutChunk extends Task implements Runnable {
+class PutChunk extends Task implements Runnable {
 
     private Multicast MC;
 
@@ -21,11 +21,6 @@ public class PutChunk extends Task implements Runnable {
 
     @Override
     public void run() {
-        try {
 
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

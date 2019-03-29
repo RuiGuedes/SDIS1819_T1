@@ -1,6 +1,6 @@
 package Multicast;
 
-import Peer.Peer;
+import Peer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -1,6 +1,6 @@
 package Multicast;
 
-import Peer.Peer;
+import Peer;
 
 import java.net.InetAddress;
 import java.net.MulticastSocket;

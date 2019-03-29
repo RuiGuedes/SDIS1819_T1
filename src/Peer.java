@@ -1,5 +1,3 @@
-package Peer;
-
 import Multicast.MC;
 import Multicast.MDB;
 import Multicast.MDR;
@@ -44,17 +42,17 @@ public class Peer implements RMI {
     /**
      * Multicast channel used for control messages
      */
-    private static MC mc_channel;
+    private static Multicast MC;
 
     /**
      * Multicast channel used to backup files
      */
-    private static MDB mdb_channel;
+    private static Multicast MDB;
 
     /**
      * Multicast channel used to restore files
      */
-    private static MDR mdr_channel;
+    private static Multicast MDR;
 
     /**
      * Default constructor
@@ -89,21 +87,6 @@ public class Peer implements RMI {
     }
 
     /**
-     * Initializes and starts multicast channels
-     */
-    private static void init_multicast_channels() {
-        // Creates each multicast channel
-        mc_channel = new MC(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
-        mdb_channel = new MDB(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
-        mdr_channel = new MDR(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
-
-        // Starts each multicast channel
-        mc_channel.start();
-        mdb_channel.start();
-        mdr_channel.start();
-    }
-
-    /**
      * Creates and exports a remote object and binds it to the name provided (STUB_NAME)
      */
     private static void init_remote_object() {
@@ -123,19 +106,23 @@ public class Peer implements RMI {
         }
     }
 
-    @Override
-    public String backup(String filename, Integer replication_degree) throws IOException {
+    /**
+     * Initializes multicast channels
+     */
+    private static void init_multicast_channels() {
+        // Creates each multicast channel
+        MC = new Multicast(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
+        MDB = new Multicast(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
+        MDR = new Multicast(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
+    }
 
-        File file = new File(filename);
-        InputStream file_stream = null;
-        try {
-            file_stream = new FileInputStream(filename);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public String backup(String filepath, Integer replication_degree) throws IOException {
+
+        FileData filezito = new FileData(filepath);
 
         // Header
-        String file_id = filename + file.lastModified();
+        String file_id = filezito.getFilename() + filezito.getFile().lastModified();
         String header_end = "\r\n\r\n"; // <CRLF><CRLF>
         MessageDigest digest = null;
         try {
@@ -161,15 +148,17 @@ public class Peer implements RMI {
 
         DatagramPacket packet;
 
-        while((bytes_readed = file_stream.readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
+        while((bytes_readed = filezito.getStream().readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
             String header_chunk = header + " " + chunk_no + " " + replication_degree + " " + header_end;
 
             byte[] message = (header_chunk + chunk.toString()).getBytes();
             packet = new DatagramPacket(message,message.length, mdb_group, mdb_port);
 
-            PutChunk task = new PutChunk(MC, MDB, )
+            PutChunk task = new PutChunk(MC, MDB);
 
-            send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
+            MDB.getExecuter().execute(task);
+
+            //send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
 
             chunk_no++;
 
@@ -179,7 +168,7 @@ public class Peer implements RMI {
         }
 
 
-        return "Backup of " + filename + " has been done with success !";
+        return "Backup of " + filezito.getFilename() + " has been done with success !";
     }
 
     private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet) throws IOException {

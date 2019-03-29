@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -21,13 +22,17 @@ public class Multicast {
      * @param address
      * @param port
      */
-    public Multicast(String address, String port) throws IOException {
+    public Multicast(String address, String port)  {
         this.address = address;
         this.port = Integer.parseInt(port);
-        this.group = InetAddress.getByName(this.address);
 
-        this.socket = new MulticastSocket(this.port);
-        this.socket.joinGroup(this.group);
+        try {
+            this.group = InetAddress.getByName(this.address);
+            this.socket = new MulticastSocket(this.port);
+            this.socket.joinGroup(this.group);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         this.executer = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     }
