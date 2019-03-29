@@ -1,7 +1,5 @@
 package Multicast;
 
-import Peer;
-
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
@@ -32,8 +30,5 @@ public class MDB extends Thread {
     @Override
     public void run() {
 
-        MulticastSocket mdb_socket = Peer.create_socket(port, group);
-
     }
-
 }

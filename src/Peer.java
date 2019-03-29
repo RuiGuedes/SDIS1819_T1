@@ -1,19 +1,11 @@
-import Multicast.MC;
-import Multicast.MDB;
-import Multicast.MDR;
-
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 
@@ -115,10 +107,12 @@ public class Peer implements RMI {
         MC = new Multicast(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
         MDB = new Multicast(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
         MDR = new Multicast(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
+
+
     }
 
     @Override
-    public String backup(String filepath, Integer replication_degree) throws IOException {
+    public String backup(String filepath, Integer replication_degree) {
 
         FileData file = new FileData(filepath);
         Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file);

@@ -1,7 +1,6 @@
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
 class Message {
 
@@ -30,6 +29,21 @@ class Message {
      */
     private FileData file;
 
+    /**
+     * Chunk number
+     */
+    private String chunk_no = null;
+
+    /**
+     * Replication degree
+     */
+    private String replication_degree = null;
+
+    /**
+     * Chunk
+     */
+    private String body = null;
+
     Message(String message_type, String protocol_version, Integer server_id, FileData file) {
         // Initializes class variables
         this.file = file;
@@ -41,6 +55,13 @@ class Message {
         init_message_header();
     }
 
+    Message(String protocol) {
+        // Decoding of the message and initialization of the respective fields
+
+
+        // esta classe devia conter os atributos: chunk_no, replication_degree e body que inicialmente estariam a null
+    }
+
     /**
      * Initializes message header
      */
@@ -48,7 +69,7 @@ class Message {
         this.header =   this.message_type + " " +
                         this.protocol_version + " " +
                         this.server_id + " " +
-                        encrypt_file(file.get_file_id());
+                        encrypt_file(file.get_file_id() + file.get_last_modified());
     }
 
     /**
@@ -87,7 +108,7 @@ class Message {
      * @return Full header
      */
     public String get_full_header(Integer[] info) {
-        return header + convert_to_header_string(info) + "\r\n\r\n";
+        return header + convert_to_string(info) + "\r\n\r\n";
     }
 
     /**
@@ -95,7 +116,7 @@ class Message {
      * @param info Extra information to be converted to string
      * @return Converted string
      */
-    private String convert_to_header_string(Integer[] info) {
+    private String convert_to_string(Integer[] info) {
         String information = "";
         for(Integer element : info) {
             information += element + " ";
@@ -103,5 +124,43 @@ class Message {
         return information;
     }
 
+    public String getMessage_type() {
+        return message_type;
+    }
 
+    public String getProtocol_version() {
+        return protocol_version;
+    }
+
+    public Integer getServer_id() {
+        return server_id;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public String getChunk_no() {
+        return chunk_no;
+    }
+
+    public void setChunk_no(Integer chunk_no) {
+        this.chunk_no = String.valueOf(chunk_no);
+    }
+
+    public String getReplication_degree() {
+        return replication_degree;
+    }
+
+    public void setReplication_degree(Integer replication_degree) {
+        this.replication_degree = String.valueOf(replication_degree);
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 }

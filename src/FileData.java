@@ -4,39 +4,36 @@ import java.nio.file.Files;
 public class FileData {
 
     /**
-     *
+     * Name of file
      */
     private String filename;
 
     /**
-     *
+     * Object file
      */
     private File file;
 
     /**
-     *
+     * File stream
      */
     private InputStream stream;
 
     /**
-     *
+     * Date of last modification
      */
     private long last_modified;
 
     /**
-     *
+     * Owner of the file
      */
     private String owner;
 
     /**
-     *
+     * Cursor position in the file
      */
     private Integer offset = 0;
 
-    /**
-     *
-     */
-    private Boolean file_ended = false;
+    private Boolean end_of_file = false;
 
     /**
      * Default constructor
@@ -57,7 +54,6 @@ public class FileData {
             e.printStackTrace();
         }
     }
-
 
     public InputStream get_stream() {
         return stream;
@@ -85,7 +81,7 @@ public class FileData {
      */
     public byte[] next_chunk() {
 
-        if (this.file_ended) return null;
+        if (this.end_of_file) return null;
 
         byte[] chunk = new byte[0];
         int bytes_read = 0;
@@ -97,7 +93,7 @@ public class FileData {
 
         this.offset += bytes_read;
 
-        if (bytes_read < 64000) this.file_ended = true;
+        if (bytes_read < 64000) this.end_of_file = true;
 
         return chunk;
     }
