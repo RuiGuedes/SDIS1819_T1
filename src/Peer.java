@@ -3,6 +3,7 @@ import Multicast.MDB;
 import Multicast.MDR;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -119,19 +120,8 @@ public class Peer implements RMI {
     @Override
     public String backup(String filepath, Integer replication_degree) throws IOException {
 
-        FileData filezito = new FileData(filepath);
-
-        // Header
-        String file_id = filezito.getFilename() + filezito.getFile().lastModified();
-        String header_end = "\r\n\r\n"; // <CRLF><CRLF>
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        String sha256hex = bytesToHex(digest.digest(file_id.getBytes(StandardCharsets.UTF_8)));
-        String header = "PUTCHUNK " + PROTOCOL_VERSION + " " + SERVER_ID + " " + sha256hex;
+        FileData file = new FileData(filepath);
+        Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file);
 
         // Socket creation
         InetAddress mdb_group = InetAddress.getByName(MULTICAST.get("MDB")[0]);
@@ -146,13 +136,15 @@ public class Peer implements RMI {
         int bytes_readed;
         int chunk_no = 0;
 
-        DatagramPacket packet;
 
-        while((bytes_readed = filezito.getStream().readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
-            String header_chunk = header + " " + chunk_no + " " + replication_degree + " " + header_end;
 
-            byte[] message = (header_chunk + chunk.toString()).getBytes();
-            packet = new DatagramPacket(message,message.length, mdb_group, mdb_port);
+        while((bytes_readed = file.getStream().readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
+            
+            String full_header = message.get_full_header(new Integer[]{chunk_no, replication_degree});
+
+
+            byte[] messagem = (full_header + chunk.toString()).getBytes();
+            DatagramPacket packet = new DatagramPacket(messagem,messagem.length, mdb_group, mdb_port);
 
             PutChunk task = new PutChunk(MC, MDB);
 
@@ -168,7 +160,7 @@ public class Peer implements RMI {
         }
 
 
-        return "Backup of " + filezito.getFilename() + " has been done with success !";
+        return "Backup of " + file.getFilename() + " has been done with success !";
     }
 
     private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet) throws IOException {
@@ -231,16 +223,6 @@ public class Peer implements RMI {
     @Override
     public String state() throws RemoteException {
         return null;
-    }
-
-    public static String bytesToHex(byte[] hash) {
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
     public static String[] clean_array(String[] list) {
