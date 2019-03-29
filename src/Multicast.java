@@ -48,6 +48,14 @@ public class Multicast {
         return socket;
     }
 
+    public InetAddress getGroup() {
+        return group;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
     public void send_packet(DatagramPacket packet) {
         try {
             this.socket.send(packet);

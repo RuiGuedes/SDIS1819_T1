@@ -123,44 +123,25 @@ public class Peer implements RMI {
         FileData file = new FileData(filepath);
         Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file);
 
-        // Socket creation
-        InetAddress mdb_group = InetAddress.getByName(MULTICAST.get("MDB")[0]);
-        int mdb_port = Integer.parseInt(MULTICAST.get("MDB")[1]);
-        MulticastSocket mdb_socket = create_socket(mdb_port, mdb_group);
-
-        InetAddress mc_group = InetAddress.getByName(MULTICAST.get("MC")[0]);
-        int mc_port = Integer.parseInt(MULTICAST.get("MC")[1]);
-        MulticastSocket mc_socket = create_socket(mc_port, mc_group);
-
-        byte[] chunk = new byte[64000];
-        int bytes_readed;
+        byte[] chunk;
         int chunk_no = 0;
 
-
-
-        while((bytes_readed = file.getStream().readNBytes(chunk,chunk_no*64000, 64000)) >= 0) {
-            
+        while ((chunk = file.next_chunk()) != null) {
             String full_header = message.get_full_header(new Integer[]{chunk_no, replication_degree});
 
-
             byte[] messagem = (full_header + chunk.toString()).getBytes();
-            DatagramPacket packet = new DatagramPacket(messagem,messagem.length, mdb_group, mdb_port);
+            DatagramPacket packet = new DatagramPacket(messagem,messagem.length, MDB.getGroup(), MDB.getPort());
 
             PutChunk task = new PutChunk(MC, MDB);
-
             MDB.getExecuter().execute(task);
 
             //send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
 
             chunk_no++;
-
-            if (bytes_readed < 64000) {
-                break;
-            }
         }
 
 
-        return "Backup of " + file.getFilename() + " has been done with success !";
+        return "Backup of " + file.get_filename() + " has been done with success !";
     }
 
     private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet) throws IOException {

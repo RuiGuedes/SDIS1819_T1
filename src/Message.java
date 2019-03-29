@@ -48,7 +48,7 @@ class Message {
         this.header =   this.message_type + " " +
                         this.protocol_version + " " +
                         this.server_id + " " +
-                        encrypt_file(file.getFileId());
+                        encrypt_file(file.get_file_id());
     }
 
     /**
