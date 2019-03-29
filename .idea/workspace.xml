@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Multicast.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Multicast/MC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Multicast/MC.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Peer/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer/Peer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -18,11 +17,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Peer/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="275" column="12" lean-forward="true" selection-start-line="275" selection-start-column="12" selection-end-line="276" selection-end-column="36" />
+            <state relative-caret-position="-245">
+              <caret line="171" column="110" lean-forward="true" selection-start-line="171" selection-start-column="12" selection-end-line="171" selection-end-column="110" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1074#1092#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Task.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="23" column="13" lean-forward="true" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
+              <folding>
+                <element signature="e#128#129#0" expanded="true" />
+                <element signature="e#156#157#0" expanded="true" />
+                <element signature="e#223#224#0" expanded="true" />
+                <element signature="e#248#249#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -102,6 +116,7 @@
         <option value="$PROJECT_DIR$/src/ReceiverThread/MC.java" />
         <option value="$PROJECT_DIR$/src/Multicast/MDR.java" />
         <option value="$PROJECT_DIR$/src/Peer/sadas.java" />
+        <option value="$PROJECT_DIR$/src/Task.java" />
         <option value="$PROJECT_DIR$/src/Peer/Peer.java" />
         <option value="$PROJECT_DIR$/src/Multicast/MC.java" />
         <option value="$PROJECT_DIR$/src/Multicast.java" />
@@ -153,6 +168,12 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="Peer" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="SDIS1819_T1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SDIS1819_T1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Task.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -162,7 +183,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553853925592" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553853994105" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -241,12 +262,12 @@
       <workItem from="1553634054991" duration="1078000" />
       <workItem from="1553635189060" duration="23857000" />
       <workItem from="1553816680019" duration="4069000" />
-      <workItem from="1553852269991" duration="642000" />
+      <workItem from="1553852269991" duration="1912000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="63505000" />
+    <option name="totallyTimeSpent" value="63633000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -261,7 +282,7 @@
     <frame x="-8" y="0" width="1552" height="832" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14812332" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20402685" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -333,17 +354,7 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Peer/sadas.java" />
-    <entry file="file://$PROJECT_DIR$/src/App/TestApp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="952">
-          <caret line="61" column="34" selection-start-line="61" selection-start-column="34" selection-end-line="61" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Multicast/MDR.java">
+    <entry file="file://$PROJECT_DIR$/src/Multicast/MC.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
           <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
@@ -393,6 +404,29 @@
             <element signature="e#927#928#0" expanded="true" />
             <element signature="e#1007#1008#0" expanded="true" />
             <element signature="e#1036#1037#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Task.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="13" lean-forward="true" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
+          <folding>
+            <element signature="e#128#129#0" expanded="true" />
+            <element signature="e#156#157#0" expanded="true" />
+            <element signature="e#223#224#0" expanded="true" />
+            <element signature="e#248#249#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Peer/Peer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-245">
+          <caret line="171" column="110" lean-forward="true" selection-start-line="171" selection-start-column="12" selection-end-line="171" selection-end-column="110" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -167,6 +167,8 @@ public class Peer implements RMI {
             byte[] message = (header_chunk + chunk.toString()).getBytes();
             packet = new DatagramPacket(message,message.length, mdb_group, mdb_port);
 
+            PutChunk task = new PutChunk(MC, MDB, )
+
             send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
 
             chunk_no++;
@@ -175,12 +177,6 @@ public class Peer implements RMI {
                 break;
             }
         }
-
-
-        // MDB threadpoolexector
-        // Task putChunk
-        // MDB.execute(Task)
-        // Task run() ->
 
 
         return "Backup of " + filename + " has been done with success !";
