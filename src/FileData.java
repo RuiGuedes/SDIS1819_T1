@@ -1,36 +1,104 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 
 public class FileData {
 
+    /**
+     *
+     */
     private String filename;
 
+    /**
+     *
+     */
     private File file;
 
+    /**
+     *
+     */
     private InputStream stream;
 
+    /**
+     *
+     */
+    private long last_modified;
+
+    /**
+     *
+     */
+    private String owner;
+
+    /**
+     *
+     */
+    private Integer offset = 0;
+
+    /**
+     *
+     */
+    private Boolean file_ended = false;
+
+    /**
+     * Default constructor
+     * @param filepath
+     */
     FileData(String filepath) {
-        //TODO Check if is directory or file and initialize all variables
-        this.file = new File(filename);
+        this.file = new File(filepath);
+        this.filename = this.file.getName();
         try {
-            this.stream = new FileInputStream(filename);
+            this.stream = new FileInputStream(this.file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
+        this.last_modified = this.file.lastModified();
+        try {
+            this.owner = String.valueOf(Files.getOwner(file.toPath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public InputStream getStream() {
+
+    public InputStream get_stream() {
         return stream;
     }
 
-    public String getFilename() {
-        return filename;
+    public String get_filename() { return filename; }
+
+    /**
+     * Return String with filename, last_modified and owner
+     * @return
+     */
+    public String get_file_id() {
+        return this.filename + this.last_modified + this.owner;
     }
 
-    public File getFile() {
+    public File get_file() {
         return file;
+    }
+
+    public long get_last_modified() { return last_modified; }
+
+    /**
+     * Read and return the next chunk of the file
+     * @return
+     */
+    public byte[] next_chunk() {
+
+        if (this.file_ended) return null;
+
+        byte[] chunk = new byte[0];
+        int bytes_read = 0;
+        try {
+             bytes_read = this.stream.readNBytes(chunk, this.offset, 64000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.offset += bytes_read;
+
+        if (bytes_read < 64000) this.file_ended = true;
+
+        return chunk;
     }
 }
