@@ -1,13 +1,12 @@
-package ReceiverThread;
+package Multicast;
 
 import Peer.Peer;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 
-public class MDB extends Thread {
+public class MDR extends Thread {
 
     private String address;
 
@@ -20,7 +19,7 @@ public class MDB extends Thread {
      * @param address
      * @param port
      */
-    public MDB(String address, String port) {
+    public MDR(String address, String port) {
         this.address = address;
         this.port = Integer.parseInt(port);
         try {

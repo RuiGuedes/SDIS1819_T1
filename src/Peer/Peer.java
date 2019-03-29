@@ -1,7 +1,8 @@
 package Peer;
 
-import ReceiverThread.MC;
-import ReceiverThread.MDB;
+import Multicast.MC;
+import Multicast.MDB;
+import Multicast.MDR;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -18,10 +19,6 @@ import java.util.*;
 
 
 public class Peer implements RMI {
-
-    // fileID, replication_degree, serverID
-    // ChunkID, Stored's(>= rep_deg),
-
 
     /**
      * Protocol version to be used. Default = vanilla
@@ -43,6 +40,21 @@ public class Peer implements RMI {
      * String[0] - Multicast Address | String[1] - Multicast Port
      */
     private static Map<String, String[]> MULTICAST = new HashMap<String, String[]>();
+
+    /**
+     * Multicast channel used for control messages
+     */
+    private static MC mc_channel;
+
+    /**
+     * Multicast channel used to backup files
+     */
+    private static MDB mdb_channel;
+
+    /**
+     * Multicast channel used to restore files
+     */
+    private static MDR mdr_channel;
 
     /**
      * Default constructor
@@ -72,11 +84,23 @@ public class Peer implements RMI {
         // Initialize remote object
         init_remote_object();
 
-        // Create thread
-        Thread mc = new Thread(new MC(MULTICAST.get("MC")[0],MULTICAST.get("MC")[1]));
-        Thread mdb = new Thread(new MDB(MULTICAST.get("MDB")[0],MULTICAST.get("MDB")[1]));
-        mc.start();
-        mdb.start();
+        // Initializes multicast channels
+        init_multicast_channels();
+    }
+
+    /**
+     * Initializes and starts multicast channels
+     */
+    private static void init_multicast_channels() {
+        // Creates each multicast channel
+        mc_channel = new MC(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
+        mdb_channel = new MDB(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
+        mdr_channel = new MDR(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
+
+        // Starts each multicast channel
+        mc_channel.start();
+        mdb_channel.start();
+        mdr_channel.start();
     }
 
     /**
@@ -151,6 +175,13 @@ public class Peer implements RMI {
                 break;
             }
         }
+
+
+        // MDB threadpoolexector
+        // Task putChunk
+        // MDB.execute(Task)
+        // Task run() ->
+
 
         return "Backup of " + filename + " has been done with success !";
     }

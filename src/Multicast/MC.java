@@ -1,4 +1,4 @@
-package ReceiverThread;
+package Multicast;
 
 import Peer.Peer;
 
@@ -37,6 +37,7 @@ public class MC extends Thread {
         DatagramPacket packet;
 
         while(true) {
+            System.out.println("adasdasdasd");
             byte[] buf = new byte[1000];
             packet = new DatagramPacket(buf, buf.length);
             try {
