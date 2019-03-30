@@ -33,7 +33,7 @@ public class FileData {
      */
     private Integer offset = 0;
 
-    private Boolean end_of_file = false;
+    private Boolean EOF = false;
 
     /**
      * Default constructor
@@ -81,7 +81,7 @@ public class FileData {
      */
     public byte[] next_chunk() {
 
-        if (this.end_of_file) return null;
+        if (this.EOF) return null;
 
         byte[] chunk = new byte[0];
         int bytes_read = 0;
@@ -93,7 +93,7 @@ public class FileData {
 
         this.offset += bytes_read;
 
-        if (bytes_read < 64000) this.end_of_file = true;
+        if (bytes_read < 64000) this.EOF = true;
 
         return chunk;
     }

@@ -30,6 +30,11 @@ class Message {
     private FileData file;
 
     /**
+     * File Id
+     */
+    private String file_id;
+
+    /**
      * Chunk number
      */
     private String chunk_no = null;
@@ -50,26 +55,59 @@ class Message {
         this.server_id = server_id;
         this.message_type = message_type;
         this.protocol_version = protocol_version;
+        this.file_id = encrypt_file(file.get_file_id() + file.get_last_modified());
 
         // Initializes message header
         init_message_header();
     }
 
+    Message(String message_type, String protocol_version, Integer server_id, String file_id, String chunk_no) {
+        // Initializes class variables
+        this.message_type = message_type;
+        this.protocol_version = protocol_version;
+        this.server_id = server_id;
+        this.file_id = file_id;
+        this.chunk_no = chunk_no;
+
+    }
+
     Message(String protocol) {
-        // Decoding of the message and initialization of the respective fields
+        String[] fields = Peer.clean_array(protocol.split(" "));
 
+        this.message_type = fields[0];
+        this.protocol_version = fields[1];
+        this.server_id = Integer.parseInt(fields[2]);
+        this.file_id = fields[3];
 
-        // esta classe devia conter os atributos: chunk_no, replication_degree e body que inicialmente estariam a null
+        if (this.message_type != "DELETE") {
+            this.chunk_no = fields[4];
+        }
+
+        if (this.message_type == "PUTCHUNK") {
+            this.replication_degree = fields[5];
+            // <CRLF><CRLF> = fields[6]
+            this.body = fields[7];
+        }
+
+        if (this.message_type == "CHUNK")
+            this.body = fields[6];
+
+//        PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body>
+//        STORED   <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
+//        GETCHUNK <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
+//        CHUNK    <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF><Body>
+//        DELETE   <Version> <SenderId> <FileId>                            <CRLF><CRLF>
+//        REMOVED  <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
     }
 
     /**
      * Initializes message header
      */
     private void init_message_header() {
-        this.header =   this.message_type + " " +
+        this.header  =  this.message_type + " " +
                         this.protocol_version + " " +
                         this.server_id + " " +
-                        encrypt_file(file.get_file_id() + file.get_last_modified());
+                        this.file_id;
     }
 
     /**
@@ -134,6 +172,10 @@ class Message {
 
     public Integer getServer_id() {
         return server_id;
+    }
+
+    public String getFile_id() {
+        return file_id;
     }
 
     public String getHeader() {

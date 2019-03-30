@@ -179,7 +179,6 @@ public class Peer implements RMI {
     public String restore(String filename) throws RemoteException {
 
         // handle MDR channel when is invoked
-
         // actions needed to handle MDR
 
         return null;
@@ -209,18 +208,5 @@ public class Peer implements RMI {
         }
 
         return cleaned.toArray(new String[0]);
-    }
-
-    public static MulticastSocket create_socket(int port, InetAddress group) {
-        MulticastSocket socket = null;
-
-        try {
-            socket = new MulticastSocket(port);
-            socket.joinGroup(group);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return socket;
     }
 }
