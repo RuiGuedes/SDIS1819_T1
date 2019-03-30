@@ -69,7 +69,7 @@ public class Multicast {
         byte[] buf;
         DatagramPacket packet;
 
-        buf = answer.get_full_header(new Integer[0]).getBytes();
+        buf = answer.get_header().getBytes();
         packet = new DatagramPacket(buf, buf.length, this.group, this.port);
         this.send_packet(packet);
     }

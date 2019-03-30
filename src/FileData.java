@@ -1,5 +1,8 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class FileData {
 
@@ -66,7 +69,7 @@ public class FileData {
      * @return
      */
     public String get_file_id() {
-        return this.filename + this.last_modified + this.owner;
+        return encrypt_file(this.filename + this.last_modified + this.owner);
     }
 
     public File get_file() {
@@ -74,6 +77,36 @@ public class FileData {
     }
 
     public long get_last_modified() { return last_modified; }
+
+    /**
+     * Encrypts fileId using SHA-256
+     * @param file_id FileId
+     * @return Encrypted fileId
+     */
+    private String encrypt_file(String file_id) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return bytesToHex(digest.digest(file_id.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Converts bytes to hexadecimal
+     * @param hash Bytes to be converted
+     * @return Returns converted bytes
+     */
+    private static String bytesToHex(byte[] hash) {
+        StringBuffer hexString = new StringBuffer();
+        for (byte element : hash) {
+            String hex = Integer.toHexString(0xff & element);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
     /**
      * Read and return the next chunk of the file

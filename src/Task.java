@@ -1,4 +1,10 @@
+import java.io.File;
+import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Task {
 
@@ -13,14 +19,59 @@ class PutChunk extends Task implements Runnable {
 
     private Multicast MDB;
 
-    public PutChunk(Multicast MC, Multicast MDB) {
+    private Message message;
+
+    private DatagramPacket packet;
+
+    public PutChunk(Multicast MC, Multicast MDB, Message message, DatagramPacket packet) {
         super(MC);
         this.MDB = MDB;
+        this.message = message;
+        this.packet = packet;
+    }
+
+    public static String[] clean_array(String[] list) {
+        List<String> cleaned = new ArrayList<>();
+
+        for (String s: list) {
+            if (s.length() > 0)
+                cleaned.add(s);
+        }
+
+        return cleaned.toArray(new String[0]);
     }
 
     @Override
     public void run() {
+        Timer timer = new Timer();
 
+        for (int j = 1; j <= 5; j++) {
+            MDB.send_packet(packet);
+            final int[] stored_count = {0};
+
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+
+                    DatagramPacket received_packet = M.receive_packet();
+                    
+                    String answer = received_packet.getData().toString();
+                    String[] fields = answer.split(" ");
+                    fields = clean_array(fields);
+                    if (fields[0] == "STORED" && fields[1] == "1.0" &&
+                            Integer.parseInt(fields[2]) == message.getServer_id() &&
+                            fields[3] == message.getFile_id() &&
+                            Integer.parseInt(fields[4]) == message.getChunk_no() &&
+                            fields[5] == "\r\n\r\n")
+                        stored_count[0]++;
+                }
+            }, j*1000);
+
+            if (stored_count[0] >= message.getReplication_degree())
+                break;
+        }
+
+        timer.cancel();
     }
 }
 
@@ -64,7 +115,7 @@ class Listener extends Task implements Runnable {
             case "PUTCHUNK":
                 // store Chunk
                 // Send STORE message
-                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no());
+                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
                 M2.send_packet(response);
             case "STORED":
                 // Increment stored

@@ -113,67 +113,25 @@ public class Peer implements RMI {
 
     @Override
     public String backup(String filepath, Integer replication_degree) {
-
-        FileData file = new FileData(filepath);
-        Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file);
-
+        // Variables
         byte[] chunk;
         int chunk_no = 0;
+        FileData file = new FileData(filepath);
 
         while ((chunk = file.next_chunk()) != null) {
-            String full_header = message.get_full_header(new Integer[]{chunk_no, replication_degree});
 
-            byte[] messagem = (full_header + chunk.toString()).getBytes();
-            DatagramPacket packet = new DatagramPacket(messagem,messagem.length, MDB.getGroup(), MDB.getPort());
+            Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
-            PutChunk task = new PutChunk(MC, MDB);
+            byte[] data = (message.get_header() + Arrays.toString(chunk)).getBytes();
+            DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
+
+            PutChunk task = new PutChunk(MC, MDB, message, packet);
             MDB.getExecuter().execute(task);
-
-            //send_putchunk(replication_degree, header_end, sha256hex, mdb_socket, mc_socket, chunk_no, packet);
-
-            chunk_no++;
         }
-
 
         return "Backup of " + file.get_filename() + " has been done with success !";
     }
 
-    private void send_putchunk(Integer replication_degree, String header_end, String sha256hex, MulticastSocket mdb_socket, MulticastSocket mc_socket, int chunk_id, DatagramPacket packet) throws IOException {
-        Timer timer = new Timer();
-
-        for (int j = 1; j <= 5; j++) {
-            mdb_socket.send(packet);
-            final int[] stored_count = {0};
-
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    byte[] buf = new byte[1000];
-                    DatagramPacket received_packet = new DatagramPacket(buf, buf.length);
-
-                    try {
-                        mc_socket.receive(received_packet);
-                    } catch (IOException e) {
-                        System.out.println("Receive MC packet STORED exception : " + e.toString());
-                    }
-                    String answer = received_packet.getData().toString();
-                    String[] fields = answer.split(" ");
-                    fields = clean_array(fields);
-                    if (fields[0] == "STORED" && fields[1] == "1.0" &&
-                            Integer.parseInt(fields[2]) == SERVER_ID &&
-                            fields[3] == sha256hex &&
-                            Integer.parseInt(fields[4]) == chunk_id &&
-                            fields[5] == header_end)
-                        stored_count[0]++;
-                }
-            }, j*1000);
-
-            if (stored_count[0] >= replication_degree)
-                break;
-        }
-
-        timer.cancel();
-    }
 
     @Override
     public String restore(String filename) throws RemoteException {
@@ -197,16 +155,5 @@ public class Peer implements RMI {
     @Override
     public String state() throws RemoteException {
         return null;
-    }
-
-    public static String[] clean_array(String[] list) {
-        List<String> cleaned = new ArrayList<>();
-
-        for (String s: list) {
-            if (s.length() > 0)
-                cleaned.add(s);
-        }
-
-        return cleaned.toArray(new String[0]);
     }
 }
