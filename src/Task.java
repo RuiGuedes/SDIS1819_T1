@@ -26,38 +26,46 @@ class PutChunk extends Task implements Runnable {
 
 class Listener extends Task implements Runnable {
 
+    /**
+     * Multicast channel to send to: MC or MDB
+     */
     private Multicast M2;
 
-    private String channel;
+    /**
+     * Multicast used for restore
+     */
+    private Multicast MDR;
 
-    public Listener(Multicast M1, Multicast M2, String channel) {
+    /**
+     * Constructor of Listener class
+     * @param M1 Multicast channel to listen to: MC or MDB
+     * @param M2 Multicast channel to send to: MC or MDB
+     * @param MDR Multicast used for restore
+     */
+    public Listener(Multicast M1, Multicast M2, Multicast MDR) {
         super(M1);
         this.M2 = M2;
-        this.channel = channel;
+        this.MDR = MDR;
     }
 
     @Override
     public void run() {
-        DatagramPacket packet;
-
         while(true) {
-            packet = M.receive_packet();
+            DatagramPacket packet = M.receive_packet();
 
             Message message = new Message(packet.getData().toString());
             decrypt_message(message);
         }
-
     }
 
     private void decrypt_message(Message message) {
-        Message answer;
 
         switch (message.getMessage_type()) {
             case "PUTCHUNK":
                 // store Chunk
                 // Send STORE message
-                answer = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no());
-                send_answer(answer);
+                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no());
+                M2.send_packet(response);
             case "STORED":
                 // Increment stored
             case "GETCHUNK":
@@ -76,14 +84,4 @@ class Listener extends Task implements Runnable {
         }
     }
 
-    // se calhar pode ser a send_packet da classe multicast a fazer isto
-    private void send_answer(Message answer) {
-
-        byte[] buf;
-        DatagramPacket packet;
-
-        buf = answer.get_full_header(new Integer[0]).getBytes();
-        packet = new DatagramPacket(buf, buf.length, M2.getGroup(), M2.getPort());
-        M2.send_packet(packet);
-    }
 }

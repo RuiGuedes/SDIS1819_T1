@@ -64,6 +64,16 @@ public class Multicast {
         }
     }
 
+    public void send_packet(Message answer) {
+
+        byte[] buf;
+        DatagramPacket packet;
+
+        buf = answer.get_full_header(new Integer[0]).getBytes();
+        packet = new DatagramPacket(buf, buf.length, this.group, this.port);
+        this.send_packet(packet);
+    }
+
     public DatagramPacket receive_packet() {
         byte[] buf = new byte[PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
