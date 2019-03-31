@@ -48,6 +48,11 @@ public class Peer implements RMI {
     private static Multicast MDR;
 
     /**
+     * Storage class
+     */
+    private static Storage storage;
+
+    /**
      * Default constructor
      */
     private Peer() {}
@@ -71,6 +76,9 @@ public class Peer implements RMI {
         MULTICAST.put("MC", args[3].split(":", -1));
         MULTICAST.put("MDB", args[4].split(":", -1));
         MULTICAST.put("MDR", args[5].split(":", -1));
+
+        // Initializes storage
+        storage = new Storage(SERVER_ID);
 
         // Initialize remote object
         init_remote_object();

@@ -31,51 +31,76 @@ public class Storage {
     private File local_storage;
 
     /**
-     * Local space to storage
+     * Local space to storage in bytes
      */
     private long space;
 
     Storage(Integer server_id) {
         if (Files.exists(Paths.get("peer" + server_id)))
-            open_storage(server_id);
+            load_storage(server_id);
         else
-            create_storage_structure(server_id);
-
+            create_storage(server_id);
     }
 
-    private void create_storage_structure(Integer server_id) {
-        this.root = new File("peer" + server_id);
-        this.root.mkdirs();
-
-        this.backup = new File(this.root, "backup");
-        this.backup.mkdirs();
-
-        this.restore = new File(this.root, "restore");
-        this.restore.mkdirs();
-
-        this.info = new File(this.root, "info");
-        this.info.mkdirs();
-
-        this.local_storage = new File(this.root, "local_storage.txt");
-
-        this.space = this.root.getFreeSpace();
-
-        try {
-            new FileOutputStream(this.local_storage).write(String.valueOf(this.space).getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void open_storage(Integer server_id) {
+    /**
+     * Loads current storage information
+     * @param server_id Server identifier
+     */
+    private void load_storage(Integer server_id) {
         this.root = new File("peer" + server_id);
         this.backup = new File(this.root, "backup");
         this.restore = new File(this.root, "restore");
         this.local_storage = new File(this.root, "local_storage.txt");
         this.info = new File(this.root,"info");
+        this.read_local_storage();
+    }
 
+    /**
+     * Creates storage structure for the respective server
+     * @param server_id Server identifier
+     */
+    private void create_storage(Integer server_id) {
+        this.root = new File("peer" + server_id); this.root.mkdirs();
+        this.backup = new File(this.root, "backup"); this.backup.mkdirs();
+        this.restore = new File(this.root, "restore"); this.restore.mkdirs();
+        this.info = new File(this.root, "info"); this.info.mkdirs();
+        this.local_storage = new File(this.root, "local_storage.txt");
+        this.space = this.root.getFreeSpace();
+        this.write_local_storage(-1);
+    }
+
+    /**
+     * Reads peer local storage
+     */
+    private void read_local_storage() {
         try {
-            this.space = new FileReader(this.local_storage).read();
+            // Opens file, reads local storage and closes file
+            BufferedReader file_reader = new BufferedReader(new FileReader(this.local_storage));
+            this.space = Long.parseLong(file_reader.readLine());
+            file_reader.close();
+
+            // Checks if the current local system running the peer has lower memory than required
+            if(this.space > this.root.getFreeSpace())
+                this.space = this.root.getFreeSpace();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Writes local storage to its respective file
+     * @param new_local_storage Peer new local storage value. If value equals -1 it saves host free disk space
+     */
+    private void write_local_storage(long new_local_storage) {
+        try {
+            // Opens file, writes respective content and closes it
+            FileWriter file_writer = new FileWriter(this.local_storage);
+            if(new_local_storage == 1)
+                file_writer.write(String.valueOf(this.space));
+            else
+                file_writer.write(String.valueOf(new_local_storage));
+            file_writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
