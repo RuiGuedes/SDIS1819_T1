@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/peer1/local_storage.txt" beforeDir="false" afterPath="$PROJECT_DIR$/peer1/local_storage.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,8 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Task.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1156">
-              <caret line="72" column="36" selection-start-line="72" selection-start-column="36" selection-end-line="72" selection-end-column="36" />
+            <state relative-caret-position="476">
+              <caret line="100" column="123" selection-start-line="100" selection-start-column="123" selection-end-line="100" selection-end-column="123" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -52,8 +48,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Storage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="427">
-              <caret line="73" column="7" lean-forward="true" selection-start-line="73" selection-start-column="7" selection-end-line="73" selection-end-column="7" />
+            <state relative-caret-position="291">
+              <caret line="200" column="54" lean-forward="true" selection-start-line="200" selection-start-column="54" selection-end-line="200" selection-end-column="54" />
             </state>
           </provider>
         </entry>
@@ -83,7 +79,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Multicast.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
+            <state relative-caret-position="17">
               <caret line="21" column="40" selection-start-line="21" selection-start-column="40" selection-end-line="21" selection-end-column="40" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -145,10 +141,10 @@
         <option value="$PROJECT_DIR$/src/FileData.java" />
         <option value="$PROJECT_DIR$/src/Message.java" />
         <option value="$PROJECT_DIR$/src/Multicast.java" />
-        <option value="$PROJECT_DIR$/src/Task.java" />
         <option value="$PROJECT_DIR$/peer1/restore/as" />
         <option value="$PROJECT_DIR$/peer1/backup/as/1" />
         <option value="$PROJECT_DIR$/src/Peer.java" />
+        <option value="$PROJECT_DIR$/src/Task.java" />
         <option value="$PROJECT_DIR$/src/Storage.java" />
       </list>
     </option>
@@ -246,7 +242,7 @@
       </method>
     </configuration>
     <configuration name="TestApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="App.TestApp" />
+      <option name="MAIN_CLASS_NAME" value="TestApp" />
       <module name="SDIS1819_T1" />
       <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; BACKUP &quot;FileTest.txt&quot; 6" />
       <method v="2">
@@ -294,12 +290,12 @@
       <workItem from="1553852269991" duration="1912000" />
       <workItem from="1553957607961" duration="1948000" />
       <workItem from="1553969025408" duration="5259000" />
-      <workItem from="1554044620171" duration="1699000" />
+      <workItem from="1554044620171" duration="6695000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="83121000" />
+    <option name="totallyTimeSpent" value="88117000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -417,16 +413,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Task.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1156">
-          <caret line="72" column="36" selection-start-line="72" selection-start-column="36" selection-end-line="72" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Message.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1751">
@@ -441,16 +427,6 @@
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1555#1556#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="21" column="40" selection-start-line="21" selection-start-column="40" selection-end-line="21" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -472,10 +448,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="21" column="40" selection-start-line="21" selection-start-column="40" selection-end-line="21" selection-end-column="40" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Task.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="100" column="123" selection-start-line="100" selection-start-column="123" selection-end-line="100" selection-end-column="123" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Storage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="73" column="7" lean-forward="true" selection-start-line="73" selection-start-column="7" selection-end-line="73" selection-end-column="7" />
+        <state relative-caret-position="291">
+          <caret line="200" column="54" lean-forward="true" selection-start-line="200" selection-start-column="54" selection-end-line="200" selection-end-column="54" />
         </state>
       </provider>
     </entry>

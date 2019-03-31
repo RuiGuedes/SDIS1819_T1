@@ -6,24 +6,24 @@ import java.nio.file.Paths;
 public class Storage {
 
     /**
-     * Root directory (peerX)
+     * Root directory [peerX]
      */
     private File root;
 
     /**
      * Backup directory
      */
-    private File backup;
+    private static File backup;
 
     /**
      * Restore directory
      */
-    private File restore;
+    private static File restore;
 
     /**
      * Directory of information about confirm messages
      */
-    private File info;
+    private static File info;
 
     /**
      * Local storage file
@@ -48,10 +48,10 @@ public class Storage {
      */
     private void load_storage(Integer server_id) {
         this.root = new File("peer" + server_id);
-        this.backup = new File(this.root, "backup");
-        this.restore = new File(this.root, "restore");
+        backup = new File(this.root, "backup");
+        restore = new File(this.root, "restore");
+        info = new File(this.root,"info");
         this.local_storage = new File(this.root, "local_storage.txt");
-        this.info = new File(this.root,"info");
         this.read_local_storage();
     }
 
@@ -61,9 +61,9 @@ public class Storage {
      */
     private void create_storage(Integer server_id) {
         this.root = new File("peer" + server_id); this.root.mkdirs();
-        this.backup = new File(this.root, "backup"); this.backup.mkdirs();
-        this.restore = new File(this.root, "restore"); this.restore.mkdirs();
-        this.info = new File(this.root, "info"); this.info.mkdirs();
+        backup = new File(this.root, "backup"); backup.mkdirs();
+        restore = new File(this.root, "restore"); restore.mkdirs();
+        info = new File(this.root, "info"); info.mkdirs();
         this.local_storage = new File(this.root, "local_storage.txt");
         this.space = this.root.getFreeSpace();
         this.write_local_storage(-1);
@@ -95,74 +95,111 @@ public class Storage {
     private void write_local_storage(long new_local_storage) {
         try {
             // Opens file, writes respective content and closes it
-            FileWriter file_writer = new FileWriter(this.local_storage);
-            if(new_local_storage == 1)
-                file_writer.write(String.valueOf(this.space));
-            else
-                file_writer.write(String.valueOf(new_local_storage));
-            file_writer.close();
+            synchronized (this.local_storage) {
+                BufferedWriter file_writer = new BufferedWriter(new FileWriter(this.local_storage));
+                if(new_local_storage == -1)
+                    file_writer.write(String.valueOf(this.space));
+                else
+                    file_writer.write(String.valueOf(new_local_storage));
+                file_writer.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Store num confirm message
-    public void store_count_messages(String file_id, Integer chunk_no, Integer count) {
-        File file_directory = new File(this.info, file_id);
-
-        if (!file_directory.exists())
-            file_directory.mkdirs();
-        write_in_chunk_file(file_directory, chunk_no, String.valueOf(count));
-    }
-
-    // Store Chunk
-    public void store_chunk(String file_id, Integer chunk_no, String chunk) {
-        File file_directory = new File(this.backup, file_id);
-
-        if (!file_directory.exists())
-            file_directory.mkdirs();
-        write_in_chunk_file(file_directory, chunk_no, chunk);
-    }
-
-    private void write_in_chunk_file(File file_directory, Integer chunk_no, String to_store) {
-        File chunk_file = new File(file_directory, String.valueOf(chunk_no));
-
+    /**
+     * Writes data to a certain file
+     * @param file File where data will be stored
+     * @param data Data to be written
+     */
+    static void write_to_file(File file, String data) {
         try {
-            chunk_file.createNewFile();
-            new FileWriter(chunk_file).write(to_store);
+            // Opens file, writes its respective content and closes it
+            synchronized (file) {
+                FileWriter file_writer = new FileWriter(file);
+                file_writer.write(data);
+                file_writer.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Read Chunk if exists
-    public String read_chunk(String file_id, Integer chunk_no) {
-        Path path = Paths.get(this.backup.getPath(), file_id, String.valueOf(chunk_no));
-        byte[] chunk = new byte[0];
+    /**
+     * Reads data from a file
+     * @param file File where data will be read
+     * @return File data
+     */
+    static String read_from_file(File file) {
+        StringBuilder data = new StringBuilder();
+        try {
+            BufferedReader file_reader = new BufferedReader(new FileReader(file));
+
+            String curr_line;
+            while ((curr_line = file_reader.readLine()) != null) {
+                data.append(curr_line);
+            }
+
+            file_reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data.toString();
+    }
+
+    /**
+     * Stores information about the replication degree of a certain chunk of file
+     * @param file_id File identifier
+     * @param chunk_no Chunk identifier
+     * @param replication_degree Desired replication degree
+     */
+    static void store_count_messages(String file_id, Integer chunk_no, Integer replication_degree) {
+        File directory = new File(info, file_id);
+        int curr_replication_degree = 1;
+
+        if (!directory.exists())
+            directory.mkdirs();
+        else
+            curr_replication_degree = Integer.valueOf(read_from_file(new File(directory, String.valueOf(chunk_no))).split("/")[0]) + 1;
+
+        write_to_file(new File(directory, String.valueOf(chunk_no)), curr_replication_degree + "/" + replication_degree);
+    }
+
+    /**
+     * Stores chunk content in backup directory
+     * @param file_id File identifier
+     * @param chunk_no Chunk identifier
+     * @param chunk Chunk content
+     */
+    static void store_chunk(String file_id, Integer chunk_no, String chunk) {
+        File directory = new File(backup, file_id);
+
+        if (!directory.exists())
+            directory.mkdirs();
+
+        write_to_file(new File(directory, String.valueOf(chunk_no)), chunk);
+    }
+
+    /**
+     * Reads chunk content if exists
+     * @param file_id File identifier
+     * @param chunk_no Chunk identifier
+     * @return Chunk content
+     */
+    static String read_chunk(String file_id, Integer chunk_no) {
+        Path path = Paths.get(backup.getPath(), file_id, String.valueOf(chunk_no));
 
         if (!Files.exists(path))
             return null;
-
-        try {
-            FileInputStream chunk_file = new FileInputStream(path.toFile());
-            chunk = chunk_file.readAllBytes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String chunk_str = "";
-        try {
-             chunk_str = new String(chunk,"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return chunk_str;
+        else
+            return read_from_file(path.toFile());
     }
 
+
     // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)
-    public void restore_file(String filename, String[] chunks) {
-        File restored_file = new File(this.restore,filename);
+    static void restore_file(String filename, String[] chunks) {
+        File restored_file = new File(restore,filename);
         try {
             FileWriter file = new FileWriter(restored_file);
 
@@ -174,21 +211,5 @@ public class Storage {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        Storage s = new Storage(1);
-        System.out.println("s created");
-
-        s.store_chunk("as",1,"pppppp");
-        System.out.println("chunk stored");
-
-        s.store_count_messages("as",1,4);
-        System.out.println("count stored");
-
-        System.out.println("chunk " + s.read_chunk("as", 1));
-
-        s.restore_file("as", new String[]{"asdc", "ppsds"});
-        System.out.println("file restored");
     }
 }

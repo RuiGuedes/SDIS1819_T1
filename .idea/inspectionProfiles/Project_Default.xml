@@ -7,5 +7,6 @@
     </inspection_tool>
     <inspection_tool class="InfiniteLoopStatement" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StringBufferReplaceableByStringBuilder" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SynchronizeOnNonFinalField" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>

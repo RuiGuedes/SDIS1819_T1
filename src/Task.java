@@ -84,10 +84,8 @@ class Listener extends Task implements Runnable {
     @Override
     public void run() {
         while(true) {
-            DatagramPacket packet = M.receive_packet();
-
-            Message message = new Message(Arrays.toString(packet.getData()));
-            decrypt_message(message);
+            // TODO Make listener channel execute thread to decrypt message
+            decrypt_message(new Message(Arrays.toString(M.receive_packet().getData())));
         }
     }
 
@@ -100,7 +98,7 @@ class Listener extends Task implements Runnable {
                 Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
                 M2.send_packet(response);
             case "STORED":
-                // Stores on file information about store
+                Storage.store_count_messages(message.getFile_id(), message.getChunk_no(), message.getReplication_degree());
             case "GETCHUNK":
                 // Check if you have the chunk  **
                 // If so, send chunk

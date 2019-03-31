@@ -1,5 +1,3 @@
-package App;
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -39,7 +37,7 @@ public class TestApp {
     public static <string> void main(String[] args) throws RemoteException, NotBoundException {
         // Check arguments
         if (args.length < 2) {
-            System.out.println("Usage: java App.TestApp <peer_ap> <operation> <opnd_1> [<opnd_2>]");
+            System.out.println("Usage: java TestApp <peer_ap> <operation> <opnd_1> [<opnd_2>]");
             return;
         }
 
@@ -88,7 +86,7 @@ public class TestApp {
 //                    System.out.println("Such operation is not available: " + OPERATION + " !");
 //            }
 //        } catch (Exception e) {
-//            System.err.println("App.TestApp exception: " + e.toString());
+//            System.err.println("TestApp exception: " + e.toString());
 //            e.printStackTrace();
 //        }
 //    }
