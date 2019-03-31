@@ -63,17 +63,17 @@ class Message {
         this.server_id = Integer.parseInt(fields[2]);
         this.file_id = fields[3];
 
-        if (this.message_type != "DELETE") {
+        if (!this.message_type.equals("DELETE")) {
             this.chunk_no = Integer.parseInt(fields[4]);
         }
 
-        if (this.message_type == "PUTCHUNK") {
+        if (this.message_type.equals("PUTCHUNK")) {
             this.replication_degree = Integer.parseInt(fields[5]);
             // <CRLF><CRLF> = fields[6]
             this.body = fields[7];
         }
 
-        if (this.message_type == "CHUNK")
+        if (this.message_type.equals("CHUNK"))
             this.body = fields[6];
 
 //        PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body>
