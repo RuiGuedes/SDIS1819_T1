@@ -1,7 +1,5 @@
 package App;
 
-import RMI;
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -27,7 +25,7 @@ public class TestApp {
     /**
      * RMI object used to communicate with peers
      */
-    private static RMI STUB;
+//    private static RMI STUB;
 
     /**
      * Default Constructor
@@ -59,39 +57,39 @@ public class TestApp {
 
         // Get registry in order to find remote object to establish communication
         Registry registry = LocateRegistry.getRegistry(null);
-        STUB = (RMI) registry.lookup(STUB_NAME);
+//        STUB = (RMI) registry.lookup(STUB_NAME);
 
        //Initialize operation
-        init_operation();
+//        init_operation();
     }
 
     /**
      * Initialize operation having into account the information passed by as parameter
      */
-    private static void init_operation() {
-        try {
-            switch(OPERATION) {
-                case "BACKUP":
-                    System.out.println(STUB.backup(OPND_1, OPND_2));
-                    break;
-                case "RESTORE":
-                    STUB.restore(OPND_1);
-                    break;
-                case "DELETE":
-                    STUB.delete(OPND_1);
-                    break;
-                case "RECLAIM":
-                    STUB.reclaim(Integer.parseInt(OPND_1));
-                    break;
-                case "STATE":
-                    STUB.state();
-                    break;
-                default:
-                    System.out.println("Such operation is not available: " + OPERATION + " !");
-            }
-        } catch (Exception e) {
-            System.err.println("App.TestApp exception: " + e.toString());
-            e.printStackTrace();
-        }
-    }
+//    private static void init_operation() {
+//        try {
+//            switch(OPERATION) {
+//                case "BACKUP":
+//                    System.out.println(STUB.backup(OPND_1, OPND_2));
+//                    break;
+//                case "RESTORE":
+//                    STUB.restore(OPND_1);
+//                    break;
+//                case "DELETE":
+//                    STUB.delete(OPND_1);
+//                    break;
+//                case "RECLAIM":
+//                    STUB.reclaim(Integer.parseInt(OPND_1));
+//                    break;
+//                case "STATE":
+//                    STUB.state();
+//                    break;
+//                default:
+//                    System.out.println("Such operation is not available: " + OPERATION + " !");
+//            }
+//        } catch (Exception e) {
+//            System.err.println("App.TestApp exception: " + e.toString());
+//            e.printStackTrace();
+//        }
+//    }
 }

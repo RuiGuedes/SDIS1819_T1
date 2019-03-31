@@ -86,7 +86,7 @@ public class Storage {
     // Store num confirm message
     public void store_count_messages(String file_id, Integer chunk_no, Integer count) {
         File file_directory = new File(this.info, file_id);
-        System.out.println("1");
+
         if (!file_directory.exists())
             file_directory.mkdirs();
         write_in_chunk_file(file_directory, chunk_no, String.valueOf(count));
@@ -95,7 +95,7 @@ public class Storage {
     // Store Chunk
     public void store_chunk(String file_id, Integer chunk_no, String chunk) {
         File file_directory = new File(this.backup, file_id);
-        System.out.println("1");
+
         if (!file_directory.exists())
             file_directory.mkdirs();
         write_in_chunk_file(file_directory, chunk_no, chunk);
@@ -103,12 +103,10 @@ public class Storage {
 
     private void write_in_chunk_file(File file_directory, Integer chunk_no, String to_store) {
         File chunk_file = new File(file_directory, String.valueOf(chunk_no));
-        System.out.println("2");
+
         try {
             chunk_file.createNewFile();
-            System.out.println("2");
             new FileOutputStream(chunk_file).write(to_store.getBytes());
-            System.out.println("3");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,7 +122,7 @@ public class Storage {
 
         try {
             FileInputStream chunk_file = new FileInputStream(path.toFile());
-            chunk_file.read(chunk);
+            chunk = chunk_file.readAllBytes();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -167,9 +165,7 @@ public class Storage {
 
         System.out.println("chunk " + s.read_chunk("as", 1));
 
-
         s.restore_file("as", new String[]{"asdc", "ppsds"});
         System.out.println("file restored");
-
     }
 }
