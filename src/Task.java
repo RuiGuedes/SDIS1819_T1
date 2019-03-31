@@ -1,13 +1,82 @@
 import java.net.DatagramPacket;
-import java.util.*;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 class Task {
 
+    /**
+     * Channel associated to the task
+     */
     Multicast M;
 
+    /**
+     * Task constructor
+     * @param M Channel associated to the task
+     */
     Task(Multicast M) {
         this.M = M;
+    }
+}
+
+class Listener extends Task implements Runnable {
+
+    /**
+     * Constructor of Listener class
+     * @param M Multicast channel to listen to
+     */
+    Listener(Multicast M) {
+        super(M);
+    }
+
+    @Override
+    public void run() {
+        while(true) {
+            Message message = new Message(Arrays.toString(M.receive_packet().getData()));
+            M.getExecuter().execute(new DecryptMessage(message));
+        }
+    }
+}
+
+class DecryptMessage implements Runnable {
+
+    /**
+     * Message to be decrypted
+     */
+    private Message message;
+
+    /**
+     * Decrypt message constructor
+     * @param message Message to be decrypted
+     */
+    DecryptMessage(Message message) {
+        this.message = message;
+    }
+
+    @Override
+    public void run() {
+        switch (message.getMessage_type()) {
+            case "PUTCHUNK":
+                // CHECK IF PEER IS NOT THE ONE SENDING PUT CHUNK !
+                // store Chunk
+                // Send STORE message
+                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
+                Peer.getMC().send_packet(response);
+            case "STORED":
+                Storage.store_count_messages(message.getFile_id(), message.getChunk_no(), message.getReplication_degree());
+            case "GETCHUNK":
+                // Check if you have the chunk  **
+                // If so, send chunk
+            case "CHUNK":
+                // Save the chunk
+            case "DELETE":
+                // Check if you have the chunk  **
+                // If so, delete chunk
+            case "REMOVED":
+                // Check if you have the chunk  **
+                // Decrease count replication degree
+            default:
+                System.out.println("Invalid message type: " + message.getMessage_type());
+        }
     }
 }
 
@@ -24,17 +93,6 @@ class PutChunk extends Task implements Runnable {
         this.MDB = MDB;
         this.message = message;
         this.packet = packet;
-    }
-
-    static String[] clean_array(String[] list) {
-        List<String> cleaned = new ArrayList<>();
-
-        for (String s: list) {
-            if (s.length() > 0)
-                cleaned.add(s);
-        }
-
-        return cleaned.toArray(new String[0]);
     }
 
     @Override
@@ -55,64 +113,4 @@ class PutChunk extends Task implements Runnable {
                 break;
         }
     }
-}
-
-class Listener extends Task implements Runnable {
-
-    /**
-     * Multicast channel to send to: MC or MDB
-     */
-    private Multicast M2;
-
-    /**
-     * Multicast used for restore
-     */
-    private Multicast MDR;
-
-    /**
-     * Constructor of Listener class
-     * @param M1 Multicast channel to listen to: MC or MDB
-     * @param M2 Multicast channel to send to: MC or MDB
-     * @param MDR Multicast used for restore
-     */
-    Listener(Multicast M1, Multicast M2, Multicast MDR) {
-        super(M1);
-        this.M2 = M2;
-        this.MDR = MDR;
-    }
-
-    @Override
-    public void run() {
-        while(true) {
-            // TODO Make listener channel execute thread to decrypt message
-            decrypt_message(new Message(Arrays.toString(M.receive_packet().getData())));
-        }
-    }
-
-    private void decrypt_message(Message message) {
-        switch (message.getMessage_type()) {
-            case "PUTCHUNK":
-                // CHECK IF PEER IS NOT THE ONE SENDING PUT CHUNK !
-                // store Chunk
-                // Send STORE message
-                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
-                M2.send_packet(response);
-            case "STORED":
-                Storage.store_count_messages(message.getFile_id(), message.getChunk_no(), message.getReplication_degree());
-            case "GETCHUNK":
-                // Check if you have the chunk  **
-                // If so, send chunk
-            case "CHUNK":
-                // Save the chunk
-            case "DELETE":
-                // Check if you have the chunk  **
-                // If so, delete chunk
-            case "REMOVED":
-                // Check if you have the chunk  **
-                // Decrease count replication degree
-            default:
-                System.out.println("Invalid message type: " + message.getMessage_type());
-        }
-    }
-
 }

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 
 class Message {
 
@@ -56,7 +58,7 @@ class Message {
     }
 
     Message(String protocol) {
-        String[] fields = PutChunk.clean_array(protocol.split(" "));
+        String[] fields = clean_array(protocol.split(" "));
 
         this.message_type = fields[0];
         this.protocol_version = fields[1];
@@ -83,6 +85,19 @@ class Message {
 //        DELETE   <Version> <SenderId> <FileId>                            <CRLF><CRLF>
 //        REMOVED  <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
     }
+
+
+    static String[] clean_array(String[] list) {
+        List<String> cleaned = new ArrayList<>();
+
+        for (String s: list) {
+            if (s.length() > 0)
+                cleaned.add(s);
+        }
+
+        return cleaned.toArray(new String[0]);
+    }
+
 
     /**
      * Initializes message header

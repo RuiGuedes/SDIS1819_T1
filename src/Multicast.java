@@ -2,14 +2,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class Multicast {
 
     public static Integer PACKET_SIZE = 65000;
+
+    private String name;
 
     private String address;
 
@@ -26,7 +26,8 @@ public class Multicast {
      * @param address
      * @param port
      */
-    public Multicast(String address, String port)  {
+    public Multicast(String name, String address, String port)  {
+        this.name = name;
         this.address = address;
         this.port = Integer.parseInt(port);
 
@@ -55,6 +56,10 @@ public class Multicast {
 
     public Integer getPort() {
         return port;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void send_packet(DatagramPacket packet) {

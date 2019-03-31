@@ -112,13 +112,45 @@ public class Peer implements RMI {
      */
     private static void init_multicast_channels() {
         // Creates each multicast channel
-        MC = new Multicast(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
-        MDB = new Multicast(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
-        MDR = new Multicast(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
+        MC = new Multicast("MC", MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
+        MDB = new Multicast("MDB", MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
+        MDR = new Multicast("MDR", MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
 
         // Starts listening channels: MC & MDB
-        MC.getExecuter().execute(new Listener(MC, MDB, MDR));
-        MDB.getExecuter().execute(new Listener(MDB, MC, MDR));
+        MC.getExecuter().execute(new Listener(MC));
+        MDB.getExecuter().execute(new Listener(MDB));
+    }
+
+    /**
+     * Retrieves MC multicast channel
+     * @return Returns MC multicast channel
+     */
+    public static Multicast getMC() {
+        return MC;
+    }
+
+    /**
+     * Retrieves MDB multicast channel
+     * @return Returns MDB multicast channel
+     */
+    public static Multicast getMDB() {
+        return MDB;
+    }
+
+    /**
+     * Retrieves MDR multicast channel
+     * @return Returns MDR multicast channel
+     */
+    public static Multicast getMDR() {
+        return MDR;
+    }
+
+    /**
+     * Get peer storage structure
+     * @return Storage class
+     */
+    public static Storage getStorage() {
+        return storage;
     }
 
     @Override
