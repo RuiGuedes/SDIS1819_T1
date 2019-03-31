@@ -36,9 +36,7 @@ public class Storage {
     private long space;
 
     Storage(Integer server_id) {
-        Path path = Paths.get("peer" + server_id);
-
-        if (Files.exists(path))
+        if (Files.exists(Paths.get("peer" + server_id)))
             open_storage(server_id);
         else
             create_storage_structure(server_id);
@@ -106,7 +104,7 @@ public class Storage {
 
         try {
             chunk_file.createNewFile();
-            new FileOutputStream(chunk_file).write(to_store.getBytes());
+            new FileWriter(chunk_file).write(to_store);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,14 +138,14 @@ public class Storage {
     // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)
     public void restore_file(String filename, String[] chunks) {
         File restored_file = new File(this.restore,filename);
-
         try {
             FileWriter file = new FileWriter(restored_file);
-            file.write("");
 
             for (int i = 0; i< chunks.length ; i++) {
-                file.append(chunks[i]);
+                file.write(chunks[i]);
             }
+            file.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
