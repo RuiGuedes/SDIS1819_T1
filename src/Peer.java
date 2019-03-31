@@ -100,7 +100,7 @@ public class Peer implements RMI {
     }
 
     /**
-     * Initializes multicast channels
+     * Initializes multicast channels and starts listening MC & MDB
      */
     private static void init_multicast_channels() {
         // Creates each multicast channel
@@ -108,7 +108,9 @@ public class Peer implements RMI {
         MDB = new Multicast(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
         MDR = new Multicast(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
 
-
+        // Starts listening channels: MC & MDB
+        MC.getExecuter().execute(new Listener(MC, MDB, MDR));
+        MDB.getExecuter().execute(new Listener(MDB, MC, MDR));
     }
 
     @Override
@@ -119,14 +121,12 @@ public class Peer implements RMI {
         FileData file = new FileData(filepath);
 
         while ((chunk = file.next_chunk()) != null) {
-
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
             byte[] data = (message.get_header() + Arrays.toString(chunk)).getBytes();
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
 
-            PutChunk task = new PutChunk(MC, MDB, message, packet);
-            MDB.getExecuter().execute(task);
+            MDB.getExecuter().execute(new PutChunk(MC, MDB, message, packet));
         }
 
         return "Backup of " + file.get_filename() + " has been done with success !";

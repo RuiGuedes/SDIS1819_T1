@@ -1,16 +1,12 @@
-import java.io.File;
-import java.io.IOException;
 import java.net.DatagramPacket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
-public class Task {
+class Task {
 
-    protected Multicast M;
+    Multicast M;
 
-    public Task(Multicast M) {
+    Task(Multicast M) {
         this.M = M;
     }
 }
@@ -23,14 +19,14 @@ class PutChunk extends Task implements Runnable {
 
     private DatagramPacket packet;
 
-    public PutChunk(Multicast MC, Multicast MDB, Message message, DatagramPacket packet) {
+    PutChunk(Multicast MC, Multicast MDB, Message message, DatagramPacket packet) {
         super(MC);
         this.MDB = MDB;
         this.message = message;
         this.packet = packet;
     }
 
-    public static String[] clean_array(String[] list) {
+    static String[] clean_array(String[] list) {
         List<String> cleaned = new ArrayList<>();
 
         for (String s: list) {
@@ -43,35 +39,21 @@ class PutChunk extends Task implements Runnable {
 
     @Override
     public void run() {
-        Timer timer = new Timer();
+        int[] waiting_time = {1, 2, 4, 8, 16};
 
-        for (int j = 1; j <= 5; j++) {
+        for (int i = 0; i < 5; i++) {
             MDB.send_packet(packet);
-            final int[] stored_count = {0};
 
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
+            try {
+                TimeUnit.SECONDS.sleep(waiting_time[i]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-                    DatagramPacket received_packet = M.receive_packet();
-                    
-                    String answer = received_packet.getData().toString();
-                    String[] fields = answer.split(" ");
-                    fields = clean_array(fields);
-                    if (fields[0] == "STORED" && fields[1] == "1.0" &&
-                            Integer.parseInt(fields[2]) == message.getServer_id() &&
-                            fields[3] == message.getFile_id() &&
-                            Integer.parseInt(fields[4]) == message.getChunk_no() &&
-                            fields[5] == "\r\n\r\n")
-                        stored_count[0]++;
-                }
-            }, j*1000);
-
-            if (stored_count[0] >= message.getReplication_degree())
+            // Substitute 1 for function responsible for reading file
+            if (1 >= message.getReplication_degree())
                 break;
         }
-
-        timer.cancel();
     }
 }
 
@@ -93,7 +75,7 @@ class Listener extends Task implements Runnable {
      * @param M2 Multicast channel to send to: MC or MDB
      * @param MDR Multicast used for restore
      */
-    public Listener(Multicast M1, Multicast M2, Multicast MDR) {
+    Listener(Multicast M1, Multicast M2, Multicast MDR) {
         super(M1);
         this.M2 = M2;
         this.MDR = MDR;
@@ -104,21 +86,21 @@ class Listener extends Task implements Runnable {
         while(true) {
             DatagramPacket packet = M.receive_packet();
 
-            Message message = new Message(packet.getData().toString());
+            Message message = new Message(Arrays.toString(packet.getData()));
             decrypt_message(message);
         }
     }
 
     private void decrypt_message(Message message) {
-
         switch (message.getMessage_type()) {
             case "PUTCHUNK":
+                // CHECK IF PEER IS NOT THE ONE SENDING PUT CHUNK !
                 // store Chunk
                 // Send STORE message
                 Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
                 M2.send_packet(response);
             case "STORED":
-                // Increment stored
+                // Stores on file information about store
             case "GETCHUNK":
                 // Check if you have the chunk  **
                 // If so, send chunk
