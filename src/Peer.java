@@ -172,8 +172,18 @@ public class Peer implements RMI {
         while ((chunk = file.next_chunk()) != null) {
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
-            byte[] data = (message.get_header() + Message.bytes_to_string(chunk)).getBytes();;
+            //byte[] data = (message.get_header() + Message.bytes_to_string(chunk)).getBytes();
 
+            byte[] data = new byte[message.get_header().getBytes().length + chunk.length];
+            System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
+            System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
+
+            System.out.println("0 - " + chunk.length);
+            System.out.println("1 - " + message.get_header().length());
+            System.out.println("1.1 - " + message.get_header().getBytes().length);
+            System.out.println("2 - " + Message.bytes_to_string(chunk).length());
+            System.out.println("2.1 - " + Message.bytes_to_string(chunk).getBytes().length);
+            System.out.println(data.length);
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
             MDB.getExecuter().execute(new PutChunk(message, packet));
         }

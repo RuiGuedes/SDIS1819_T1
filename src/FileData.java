@@ -119,7 +119,9 @@ public class FileData {
         byte[] chunk = new byte[64000];
         int bytes_read = 0;
         try {
-             bytes_read = this.stream.readNBytes(chunk, this.offset, 64000);
+            System.out.println("---> >> " + this.offset);
+             bytes_read = this.stream.readNBytes(chunk, 0   , 64000);
+             System.out.println("--> " + bytes_read);
         } catch (IOException e) {
             e.printStackTrace();
         }

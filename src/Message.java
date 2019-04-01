@@ -4,6 +4,8 @@ import java.util.List;
 
 class Message {
 
+    public static Integer MESSAGE_SIZE = 65535;
+
     /**
      * Message type to be sent
      */
@@ -59,32 +61,26 @@ class Message {
     }
 
     Message(String protocol) {
-        String[] fields = clean_array(protocol.split("\r\n\r\n"));
+        String header = protocol.substring(0, protocol.indexOf("\r\n\r\n"));
+
+        String[] fields = clean_array(header.split(" "));
+
+        System.out.println(header);
+        System.out.println(body);
 
         this.message_type = fields[0];
         this.protocol_version = fields[1];
         this.server_id = Integer.parseInt(fields[2]);
         this.file_id = fields[3];
 
-        switch (this.message_type) {
-            case "DELETE":
-                this.chunk_no = Integer.parseInt(fields[4]);
-                break;
-            case "PUTCHUNK":
-                this.replication_degree = Integer.parseInt(fields[5]);
-                this.body = fields[7];
-                break;
-            case "CHUNK":
-                this.body = fields[6];
-                break;
-        }
+        if(!this.message_type.equals("DELETE"))
+            this.chunk_no = Integer.parseInt(fields[4]);
 
-//        PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body>
-//        STORED   <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
-//        GETCHUNK <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
-//        CHUNK    <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF><Body>
-//        DELETE   <Version> <SenderId> <FileId>                            <CRLF><CRLF>
-//        REMOVED  <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
+        if(this.message_type.equals("PUTCHUNK"))
+            this.replication_degree = Integer.parseInt(fields[5]);
+
+        if(this.message_type.equals("PUTCHUNK") || this.message_type.equals("CHUNK"))
+            this.body = protocol.substring(protocol.indexOf("\r\n\r\n") + "\r\n\r\n".length());
     }
 
 
@@ -92,7 +88,6 @@ class Message {
         List<String> cleaned = new ArrayList<>();
 
         for (String s: list) {
-            System.out.println("---> " + s + " <---");
             if (s.length() > 0){
                 cleaned.add(s);
             }

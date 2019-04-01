@@ -7,8 +7,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Multicast {
 
-    public static Integer PACKET_SIZE = 65000;
-
     private String name;
 
     private String address;
@@ -81,7 +79,7 @@ public class Multicast {
     }
 
     public DatagramPacket receive_packet() {
-        byte[] buf = new byte[PACKET_SIZE];
+        byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         try {
