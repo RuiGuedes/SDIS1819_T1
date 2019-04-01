@@ -1,3 +1,4 @@
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,25 +59,25 @@ class Message {
     }
 
     Message(String protocol) {
-        String[] fields = clean_array(protocol.split(" "));
+        String[] fields = clean_array(protocol.split("\r\n\r\n"));
 
         this.message_type = fields[0];
         this.protocol_version = fields[1];
         this.server_id = Integer.parseInt(fields[2]);
         this.file_id = fields[3];
 
-        if (!this.message_type.equals("DELETE")) {
-            this.chunk_no = Integer.parseInt(fields[4]);
+        switch (this.message_type) {
+            case "DELETE":
+                this.chunk_no = Integer.parseInt(fields[4]);
+                break;
+            case "PUTCHUNK":
+                this.replication_degree = Integer.parseInt(fields[5]);
+                this.body = fields[7];
+                break;
+            case "CHUNK":
+                this.body = fields[6];
+                break;
         }
-
-        if (this.message_type.equals("PUTCHUNK")) {
-            this.replication_degree = Integer.parseInt(fields[5]);
-            // <CRLF><CRLF> = fields[6]
-            this.body = fields[7];
-        }
-
-        if (this.message_type.equals("CHUNK"))
-            this.body = fields[6];
 
 //        PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body>
 //        STORED   <Version> <SenderId> <FileId> <ChunkNo>                  <CRLF><CRLF>
@@ -91,13 +92,24 @@ class Message {
         List<String> cleaned = new ArrayList<>();
 
         for (String s: list) {
-            if (s.length() > 0)
+            System.out.println("---> " + s + " <---");
+            if (s.length() > 0){
                 cleaned.add(s);
+            }
+
         }
 
         return cleaned.toArray(new String[0]);
     }
 
+    static String bytes_to_string(byte[] bytes) {
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 
     /**
      * Initializes message header

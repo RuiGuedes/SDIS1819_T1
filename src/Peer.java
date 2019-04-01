@@ -1,7 +1,5 @@
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -10,6 +8,9 @@ import java.util.*;
 
 
 public class Peer implements RMI {
+
+    // SERVER 1 - "vanilla" 1 "rmi-access-point" "224.0.0.2:4441" "224.0.0.3:4442" "224.0.0.4:4443"
+    // SERVER 2 - "vanilla" 2 "rmi-access-point2" "224.0.0.2:4441" "224.0.0.3:4442" "224.0.0.4:4443"
 
     /**
      * Protocol version to be used. Default = vanilla
@@ -122,6 +123,14 @@ public class Peer implements RMI {
     }
 
     /**
+     * Returns server id
+     * @return Server id
+     */
+    public static Integer getServerId() {
+        return SERVER_ID;
+    }
+
+    /**
      * Retrieves MC multicast channel
      * @return Returns MC multicast channel
      */
@@ -163,10 +172,10 @@ public class Peer implements RMI {
         while ((chunk = file.next_chunk()) != null) {
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
-            byte[] data = (message.get_header() + Arrays.toString(chunk)).getBytes();
-            DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
+            byte[] data = (message.get_header() + Message.bytes_to_string(chunk)).getBytes();;
 
-            MDB.getExecuter().execute(new PutChunk(MC, MDB, message, packet));
+            DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
+            MDB.getExecuter().execute(new PutChunk(message, packet));
         }
 
         return "Backup of " + file.get_filename() + " has been done with success !";

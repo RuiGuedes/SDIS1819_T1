@@ -116,7 +116,7 @@ public class FileData {
 
         if (this.EOF) return null;
 
-        byte[] chunk = new byte[0];
+        byte[] chunk = new byte[64000];
         int bytes_read = 0;
         try {
              bytes_read = this.stream.readNBytes(chunk, this.offset, 64000);

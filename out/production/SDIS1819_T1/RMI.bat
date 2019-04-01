@@ -1,2 +1,2 @@
-javac -d ./ Peer/RMI.java Peer/Peer.java App/TestApp.java
+javac -d ./ *.java
 start rmiregistry

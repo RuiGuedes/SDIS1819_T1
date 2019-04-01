@@ -166,6 +166,15 @@ public class Storage {
         write_to_file(new File(directory, String.valueOf(chunk_no)), curr_replication_degree + "/" + replication_degree);
     }
 
+    static int read_count_messages(String file_id, Integer chunk_no) {
+        File directory = new File(info, file_id);
+
+        if (!directory.exists())
+            return 0;
+        else
+            return Integer.valueOf(read_from_file(new File(directory, String.valueOf(chunk_no))).split("/")[0]);
+    }
+
     /**
      * Stores chunk content in backup directory
      * @param file_id File identifier

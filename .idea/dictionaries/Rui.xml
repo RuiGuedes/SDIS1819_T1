@@ -2,6 +2,7 @@
   <dictionary name="Rui">
     <words>
       <w>opnd</w>
+      <w>putchunk</w>
     </words>
   </dictionary>
 </component>

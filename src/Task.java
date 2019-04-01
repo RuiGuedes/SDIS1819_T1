@@ -2,37 +2,27 @@ import java.net.DatagramPacket;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-class Task {
+
+class Listener implements Runnable {
 
     /**
      * Channel associated to the task
      */
-    Multicast M;
-
-    /**
-     * Task constructor
-     * @param M Channel associated to the task
-     */
-    Task(Multicast M) {
-        this.M = M;
-    }
-}
-
-class Listener extends Task implements Runnable {
+    private Multicast M;
 
     /**
      * Constructor of Listener class
      * @param M Multicast channel to listen to
      */
     Listener(Multicast M) {
-        super(M);
+        this.M = M;
     }
 
     @Override
     public void run() {
         while(true) {
-            Message message = new Message(Arrays.toString(M.receive_packet().getData()));
-            M.getExecuter().execute(new DecryptMessage(message));
+            Message message = new Message(Message.bytes_to_string(this.M.receive_packet().getData()));
+            this.M.getExecuter().execute(new DecryptMessage(message));
         }
     }
 }
@@ -56,13 +46,14 @@ class DecryptMessage implements Runnable {
     public void run() {
         switch (message.getMessage_type()) {
             case "PUTCHUNK":
-                // CHECK IF PEER IS NOT THE ONE SENDING PUT CHUNK !
-                // store Chunk
-                // Send STORE message
-                Message response = new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null);
-                Peer.getMC().send_packet(response);
+                if(Peer.getServerId() != message.getServer_id()) {
+                    Storage.store_chunk(message.getFile_id(), message.getChunk_no(), message.getBody());
+                    Peer.getMC().send_packet(new Message("STORED", message.getProtocol_version(), message.getServer_id(), message.getFile_id(), message.getChunk_no(), null));
+                }
+                break;
             case "STORED":
                 Storage.store_count_messages(message.getFile_id(), message.getChunk_no(), message.getReplication_degree());
+                break;
             case "GETCHUNK":
                 // Check if you have the chunk  **
                 // If so, send chunk
@@ -80,17 +71,22 @@ class DecryptMessage implements Runnable {
     }
 }
 
-class PutChunk extends Task implements Runnable {
+class PutChunk implements Runnable {
 
-    private Multicast MDB;
-
+    /**
+     * Message containing information to be sent
+     */
     private Message message;
 
+    /**
+     * Packet to be sent to the MDB
+     */
     private DatagramPacket packet;
 
-    PutChunk(Multicast MC, Multicast MDB, Message message, DatagramPacket packet) {
-        super(MC);
-        this.MDB = MDB;
+    /**
+     * Put chunk constructor
+     */
+    PutChunk(Message message, DatagramPacket packet) {
         this.message = message;
         this.packet = packet;
     }
@@ -100,7 +96,7 @@ class PutChunk extends Task implements Runnable {
         int[] waiting_time = {1, 2, 4, 8, 16};
 
         for (int i = 0; i < 5; i++) {
-            MDB.send_packet(packet);
+            Peer.getMDB().send_packet(packet);
 
             try {
                 TimeUnit.SECONDS.sleep(waiting_time[i]);
@@ -108,8 +104,7 @@ class PutChunk extends Task implements Runnable {
                 e.printStackTrace();
             }
 
-            // Substitute 1 for function responsible for reading file
-            if (1 >= message.getReplication_degree())
+            if (Storage.read_count_messages(message.getFile_id(), message.getChunk_no()) >= message.getReplication_degree())
                 break;
         }
     }
