@@ -177,6 +177,10 @@ public class Peer implements RMI {
         int chunk_no = 0;
         FileData file = new FileData(filepath);
 
+        // TODO - Check if there is space available
+        // TODO - Check if file is already backed up: if it is return else backup. NOTE: If file is a new version must delete old file and backup new one
+        // TODO - On every putchunk send/received create chunk count message
+
         while ((chunk = file.next_chunk()) != null) {
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
@@ -184,15 +188,12 @@ public class Peer implements RMI {
             System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
             System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
 
-            /*System.out.println("0 - " + chunk.length);
-            System.out.println("1 - " + message.get_header().length());
-            System.out.println("1.1 - " + message.get_header().getBytes().length);
-            System.out.println("2 - " + Message.bytes_to_string(chunk).length());
-            System.out.println("2.1 - " + Message.bytes_to_string(chunk).getBytes().length);
-            System.out.println(data.length);*/
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
             MDB.getExecuter().execute(new PutChunk(message, packet));
         }
+
+        // TODO - Backup with success: update storage
+        // TODO - Backup failed, delete all backup chunks and info
 
         return "Backup of " + file.get_filename() + " has been done with success !";
     }

@@ -48,23 +48,7 @@ public class Storage {
         else
             create_storage(server_id);
 
-        init_over_replication();
-    }
-
-    /**
-     *
-     */
-    private void init_over_replication() {
-        over_replication = new PriorityQueue<>(new String_array_cmp());
-        File[] files_directories = info.listFiles();
-
-        for (File file_directory : files_directories) {
-            File[] chunks_info_files = file_directory.listFiles();
-
-            for (File chunk_file : chunks_info_files)
-                over_replication.add(new String[]
-                        {String.valueOf(get_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
-        }
+        //init_over_replication();
     }
 
     /**
@@ -78,6 +62,46 @@ public class Storage {
         info = new File(this.root,"info");
         this.local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
+    }
+
+    /**
+     * Writes data to a certain file
+     * @param file File where data will be stored
+     * @param data Data to be written
+     */
+    static void write_to_file(File file, String data) {
+        try {
+            // Opens file, writes its respective content and closes it
+            synchronized (file) {
+                FileWriter file_writer = new FileWriter(file);
+                file_writer.write(data);
+                file_writer.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Reads data from a file
+     * @param file File where data will be read
+     * @return File data
+     */
+    static String read_from_file(File file) {
+        StringBuilder data = new StringBuilder();
+        try {
+            BufferedReader file_reader = new BufferedReader(new FileReader(file));
+
+            String curr_line;
+            while ((curr_line = file_reader.readLine()) != null) {
+                data.append(curr_line);
+            }
+
+            file_reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data.toString();
     }
 
     /**
@@ -150,6 +174,22 @@ public class Storage {
     }
 
     /**
+     *
+     */
+    private void init_over_replication() {
+        over_replication = new PriorityQueue<>(new String_array_cmp());
+        File[] files_directories = info.listFiles();
+
+        for (File file_directory : files_directories) {
+            File[] chunks_info_files = file_directory.listFiles();
+
+            for (File chunk_file : chunks_info_files)
+                over_replication.add(new String[]
+                        {String.valueOf(get_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
+        }
+    }
+
+    /**
      * Remove a chunk file of the storage and remove empty folders
      * @param file_id File id
      * @param chunk_no Chunk number
@@ -166,6 +206,7 @@ public class Storage {
             info_file_directory.delete();
         }
 
+        // TODO - Remove the following lines: Storage class its only used to manipulate files.
         Message removed_message =
                 new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, Integer.parseInt(chunk_no),null);
         Peer.getMC().send_packet(removed_message);
@@ -180,50 +221,6 @@ public class Storage {
         String[] info_str = read_from_file(file).split("/");
 
         return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
-    }
-
-    /**
-     * Writes data to a certain file
-     * @param file File where data will be stored
-     * @param data Data to be written
-     */
-    static void write_to_file(File file, String data) {
-        try {
-            // Create file if not exist
-            if (!file.exists())
-                file.createNewFile();
-
-            // Opens file, writes its respective content and closes it
-            synchronized (file) {
-                FileWriter file_writer = new FileWriter(file);
-                file_writer.write(data);
-                file_writer.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Reads data from a file
-     * @param file File where data will be read
-     * @return File data
-     */
-    static String read_from_file(File file) {
-        StringBuilder data = new StringBuilder();
-        try {
-            BufferedReader file_reader = new BufferedReader(new FileReader(file));
-
-            String curr_line;
-            while ((curr_line = file_reader.readLine()) != null) {
-                data.append(curr_line);
-            }
-
-            file_reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return data.toString();
     }
 
     /**
@@ -243,8 +240,15 @@ public class Storage {
 
         if (file_writer.exists())
             curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + 1;
+        else {
+            try {
+                file_writer.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        write_to_file(new File(directory, String.valueOf(chunk_no)), curr_replication_degree + "/" + replication_degree);
+        write_to_file(file_writer, curr_replication_degree + "/" + replication_degree);
     }
 
     static int read_count_messages(String file_id, Integer chunk_no) {
@@ -255,7 +259,7 @@ public class Storage {
 
         File file_reader = new File(directory, String.valueOf(chunk_no));
 
-        if (!file_reader.exists())
+        if(!file_reader.exists())
             return 0;
         else
             return Integer.valueOf(read_from_file(file_reader).split("/")[0]);

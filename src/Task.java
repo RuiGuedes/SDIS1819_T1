@@ -93,13 +93,11 @@ class PutChunk implements Runnable {
 
     @Override
     public void run() {
-//        int[] waiting_time = {1, 2, 4, 8, 16};
 
         for (int i = 0; i < 5; i++) {
             Peer.getMDB().send_packet(packet);
 
             try {
-//                TimeUnit.SECONDS.sleep(waiting_time[i]);
                 TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
             } catch (InterruptedException e) {
                 e.printStackTrace();
