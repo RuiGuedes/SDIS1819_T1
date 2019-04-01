@@ -123,6 +123,14 @@ public class Peer implements RMI {
     }
 
     /**
+     * Returns protocol version
+     * @return Protocol version
+     */
+    public static String getProtocolVersion() {
+        return PROTOCOL_VERSION;
+    }
+
+    /**
      * Returns server id
      * @return Server id
      */

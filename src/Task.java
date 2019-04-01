@@ -61,6 +61,7 @@ class DecryptMessage implements Runnable {
             case "DELETE":
                 // Check if you have the chunk  **
                 // If so, delete chunk
+                Storage.remove_chunk(message.getFile_id(), String.valueOf(message.getChunk_no()));
             case "REMOVED":
                 // Check if you have the chunk  **
                 // Decrease count replication degree
@@ -92,13 +93,14 @@ class PutChunk implements Runnable {
 
     @Override
     public void run() {
-        int[] waiting_time = {1, 2, 4, 8, 16};
+//        int[] waiting_time = {1, 2, 4, 8, 16};
 
         for (int i = 0; i < 5; i++) {
             Peer.getMDB().send_packet(packet);
 
             try {
-                TimeUnit.SECONDS.sleep(waiting_time[i]);
+//                TimeUnit.SECONDS.sleep(waiting_time[i]);
+                TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -2,8 +2,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class Storage {
 
@@ -38,9 +38,9 @@ public class Storage {
     private long space;
 
     /**
-     * [file_id,chunk_no] -> overflow_replication_degree
+     * [over_replication_degree , file_id , chunk_no]
      */
-    private Map<String[], Integer> replication_overflow;
+    private PriorityQueue<String[]> over_replication;
 
     Storage(Integer server_id) {
         if (Files.exists(Paths.get("peer" + server_id)))
@@ -48,12 +48,23 @@ public class Storage {
         else
             create_storage(server_id);
 
-        check_replication_degree();
+        init_over_replication();
     }
 
-    private void check_replication_degree() {
-        replication_overflow = new HashMap<>();
-        File[] list = info.listFiles();
+    /**
+     *
+     */
+    private void init_over_replication() {
+        over_replication = new PriorityQueue<>(new String_array_cmp());
+        File[] files_directories = info.listFiles();
+
+        for (File file_directory : files_directories) {
+            File[] chunks_info_files = file_directory.listFiles();
+
+            for (File chunk_file : chunks_info_files)
+                over_replication.add(new String[]
+                        {String.valueOf(get_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
+        }
     }
 
     /**
@@ -122,14 +133,53 @@ public class Storage {
         }
     }
 
+    /**
+     * Change the system storage
+     * @param space New space value
+     */
     public void update_storage_space(Integer space) {
         this.space = space;
         while (this.space < this.root.getTotalSpace()) {
-            // Check most replicated chunks
-
-
-            // remove most replicated chunks
+            if (over_replication.size() > 0) {
+                String[] info = over_replication.poll();
+                remove_chunk(info[1], info[2]);
+            } else {
+                // remove random chunks
+            }
         }
+    }
+
+    /**
+     * Remove a chunk file of the storage and remove empty folders
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     */
+    static void remove_chunk(String file_id, String chunk_no) {
+        File backup_file_directory = new File(backup, file_id);
+        File info_file_directory = new File(info, file_id);
+
+        new File(backup_file_directory, chunk_no).delete();
+        new File(info_file_directory, chunk_no).delete();
+
+        if (backup_file_directory.getTotalSpace() == 0) {
+            backup_file_directory.delete();
+            info_file_directory.delete();
+        }
+
+        Message removed_message =
+                new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, Integer.parseInt(chunk_no),null);
+        Peer.getMC().send_packet(removed_message);
+    }
+
+    /**
+     * Calculate the over replication of a chunk
+     * @param file File with chunk replication information
+     * @return over replication degree
+     */
+    static Integer get_over_replication(File file) {
+        String[] info_str = read_from_file(file).split("/");
+
+        return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
     }
 
     /**
@@ -256,5 +306,12 @@ public class Storage {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+}
+
+class String_array_cmp implements Comparator<String[]> {
+
+    public int compare (String[] s1, String[] s2) {
+        return s1[0].compareTo(s2[0]);
     }
 }
