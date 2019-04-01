@@ -172,18 +172,16 @@ public class Peer implements RMI {
         while ((chunk = file.next_chunk()) != null) {
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
 
-            //byte[] data = (message.get_header() + Message.bytes_to_string(chunk)).getBytes();
-
             byte[] data = new byte[message.get_header().getBytes().length + chunk.length];
             System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
             System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
 
-            System.out.println("0 - " + chunk.length);
+            /*System.out.println("0 - " + chunk.length);
             System.out.println("1 - " + message.get_header().length());
             System.out.println("1.1 - " + message.get_header().getBytes().length);
             System.out.println("2 - " + Message.bytes_to_string(chunk).length());
             System.out.println("2.1 - " + Message.bytes_to_string(chunk).getBytes().length);
-            System.out.println(data.length);
+            System.out.println(data.length);*/
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
             MDB.getExecuter().execute(new PutChunk(message, packet));
         }
@@ -193,7 +191,7 @@ public class Peer implements RMI {
 
 
     @Override
-    public String restore(String filename) throws RemoteException {
+    public String restore(String filename) {
 
         // handle MDR channel when is invoked
         // actions needed to handle MDR
@@ -202,17 +200,26 @@ public class Peer implements RMI {
     }
 
     @Override
-    public String delete(String filename) throws RemoteException {
-        return null;
+    public String delete(String filepath) {
+        FileData file = new FileData(filepath);
+
+        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(),null,null);
+
+        MC.send_packet(message);
+
+        return file.get_filename() + " has been deleted with success !";
     }
 
     @Override
-    public String reclaim(Integer disk_space) throws RemoteException {
-        return null;
+    public String reclaim(Integer disk_space) {
+
+        storage.update_storage_space(disk_space);
+
+        return "Storage reclaim has been done with success !";
     }
 
     @Override
-    public String state() throws RemoteException {
-        return null;
+    public String state() {
+        return "";
     }
 }

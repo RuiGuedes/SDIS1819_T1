@@ -65,9 +65,6 @@ class Message {
 
         String[] fields = clean_array(header.split(" "));
 
-        System.out.println(header);
-        System.out.println(body);
-
         this.message_type = fields[0];
         this.protocol_version = fields[1];
         this.server_id = Integer.parseInt(fields[2]);
@@ -76,8 +73,13 @@ class Message {
         if(!this.message_type.equals("DELETE"))
             this.chunk_no = Integer.parseInt(fields[4]);
 
-        if(this.message_type.equals("PUTCHUNK"))
+        if(this.message_type.equals("PUTCHUNK")){
             this.replication_degree = Integer.parseInt(fields[5]);
+            System.out.println("fields-  " + fields[5]);
+        }
+
+        System.out.println("RD----  " + this.replication_degree);
+        System.out.println("header-> " + header);
 
         if(this.message_type.equals("PUTCHUNK") || this.message_type.equals("CHUNK"))
             this.body = protocol.substring(protocol.indexOf("\r\n\r\n") + "\r\n\r\n".length());

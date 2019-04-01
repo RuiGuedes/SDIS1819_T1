@@ -2,6 +2,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Storage {
 
@@ -35,11 +37,23 @@ public class Storage {
      */
     private long space;
 
+    /**
+     * [file_id,chunk_no] -> overflow_replication_degree
+     */
+    private Map<String[], Integer> replication_overflow;
+
     Storage(Integer server_id) {
         if (Files.exists(Paths.get("peer" + server_id)))
             load_storage(server_id);
         else
             create_storage(server_id);
+
+        check_replication_degree();
+    }
+
+    private void check_replication_degree() {
+        replication_overflow = new HashMap<>();
+        File[] list = info.listFiles();
     }
 
     /**
@@ -108,6 +122,16 @@ public class Storage {
         }
     }
 
+    public void update_storage_space(Integer space) {
+        this.space = space;
+        while (this.space < this.root.getTotalSpace()) {
+            // Check most replicated chunks
+
+
+            // remove most replicated chunks
+        }
+    }
+
     /**
      * Writes data to a certain file
      * @param file File where data will be stored
@@ -115,6 +139,10 @@ public class Storage {
      */
     static void write_to_file(File file, String data) {
         try {
+            // Create file if not exist
+            if (!file.exists())
+                file.createNewFile();
+
             // Opens file, writes its respective content and closes it
             synchronized (file) {
                 FileWriter file_writer = new FileWriter(file);
@@ -160,8 +188,11 @@ public class Storage {
 
         if (!directory.exists())
             directory.mkdirs();
-        else
-            curr_replication_degree = Integer.valueOf(read_from_file(new File(directory, String.valueOf(chunk_no))).split("/")[0]) + 1;
+
+        File file_writer = new File(directory, String.valueOf(chunk_no));
+
+        if (file_writer.exists())
+            curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + 1;
 
         write_to_file(new File(directory, String.valueOf(chunk_no)), curr_replication_degree + "/" + replication_degree);
     }
@@ -171,8 +202,13 @@ public class Storage {
 
         if (!directory.exists())
             return 0;
+
+        File file_reader = new File(directory, String.valueOf(chunk_no));
+
+        if (!file_reader.exists())
+            return 0;
         else
-            return Integer.valueOf(read_from_file(new File(directory, String.valueOf(chunk_no))).split("/")[0]);
+            return Integer.valueOf(read_from_file(file_reader).split("/")[0]);
     }
 
     /**

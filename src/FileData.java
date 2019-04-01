@@ -31,11 +31,6 @@ public class FileData {
      */
     private String owner;
 
-    /**
-     * Cursor position in the file
-     */
-    private Integer offset = 0;
-
     private Boolean EOF = false;
 
     /**
@@ -119,14 +114,10 @@ public class FileData {
         byte[] chunk = new byte[64000];
         int bytes_read = 0;
         try {
-            System.out.println("---> >> " + this.offset);
-             bytes_read = this.stream.readNBytes(chunk, 0   , 64000);
-             System.out.println("--> " + bytes_read);
+             bytes_read = this.stream.readNBytes(chunk, 0, 64000);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        this.offset += bytes_read;
 
         if (bytes_read < 64000) this.EOF = true;
 
