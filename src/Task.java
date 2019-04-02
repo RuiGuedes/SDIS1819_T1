@@ -56,23 +56,31 @@ class DecryptMessage implements Runnable {
                 Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null));
                 break;
             case "STORED":
-                Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no());
+                Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
-                // Check if you have the chunk  **
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // If so, send chunk
             case "CHUNK":
                 // Save the chunk
             case "DELETE":
-                // Check if you have the chunk  **
-                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
+                /*Storage.exists_file(message.get_file_id());
                 // If so, delete chunk
-                Storage.delete_chunk(message.get_file_id(), message.get_chunk_no());
+                Storage.delete_file(message.get_file_id());*/
             case "REMOVED":
-                // Check if you have the chunk  **
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
+                if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
+                    Message new_putchunk = new Message("PUTCHUNK", Peer.get_protocol_version(),
+                            Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), 1);//replication degree
+                    byte[] chunk = Storage.read_chunk(message.get_file_id(), message.get_chunk_no());
+                    /*byte[] data = new byte[new_putchunk.get_header().getBytes().length + .length];
+                    System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
+                    System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
+
+                    DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
+                    MDB.getExecuter().execute(new PutChunk(message, packet));*/
+                }
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
         }

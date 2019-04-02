@@ -2,6 +2,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -117,6 +118,20 @@ public class Storage {
         return data.toString();
     }
 
+    static byte[] read_bytes_from_file(File file) {
+        byte[] chunk = new byte[64000];
+        int bytes_read = 0;
+        try {
+            FileInputStream file_reader = new FileInputStream(file);
+            bytes_read = file_reader.readNBytes(chunk,0,64000);
+
+            file_reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Arrays.copyOf(chunk,bytes_read);
+    }
+
     /**
      * Creates storage structure for the respective server
      * @param server_id Server identifier
@@ -221,18 +236,14 @@ public class Storage {
 
     static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
         File directory = new File(info, file_id);
-
-        if (!directory.exists())
-            directory.mkdirs();
+        directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
 
-        if(!file_writer.exists()) {
-            try {
-                file_writer.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            file_writer.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         write_to_file(file_writer, 0 + "/" + replication_degree);
@@ -242,18 +253,19 @@ public class Storage {
      * Stores information about the replication degree of a certain chunk of file
      * @param file_id File identifier
      * @param chunk_no Chunk identifier
+     * @param increment Value to increment (positive or negative)
      */
-    static void store_chunk_info(String file_id, Integer chunk_no) {
+    static boolean store_chunk_info(String file_id, Integer chunk_no, Integer increment) {
         File directory = new File(info, file_id);
-
-        if (!directory.exists())
-            directory.mkdirs();
+        directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
 
-        int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + 1;
+        int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + increment;
         int desired_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[1]);
         write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
+
+        return curr_replication_degree >= desired_replication_degree;
     }
 
     static int read_chunk_info(String file_id, Integer chunk_no) {
@@ -290,12 +302,10 @@ public class Storage {
      */
     static void store_chunk(String file_id, Integer chunk_no, byte[] chunk) {
         File directory = new File(backup, file_id);
-
-        if (!directory.exists())
-            directory.mkdirs();
+        directory.mkdirs();
 
         write_to_file(new File(directory, String.valueOf(chunk_no)), chunk);
-        Storage.store_chunk_info(file_id, chunk_no);
+        Storage.store_chunk_info(file_id, chunk_no, 1);
     }
 
     /**
@@ -304,13 +314,10 @@ public class Storage {
      * @param chunk_no Chunk identifier
      * @return Chunk content
      */
-    static String read_chunk(String file_id, Integer chunk_no) {
+    static byte[] read_chunk(String file_id, Integer chunk_no) {
         Path path = Paths.get(backup.getPath(), file_id, String.valueOf(chunk_no));
 
-        if (!Files.exists(path))
-            return null;
-        else
-            return read_from_file(path.toFile());
+        return read_bytes_from_file(path.toFile());
     }
 
     /**
@@ -326,9 +333,11 @@ public class Storage {
         if (!backup_file_directory.exists() || !info_file_directory.exists())
             return;
 
+        // Delete chunk files
         new File(backup_file_directory, String.valueOf(chunk_no)).delete();
         new File(info_file_directory, String.valueOf(chunk_no)).delete();
 
+        // Delete directory if empty
         if (backup_file_directory.getTotalSpace() == 0) {
             backup_file_directory.delete();
             info_file_directory.delete();
@@ -355,6 +364,10 @@ public class Storage {
     }
 }
 
+
+/**
+ * Priority queue comparator
+ */
 class String_array_cmp implements Comparator<String[]> {
 
     public int compare (String[] s1, String[] s2) {
