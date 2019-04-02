@@ -335,7 +335,7 @@ public class Storage {
         }
 
         Peer.getMC().send_packet(
-                new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, chunk_no,null));
+                new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null));
     }
 
     // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)

@@ -1,4 +1,5 @@
 import java.net.DatagramPacket;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 
@@ -20,7 +21,8 @@ class Listener implements Runnable {
     @Override
     public void run() {
         while(true) {
-            Message message = new Message(Message.decrypt_packet(this.M.receive_packet().getData()));
+            DatagramPacket packet = this.M.receive_packet();
+            Message message = new Message(Message.decrypt_packet(Arrays.copyOf(packet.getData(), packet.getLength())));
             this.M.getExecuter().execute(new DecryptMessage(message));
         }
     }
@@ -58,20 +60,19 @@ class DecryptMessage implements Runnable {
                 break;
             case "GETCHUNK":
                 // Check if you have the chunk  **
-                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
+                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // If so, send chunk
             case "CHUNK":
                 // Save the chunk
             case "DELETE":
                 // Check if you have the chunk  **
-                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
+                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // If so, delete chunk
-                Storage.delete_chunk(message.getFile_id(), message.getChunk_no());
+                Storage.delete_chunk(message.get_file_id(), message.get_chunk_no());
             case "REMOVED":
                 // Check if you have the chunk  **
-                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
+                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
-                Storage.
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
         }

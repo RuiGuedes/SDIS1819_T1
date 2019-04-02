@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class FileData {
 
@@ -105,11 +106,11 @@ public class FileData {
 
     /**
      * Read and return the next chunk of the file
-     * @return
+     * @return Chunk information in byte array
      */
-    public byte[] next_chunk() {
-
-        if (this.EOF) return null;
+    byte[] next_chunk() {
+        if (this.EOF)
+            return null;
 
         byte[] chunk = new byte[64000];
         int bytes_read = 0;
@@ -119,8 +120,9 @@ public class FileData {
             e.printStackTrace();
         }
 
-        if (bytes_read < 64000) this.EOF = true;
+        if (bytes_read < 64000)
+            this.EOF = true;
 
-        return chunk;
+        return Arrays.copyOf(chunk, bytes_read);
     }
 }

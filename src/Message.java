@@ -125,12 +125,18 @@ class Message {
     static ArrayList<byte[]> decrypt_packet(byte[] bytes) {
         ArrayList<byte[]> packet_info = new ArrayList<>();
 
+        System.out.println("packet ---> " + bytes.length);
+
         for(int i = 0; i < bytes.length - 3; i++) {
             if(bytes[i] == '\r' && bytes[i + 1] == '\n' && bytes[i + 2] == '\r' && bytes[i + 3] == '\n') {
                 byte[] header = Arrays.copyOfRange(bytes, 0 , i); packet_info.add(header);
-                byte[] body = Arrays.copyOfRange(bytes, i + 4, i + 64004); packet_info.add(body);
+                byte[] body = Arrays.copyOfRange(bytes, i + 4, bytes.length); packet_info.add(body);
             }
         }
+
+        System.out.println("body ---> " + packet_info.get(1).length);
+        System.out.println();
+
         return packet_info;
     }
 
