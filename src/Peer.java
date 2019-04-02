@@ -174,6 +174,7 @@ public class Peer implements RMI {
         byte[] chunk;
         int chunk_no = 0;
         FileData file = new FileData(filepath);
+        ArrayList<PutChunk> threads = new ArrayList<>();
 
         // TODO - Check if file is already backed up: if it is return else backup. NOTE: If file is a new version must delete old file and backup new one
 
@@ -185,7 +186,8 @@ public class Peer implements RMI {
             System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
 
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
-            MDB.getExecuter().execute(new PutChunk(message, packet));
+            PutChunk task = new PutChunk(message, packet);
+            MDB.getExecuter().execute(task);
         }
 
         // TODO - Backup with success: update storage

@@ -26,7 +26,12 @@ public class Storage {
     /**
      * Directory of information about confirm messages
      */
-    private static File info;
+    private static File chunks_info;
+
+    /**
+     * Directory of information about backed up files
+     */
+    private static File backup_info;
 
     /**
      * Local storage file
@@ -53,24 +58,11 @@ public class Storage {
     }
 
     /**
-     * Loads current storage information
-     * @param server_id Server identifier
-     */
-    private void load_storage(Integer server_id) {
-        this.root = new File("peer" + server_id);
-        backup = new File(this.root, "backup");
-        restore = new File(this.root, "restore");
-        info = new File(this.root,"info");
-        this.local_storage = new File(this.root, "local_storage.txt");
-        this.read_local_storage();
-    }
-
-    /**
      * Writes data to a certain file
      * @param file File where data will be stored
      * @param data Data to be written
      */
-    static void write_to_file(File file, String data) {
+    private static void write_to_file(File file, String data) {
         try {
             // Opens file, writes its respective content and closes it
             synchronized (file) {
@@ -83,7 +75,12 @@ public class Storage {
         }
     }
 
-    static void write_to_file(File file, byte[] data) {
+    /**
+     * Writes bytes to a certain file
+     * @param file File where data will be stored
+     * @param data Data to be written
+     */
+    private static void write_to_file(File file, byte[] data) {
         try {
             // Opens file, writes its respective content and closes it
             synchronized (file) {
@@ -97,11 +94,11 @@ public class Storage {
     }
 
     /**
-     * Reads data from a file
+     * Reads data from a certain file
      * @param file File where data will be read
      * @return File data
      */
-    static String read_from_file(File file) {
+    private static String read_from_file(File file) {
         StringBuilder data = new StringBuilder();
         try {
             BufferedReader file_reader = new BufferedReader(new FileReader(file));
@@ -118,7 +115,12 @@ public class Storage {
         return data.toString();
     }
 
-    static byte[] read_bytes_from_file(File file) {
+    /**
+     * Reads bytes from a certain file
+     * @param file File where data will be read
+     * @return File data
+     */
+    private static byte[] read_bytes_from_file(File file) {
         byte[] chunk = new byte[64000];
         int bytes_read = 0;
         try {
@@ -133,6 +135,20 @@ public class Storage {
     }
 
     /**
+     * Loads current storage information
+     * @param server_id Server identifier
+     */
+    private void load_storage(Integer server_id) {
+        this.root = new File("peer" + server_id);
+        backup = new File(this.root, "backup");
+        restore = new File(this.root, "restore");
+        chunks_info = new File(this.root,"chunks_info");
+        backup_info = new File(this.root, "backup_info");
+        this.local_storage = new File(this.root, "local_storage.txt");
+        this.read_local_storage();
+    }
+
+    /**
      * Creates storage structure for the respective server
      * @param server_id Server identifier
      */
@@ -140,7 +156,8 @@ public class Storage {
         this.root = new File("peer" + server_id); this.root.mkdirs();
         backup = new File(this.root, "backup"); backup.mkdirs();
         restore = new File(this.root, "restore"); restore.mkdirs();
-        info = new File(this.root, "info"); info.mkdirs();
+        chunks_info = new File(this.root, "chunks_info"); chunks_info.mkdirs();
+        backup_info = new File(this.root, "backup_info"); backup_info.mkdirs();
         this.local_storage = new File(this.root, "local_storage.txt");
         this.space = this.root.getFreeSpace();
         this.write_local_storage();
@@ -212,7 +229,7 @@ public class Storage {
      */
     private void load_replication() {
         this.chunks_replication = new PriorityQueue<>(new String_array_cmp());
-        File[] files_directories = info.listFiles();
+        File[] files_directories = chunks_info.listFiles();
 
         for (File file_directory : files_directories) {
             File[] chunks_info_files = file_directory.listFiles();
@@ -235,7 +252,7 @@ public class Storage {
     }
 
     static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
-        File directory = new File(info, file_id);
+        File directory = new File(chunks_info, file_id);
         directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
@@ -256,7 +273,7 @@ public class Storage {
      * @param increment Value to increment (positive or negative)
      */
     static boolean store_chunk_info(String file_id, Integer chunk_no, Integer increment) {
-        File directory = new File(info, file_id);
+        File directory = new File(chunks_info, file_id);
         directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
@@ -269,7 +286,7 @@ public class Storage {
     }
 
     static int read_chunk_info(String file_id, Integer chunk_no) {
-        File directory = new File(info, file_id);
+        File directory = new File(chunks_info, file_id);
 
         if (!directory.exists())
             return 0;
@@ -327,7 +344,7 @@ public class Storage {
      */
     static void delete_chunk(String file_id, Integer chunk_no) {
         File backup_file_directory = new File(backup, file_id);
-        File info_file_directory = new File(info, file_id);
+        File info_file_directory = new File(chunks_info, file_id);
 
         // check if directories exists
         if (!backup_file_directory.exists() || !info_file_directory.exists())
