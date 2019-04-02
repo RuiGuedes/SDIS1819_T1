@@ -82,6 +82,19 @@ public class Storage {
         }
     }
 
+    static void write_to_file(File file, byte[] data) {
+        try {
+            // Opens file, writes its respective content and closes it
+            synchronized (file) {
+                FileOutputStream file_writer = new FileOutputStream(file);
+                file_writer.write(data);
+                file_writer.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Reads data from a file
      * @param file File where data will be read
@@ -207,9 +220,9 @@ public class Storage {
         }
 
         // TODO - Remove the following lines: Storage class its only used to manipulate files.
-        Message removed_message =
-                new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, Integer.parseInt(chunk_no),null);
-        Peer.getMC().send_packet(removed_message);
+        //Message removed_message =
+         //       new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, Integer.parseInt(chunk_no),null);
+        //Peer.getMC().send_packet(removed_message);
     }
 
     /**
@@ -223,24 +236,15 @@ public class Storage {
         return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
     }
 
-    /**
-     * Stores information about the replication degree of a certain chunk of file
-     * @param file_id File identifier
-     * @param chunk_no Chunk identifier
-     * @param replication_degree Desired replication degree
-     */
-    static void store_count_messages(String file_id, Integer chunk_no, Integer replication_degree) {
+    static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
         File directory = new File(info, file_id);
-        int curr_replication_degree = 1;
 
         if (!directory.exists())
             directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
 
-        if (file_writer.exists())
-            curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + 1;
-        else {
+        if(!file_writer.exists()) {
             try {
                 file_writer.createNewFile();
             } catch (IOException e) {
@@ -248,10 +252,28 @@ public class Storage {
             }
         }
 
-        write_to_file(file_writer, curr_replication_degree + "/" + replication_degree);
+        write_to_file(file_writer, 0 + "/" + replication_degree);
     }
 
-    static int read_count_messages(String file_id, Integer chunk_no) {
+    /**
+     * Stores information about the replication degree of a certain chunk of file
+     * @param file_id File identifier
+     * @param chunk_no Chunk identifier
+     */
+    static void store_chunk_info(String file_id, Integer chunk_no) {
+        File directory = new File(info, file_id);
+
+        if (!directory.exists())
+            directory.mkdirs();
+
+        File file_writer = new File(directory, String.valueOf(chunk_no));
+
+        int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + 1;
+        int desired_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[1]);
+        write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
+    }
+
+    static int read_chunk_info(String file_id, Integer chunk_no) {
         File directory = new File(info, file_id);
 
         if (!directory.exists())
@@ -266,18 +288,19 @@ public class Storage {
     }
 
     /**
-     * Stores chunk content in backup directory
+     * Stores chunk content in backup directory and updates its current replication degree
      * @param file_id File identifier
      * @param chunk_no Chunk identifier
      * @param chunk Chunk content
      */
-    static void store_chunk(String file_id, Integer chunk_no, String chunk) {
+    static void store_chunk(String file_id, Integer chunk_no, byte[] chunk) {
         File directory = new File(backup, file_id);
 
         if (!directory.exists())
             directory.mkdirs();
 
         write_to_file(new File(directory, String.valueOf(chunk_no)), chunk);
+        Storage.store_chunk_info(file_id, chunk_no);
     }
 
     /**

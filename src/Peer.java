@@ -126,7 +126,7 @@ public class Peer implements RMI {
      * Returns protocol version
      * @return Protocol version
      */
-    public static String getProtocolVersion() {
+    public static String get_protocol_version() {
         return PROTOCOL_VERSION;
     }
 
@@ -134,7 +134,7 @@ public class Peer implements RMI {
      * Returns server id
      * @return Server id
      */
-    public static Integer getServerId() {
+    public static Integer get_server_id() {
         return SERVER_ID;
     }
 
@@ -177,9 +177,7 @@ public class Peer implements RMI {
         int chunk_no = 0;
         FileData file = new FileData(filepath);
 
-        // TODO - Check if there is space available
         // TODO - Check if file is already backed up: if it is return else backup. NOTE: If file is a new version must delete old file and backup new one
-        // TODO - On every putchunk send/received create chunk count message
 
         while ((chunk = file.next_chunk()) != null) {
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);

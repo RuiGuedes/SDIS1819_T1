@@ -1,10 +1,14 @@
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Message {
 
-    public static Integer MESSAGE_SIZE = 65535;
+    /**
+     * Maximum message size
+     */
+    static Integer MESSAGE_SIZE = 65536;
 
     /**
      * Message type to be sent
@@ -44,9 +48,11 @@ class Message {
     /**
      * Chunk
      */
-    private String body;
+    private byte[] body;
 
-
+    /**
+     * Message constructor by specifying each needed field
+     */
     Message(String message_type, String protocol_version, Integer server_id, String file_id, Integer chunk_no, Integer replication_degree) {
         // Initializes class variables
         this.message_type = message_type;
@@ -60,10 +66,12 @@ class Message {
         init_message_header();
     }
 
-    Message(String protocol) {
-        String header = protocol.substring(0, protocol.indexOf("\r\n\r\n"));
-
-        String[] fields = clean_array(header.split(" "));
+    /**
+     * Message constructor throughout a byte array
+     * @param packet_info Byte array containing header (0) and body (1)
+     */
+    Message(ArrayList<byte[]> packet_info) {
+        String[] fields = clean_array(bytes_to_string(packet_info.get(0)).split(" "));
 
         this.message_type = fields[0];
         this.protocol_version = fields[1];
@@ -73,39 +81,11 @@ class Message {
         if(!this.message_type.equals("DELETE"))
             this.chunk_no = Integer.parseInt(fields[4]);
 
-        if(this.message_type.equals("PUTCHUNK")){
+        if(this.message_type.equals("PUTCHUNK"))
             this.replication_degree = Integer.parseInt(fields[5]);
-            System.out.println("fields-  " + fields[5]);
-        }
-
-        System.out.println("RD----  " + this.replication_degree);
-        System.out.println("header-> " + header);
 
         if(this.message_type.equals("PUTCHUNK") || this.message_type.equals("CHUNK"))
-            this.body = protocol.substring(protocol.indexOf("\r\n\r\n") + "\r\n\r\n".length());
-    }
-
-
-    static String[] clean_array(String[] list) {
-        List<String> cleaned = new ArrayList<>();
-
-        for (String s: list) {
-            if (s.length() > 0){
-                cleaned.add(s);
-            }
-
-        }
-
-        return cleaned.toArray(new String[0]);
-    }
-
-    static String bytes_to_string(byte[] bytes) {
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
+            this.body = Arrays.copyOf(packet_info.get(1), packet_info.get(1).length);
     }
 
     /**
@@ -122,39 +102,95 @@ class Message {
         this.header += "\r\n\r\n";
     }
 
-    public String getMessage_type() {
+    /**
+     * Cleans header of message by removing non-needed spaces
+     * @param list Header message fields
+     * @return Cleaned header
+     */
+    private static String[] clean_array(String[] list) {
+        List<String> cleaned = new ArrayList<>();
+
+        for (String s: list) {
+            if (s.length() > 0)
+                cleaned.add(s);
+        }
+        return cleaned.toArray(new String[0]);
+    }
+
+    /**
+     * Decrypts packet to byte array
+     * @param bytes Received packet
+     * @return Return byte array containing header and body
+     */
+    static ArrayList<byte[]> decrypt_packet(byte[] bytes) {
+        ArrayList<byte[]> packet_info = new ArrayList<>();
+
+        for(int i = 0; i < bytes.length - 3; i++) {
+            if(bytes[i] == '\r' && bytes[i + 1] == '\n' && bytes[i + 2] == '\r' && bytes[i + 3] == '\n') {
+                byte[] header = Arrays.copyOfRange(bytes, 0 , i); packet_info.add(header);
+                byte[] body = Arrays.copyOfRange(bytes, i + 4, i + 64004); packet_info.add(body);
+            }
+        }
+        return packet_info;
+    }
+
+    /**
+     * Transforms byte array to string
+     * @param bytes Byte array
+     * @return String
+     */
+    private static String bytes_to_string(byte[] bytes) {
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+
+    /**
+     * Get's message type
+     */
+    String get_message_type() {
         return message_type;
     }
 
-    public String getProtocol_version() {
-        return protocol_version;
-    }
-
-    public Integer getServer_id() {
+    /**
+     * Get's server id
+     */
+    Integer get_server_id() {
         return server_id;
     }
 
-    public String getFile_id() {
+    /**
+     * Get's file id
+     */
+    String get_file_id() {
         return file_id;
     }
 
-    public String get_header() {
+    /**
+     * Get's header
+     */
+    String get_header() {
         return header;
     }
 
-    public Integer getChunk_no() {
+    /**
+     * Get's chunk number
+     */
+    Integer get_chunk_no() {
         return chunk_no;
     }
 
-    public Integer getReplication_degree() {
+    /**
+     * Get's desired replication degree
+     */
+    Integer get_replication_degree() {
         return replication_degree;
     }
 
-    public String getBody() {
+    /**
+     * Get's body
+     */
+    byte[] get_body() {
         return body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
 }
