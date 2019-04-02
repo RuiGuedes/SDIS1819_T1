@@ -282,6 +282,20 @@ public class Storage {
             return Integer.valueOf(read_from_file(file_reader).split("/")[0]);
     }
 
+    static int read_chunk_info_replication(String file_id, Integer chunk_no) {
+        File directory = new File(info, file_id);
+
+        if (!directory.exists())
+            return 0;
+
+        File file_reader = new File(directory, String.valueOf(chunk_no));
+
+        if(!file_reader.exists())
+            return 0;
+        else
+            return Integer.valueOf(read_from_file(file_reader).split("/")[1]);
+    }
+
     static  boolean exists_chunk(String file_id, Integer chunk_no) {
         File file_directory = new File(backup,file_id);
 
@@ -329,7 +343,7 @@ public class Storage {
         File backup_file_directory = new File(backup, file_id);
         File info_file_directory = new File(info, file_id);
 
-        // check if directories exists
+        // Check if directories exist
         if (!backup_file_directory.exists() || !info_file_directory.exists())
             return;
 
