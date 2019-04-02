@@ -1,5 +1,7 @@
+import java.awt.event.PaintEvent;
 import java.net.DatagramPacket;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -71,15 +73,27 @@ class DecryptMessage implements Runnable {
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
                 if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
-                    Message new_putchunk = new Message("PUTCHUNK", Peer.get_protocol_version(),
-                            Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), 1);//replication degree
-                    byte[] chunk = Storage.read_chunk(message.get_file_id(), message.get_chunk_no());
-                    /*byte[] data = new byte[new_putchunk.get_header().getBytes().length + .length];
-                    System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
-                    System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
+                    try {
+                        Thread.sleep(new Random().nextInt(401));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                    DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
-                    MDB.getExecuter().execute(new PutChunk(message, packet));*/
+                    if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),0))) {
+                        Message new_putchunk = new Message("PUTCHUNK", Peer.get_protocol_version(),
+                                Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(),
+                                Storage.read_chunk_info_replication(message.get_file_id(), message.get_chunk_no()));
+                        byte[] chunk = Storage.read_chunk(new_putchunk.get_file_id(), new_putchunk.get_chunk_no());
+
+                        // TODO: incluir este codigo no construtor do PUTCHUNK
+                        byte[] data = new byte[new_putchunk.get_header().getBytes().length + chunk.length];
+                        System.arraycopy(new_putchunk.get_header().getBytes(), 0, data, 0, new_putchunk.get_header().getBytes().length);
+                        System.arraycopy(chunk, 0, data, new_putchunk.get_header().getBytes().length, chunk.length);
+
+                        DatagramPacket packet = new DatagramPacket(data, data.length, Peer.getMDB().getGroup(), Peer.getMDB().getPort());
+                        //****//
+                        Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
+                    }
                 }
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
