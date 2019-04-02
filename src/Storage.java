@@ -40,7 +40,7 @@ public class Storage {
     /**
      * [over_replication_degree , file_id , chunk_no]
      */
-    private PriorityQueue<String[]> over_replication;
+    private PriorityQueue<String[]> chunks_replication;
 
     Storage(Integer server_id) {
         if (Files.exists(Paths.get("peer" + server_id)))
@@ -48,7 +48,7 @@ public class Storage {
         else
             create_storage(server_id);
 
-        //init_over_replication();
+        load_replication();
     }
 
     /**
@@ -128,7 +128,7 @@ public class Storage {
         info = new File(this.root, "info"); info.mkdirs();
         this.local_storage = new File(this.root, "local_storage.txt");
         this.space = this.root.getFreeSpace();
-        this.write_local_storage(-1);
+        this.write_local_storage();
     }
 
     /**
@@ -152,17 +152,13 @@ public class Storage {
 
     /**
      * Writes local storage to its respective file
-     * @param new_local_storage Peer new local storage value. If value equals -1 it saves host free disk space
      */
-    private void write_local_storage(long new_local_storage) {
+    private void write_local_storage() {
         try {
             // Opens file, writes respective content and closes it
             synchronized (this.local_storage) {
                 BufferedWriter file_writer = new BufferedWriter(new FileWriter(this.local_storage));
-                if(new_local_storage == -1)
-                    file_writer.write(String.valueOf(this.space));
-                else
-                    file_writer.write(String.valueOf(new_local_storage));
+                file_writer.write(String.valueOf(this.space));
                 file_writer.close();
             }
         } catch (IOException e) {
@@ -174,55 +170,42 @@ public class Storage {
      * Change the system storage
      * @param space New space value
      */
-    public void update_storage_space(Integer space) {
+    public void set_storage_space(Integer space) {
         this.space = space;
         while (this.space < this.root.getTotalSpace()) {
-            if (over_replication.size() > 0) {
-                String[] info = over_replication.poll();
-                remove_chunk(info[1], info[2]);
-            } else {
-                // remove random chunks
+            if (chunks_replication.size() > 0) {
+                String[] info = chunks_replication.poll();
+                delete_chunk(info[1], Integer.parseInt(info[2]));
             }
         }
+
+        write_local_storage();
+    }
+
+    /**
+     * Update the system storage
+     * @param space Space to increase
+     */
+    public void update_storage_space(Integer space) {
+        this.space += space;
+
+        write_local_storage();
     }
 
     /**
      *
      */
-    private void init_over_replication() {
-        over_replication = new PriorityQueue<>(new String_array_cmp());
+    private void load_replication() {
+        this.chunks_replication = new PriorityQueue<>(new String_array_cmp());
         File[] files_directories = info.listFiles();
 
         for (File file_directory : files_directories) {
             File[] chunks_info_files = file_directory.listFiles();
 
             for (File chunk_file : chunks_info_files)
-                over_replication.add(new String[]
-                        {String.valueOf(get_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
+                this.chunks_replication.add(new String[]
+                        {String.valueOf(get_chunk_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
         }
-    }
-
-    /**
-     * Remove a chunk file of the storage and remove empty folders
-     * @param file_id File id
-     * @param chunk_no Chunk number
-     */
-    static void remove_chunk(String file_id, String chunk_no) {
-        File backup_file_directory = new File(backup, file_id);
-        File info_file_directory = new File(info, file_id);
-
-        new File(backup_file_directory, chunk_no).delete();
-        new File(info_file_directory, chunk_no).delete();
-
-        if (backup_file_directory.getTotalSpace() == 0) {
-            backup_file_directory.delete();
-            info_file_directory.delete();
-        }
-
-        // TODO - Remove the following lines: Storage class its only used to manipulate files.
-        //Message removed_message =
-         //       new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, Integer.parseInt(chunk_no),null);
-        //Peer.getMC().send_packet(removed_message);
     }
 
     /**
@@ -230,7 +213,7 @@ public class Storage {
      * @param file File with chunk replication information
      * @return over replication degree
      */
-    static Integer get_over_replication(File file) {
+    static Integer get_chunk_replication(File file) {
         String[] info_str = read_from_file(file).split("/");
 
         return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
@@ -287,6 +270,18 @@ public class Storage {
             return Integer.valueOf(read_from_file(file_reader).split("/")[0]);
     }
 
+    static  boolean exists_chunk(String file_id, Integer chunk_no) {
+        File file_directory = new File(backup,file_id);
+
+        if (!file_directory.exists())
+            return false;
+
+        if (new File(file_directory, String.valueOf(chunk_no)).exists())
+            return true;
+
+        return false;
+    }
+
     /**
      * Stores chunk content in backup directory and updates its current replication degree
      * @param file_id File identifier
@@ -318,6 +313,30 @@ public class Storage {
             return read_from_file(path.toFile());
     }
 
+    /**
+     * Remove a chunk file of the storage and remove empty folders
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     */
+    static void delete_chunk(String file_id, Integer chunk_no) {
+        File backup_file_directory = new File(backup, file_id);
+        File info_file_directory = new File(info, file_id);
+
+        // check if directories exists
+        if (!backup_file_directory.exists() || !info_file_directory.exists())
+            return;
+
+        new File(backup_file_directory, String.valueOf(chunk_no)).delete();
+        new File(info_file_directory, String.valueOf(chunk_no)).delete();
+
+        if (backup_file_directory.getTotalSpace() == 0) {
+            backup_file_directory.delete();
+            info_file_directory.delete();
+        }
+
+        Peer.getMC().send_packet(
+                new Message("REMOVED", Peer.getProtocolVersion(),Peer.getServerId(), file_id, chunk_no,null));
+    }
 
     // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)
     static void restore_file(String filename, String[] chunks) {

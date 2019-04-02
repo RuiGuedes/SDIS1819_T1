@@ -58,16 +58,20 @@ class DecryptMessage implements Runnable {
                 break;
             case "GETCHUNK":
                 // Check if you have the chunk  **
+                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
                 // If so, send chunk
             case "CHUNK":
                 // Save the chunk
             case "DELETE":
                 // Check if you have the chunk  **
+                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
                 // If so, delete chunk
-                Storage.remove_chunk(message.get_file_id(), String.valueOf(message.get_chunk_no()));
+                Storage.delete_chunk(message.getFile_id(), message.getChunk_no());
             case "REMOVED":
                 // Check if you have the chunk  **
+                Storage.exists_chunk(message.getFile_id(), message.getChunk_no());
                 // Decrease count replication degree
+                Storage.
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
         }

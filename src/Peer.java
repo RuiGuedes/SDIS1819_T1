@@ -1,6 +1,4 @@
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -220,7 +218,7 @@ public class Peer implements RMI {
     @Override
     public String reclaim(Integer disk_space) {
 
-        storage.update_storage_space(disk_space);
+        storage.set_storage_space(disk_space);
 
         return "Storage reclaim has been done with success !";
     }
