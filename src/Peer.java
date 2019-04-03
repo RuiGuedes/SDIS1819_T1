@@ -174,7 +174,7 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
-        boolean status = true;
+        boolean backup_status = true;
         FileData file = new FileData(filepath);
         ArrayList<PutChunk> threads = new ArrayList<>();
 
@@ -183,18 +183,11 @@ public class Peer implements RMI {
         while ((chunk = file.next_chunk()) != null) {
             // Checks whether a thread has terminated without success or not
             for(PutChunk thread : threads) {
-                if(!status) {
-                    thread.interrupt();
-                    MDB.getExecuter().remove(thread);
-                    threads.remove(thread);
-                }
-                else if(!thread.is_alive() && !thread.get_termination_status()) {
-                    threads.remove(thread);
-                    status = false;
-                }
+                if(!thread.is_running() && !thread.get_termination_status())
+                    backup_status = false;
             }
 
-            if(!status)
+            if(!backup_status)
                 break;
 
             // Creates message to be sent with the needed variables
@@ -214,41 +207,28 @@ public class Peer implements RMI {
             MDB.getExecuter().execute(task);
         }
 
-        while (!threads.isEmpty()) {
-            for(PutChunk thread : threads) {
-                if(!status) {
+        // Waits for all worker threads to finish and also inspects its status
+        while (true) {
+            boolean still_running = false;
 
-                    if(!thread.is_alive()) {
-                        thread.interrupt();
-                        MDB.getExecuter().remove(thread);
-                    }
-                    
-                    threads.remove(thread);
+            for(PutChunk thread : threads) {
+                if(thread.is_running()) {
+                    still_running = true;
+
+                    if(!backup_status)
+                        thread.terminate();
                 }
-                else if(!thread.is_alive()) {
-                    threads.remove(thread);
+                else {
                     if(!thread.get_termination_status())
-                        status = false;
+                        backup_status = false;
                 }
             }
+
+            if(!still_running)
+                break;
         }
 
-
-        /*
-        Estar no while e uma thread nao tem sucesso
-            - Verificar se existe uma thread que acabou e se acabou mal
-            - Se acabou mal termina todas as outras threads existentes e sai do ciclo
-            - Vai removendo da lista de threads
-        Fora do while
-            - Tem de esperar que as threads terminem e em simultaneo verificar que nenhuma dá erro
-            - Se der erro termina todas as outras threads existentes e sai do ciclo
-            - Vai removendo da lista de threads
-        Por fim verifica o status final do backup e age em concordancia
-         */
-
-
-
-        if(!status) {
+        if(!backup_status) {
             // TODO - Backup failed, delete all backup chunks and info
             return "Backup of " + file.get_filename() + " has been done without success !";
         }

@@ -112,9 +112,14 @@ class PutChunk implements Runnable {
     private DatagramPacket packet;
 
     /**
-     * Thread termination status: 1 = success : 0 = failed
+     * Thread termination status: true = success : false = failed
      */
-    private Integer termination_status;
+    private Boolean termination_status;
+
+    /**
+     * Determines whether thread exited run method
+     */
+    private Boolean exit_flag;
 
     /**
      * Put chunk constructor
@@ -122,12 +127,16 @@ class PutChunk implements Runnable {
     PutChunk(Message message, DatagramPacket packet) {
         this.message = message;
         this.packet = packet;
-        this.termination_status = 0;
+        this.termination_status = false;
+        this.exit_flag = false;
     }
 
     @Override
     public void run() {
         for (int i = 0; i < 5; i++) {
+            if(this.exit_flag)
+                break;
+
             Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
 
@@ -138,38 +147,34 @@ class PutChunk implements Runnable {
             }
 
             if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree()) {
-                this.termination_status = 1;
+                this.termination_status = true;
                 break;
             }
-
         }
-    }
 
-    public boolean get_termination_status() {
-        return termination_status == 1;
+        this.exit_flag = true;
     }
 
     /**
-     * Checks if thread has terminated or not
-     * @return True if it has, false otherwise
+     * Returns thread exit status
      */
-    public boolean is_alive() {
-        return Thread.currentThread().isAlive();
+    boolean get_termination_status() {
+        return termination_status;
     }
 
     /**
-     * Interrupts current thread
+     * Checks whether thread is running or not
      */
-    public void interrupt() {
-        if(!Thread.currentThread().isInterrupted())
-            Thread.currentThread().interrupt();
+    boolean is_running() {
+        return !this.exit_flag;
     }
 
     /**
-     * Checks if thread is terminated or not
-     * @return True if it is, false otherwise
+     * Terminates this thread by activating exit_flag
      */
-    public boolean is_interrupted() {
-        return Thread.currentThread().isInterrupted();
+    void terminate() {
+        this.exit_flag = true;
     }
+
+
 }
