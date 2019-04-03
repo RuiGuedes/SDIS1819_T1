@@ -224,6 +224,10 @@ public class Storage {
         write_local_storage();
     }
 
+    public int get_free_space() {
+        return (int) (this.space - this.root.getTotalSpace());
+    }
+
     /**
      *
      */
@@ -311,6 +315,25 @@ public class Storage {
             return 0;
         else
             return Integer.valueOf(read_from_file(file_reader).split("/")[1]);
+    }
+
+    public static boolean exists_file(String file_id) {
+        return new File(backup, file_id).exists();
+    }
+
+    public static void delete_file(String file_id) {
+        File backup_file_directory = new File(backup, file_id);
+        File info_file_directory = new File(chunks_info, file_id);
+
+        for (File chunk : backup_file_directory.listFiles()) {
+            chunk.delete();
+        }
+        backup_file_directory.delete();
+
+        for (File chunk : info_file_directory.listFiles()) {
+            chunk.delete();
+        }
+        info_file_directory.delete();
     }
 
     static  boolean exists_chunk(String file_id, Integer chunk_no) {

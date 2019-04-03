@@ -53,23 +53,49 @@ class DecryptMessage implements Runnable {
         switch (message.get_message_type()) {
             case "PUTCHUNK":
                 // TODO - Check if there is space available
-                Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
-                Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
-                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
+                if (Peer.getStorage().get_free_space() >= (message.get_body().length + 3)) {
+                    Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
+                    Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
+                    Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
+                }
                 break;
             case "STORED":
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
-                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
-                // If so, send chunk
+                if (Peer.get_server_id()== message.get_server_id())
+                    break;
+
+                if (Storage.exists_chunk(message.get_file_id(), message.get_chunk_no())) {
+                    Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
+                            Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null,
+                            Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
+
+                    try {
+                        Thread.sleep(new Random().nextInt(401));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // TODO: check if is correct to check if receive a CHUNK message before send
+                    Message received = new Message(Message.decrypt_packet(Peer.getMDR().receive_packet().getData()));
+                    if (received.get_file_id() != message.get_file_id() && received.get_chunk_no() != message.get_chunk_no())
+                        Peer.getMDR().send_packet(chunk_message);
+                }
+                break;
             case "CHUNK":
+                if (Peer.get_server_id() == message.get_server_id())
+                    break;
                 // Save the chunk
+                break;
             case "DELETE":
-                /*Storage.exists_file(message.get_file_id());
-                // If so, delete chunk
-                Storage.delete_file(message.get_file_id());*/
+                if(Storage.exists_file(message.get_file_id()))
+                    Storage.delete_file(message.get_file_id());
+                break;
             case "REMOVED":
+                if (Peer.get_server_id()== message.get_server_id())
+                    break;
+
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
                 if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
@@ -93,6 +119,7 @@ class DecryptMessage implements Runnable {
                         Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
                     }
                 }
+                break;
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
         }

@@ -68,12 +68,12 @@ public class Multicast {
         }
     }
 
-    public void send_packet(Message answer) {
+    public void send_packet(Message message) {
 
         byte[] buf;
         DatagramPacket packet;
 
-        buf = answer.get_header().getBytes();
+        buf = message.get_data();
         packet = new DatagramPacket(buf, buf.length, this.group, this.port);
         this.send_packet(packet);
     }
