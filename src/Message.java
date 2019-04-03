@@ -53,7 +53,7 @@ class Message {
     /**
      * Message constructor by specifying each needed field
      */
-    Message(String message_type, String protocol_version, Integer server_id, String file_id, Integer chunk_no, Integer replication_degree) {
+    Message(String message_type, String protocol_version, Integer server_id, String file_id, Integer chunk_no, Integer replication_degree, byte[] body) {
         // Initializes class variables
         this.message_type = message_type;
         this.protocol_version = protocol_version;
@@ -61,6 +61,7 @@ class Message {
         this.file_id = file_id;
         this.chunk_no = chunk_no;
         this.replication_degree = replication_degree;
+        this.body = body;
 
         // Initializes message header
         init_message_header();
@@ -125,8 +126,6 @@ class Message {
     static ArrayList<byte[]> decrypt_packet(byte[] bytes) {
         ArrayList<byte[]> packet_info = new ArrayList<>();
 
-        System.out.println("packet ---> " + bytes.length);
-
         for(int i = 0; i < bytes.length - 3; i++) {
             if(bytes[i] == '\r' && bytes[i + 1] == '\n' && bytes[i + 2] == '\r' && bytes[i + 3] == '\n') {
                 byte[] header = Arrays.copyOfRange(bytes, 0 , i); packet_info.add(header);
@@ -134,11 +133,21 @@ class Message {
             }
         }
 
-        System.out.println("body ---> " + packet_info.get(1).length);
-        System.out.println();
-
         return packet_info;
     }
+
+    /**
+     * Given a message, creates a byte array to be sent
+     * @return Byte array containing all information
+     */
+    byte[] get_data() {
+        byte[] data = new byte[this.get_header().getBytes().length + this.get_body().length];
+        System.arraycopy(this.get_header().getBytes(), 0, data, 0, this.get_header().getBytes().length);
+        System.arraycopy(this.get_body(), 0, data, this.get_header().getBytes().length, this.get_body().length);
+        return data;
+    }
+
+
 
     /**
      * Transforms byte array to string
@@ -148,7 +157,6 @@ class Message {
     private static String bytes_to_string(byte[] bytes) {
         return new String(bytes, StandardCharsets.UTF_8);
     }
-
 
     /**
      * Get's message type

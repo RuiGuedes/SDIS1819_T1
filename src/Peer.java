@@ -1,3 +1,4 @@
+import javax.xml.crypto.Data;
 import java.net.DatagramPacket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -173,25 +174,86 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
+        boolean status = true;
         FileData file = new FileData(filepath);
         ArrayList<PutChunk> threads = new ArrayList<>();
 
         // TODO - Check if file is already backed up: if it is return else backup. NOTE: If file is a new version must delete old file and backup new one
 
         while ((chunk = file.next_chunk()) != null) {
-            Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree);
+            // Checks whether a thread has terminated without success or not
+            for(PutChunk thread : threads) {
+                if(!status) {
+                    thread.interrupt();
+                    MDB.getExecuter().remove(thread);
+                    threads.remove(thread);
+                }
+                else if(!thread.is_alive() && !thread.get_termination_status()) {
+                    threads.remove(thread);
+                    status = false;
+                }
+            }
 
-            byte[] data = new byte[message.get_header().getBytes().length + chunk.length];
-            System.arraycopy(message.get_header().getBytes(), 0, data, 0, message.get_header().getBytes().length);
-            System.arraycopy(chunk, 0, data, message.get_header().getBytes().length, chunk.length);
+            if(!status)
+                break;
 
+            // Creates message to be sent with the needed variables
+            Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree, chunk);
+
+            // Transforms message into
+            byte[] data = message.get_data();
+
+            // Creates packet to be sent and task to be executed
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
             PutChunk task = new PutChunk(message, packet);
+
+            // Adds task to running threads
+            threads.add(task);
+
+            // Executes task
             MDB.getExecuter().execute(task);
         }
 
+        while (!threads.isEmpty()) {
+            for(PutChunk thread : threads) {
+                if(!status) {
+
+                    if(!thread.is_alive()) {
+                        thread.interrupt();
+                        MDB.getExecuter().remove(thread);
+                    }
+                    
+                    threads.remove(thread);
+                }
+                else if(!thread.is_alive()) {
+                    threads.remove(thread);
+                    if(!thread.get_termination_status())
+                        status = false;
+                }
+            }
+        }
+
+
+        /*
+        Estar no while e uma thread nao tem sucesso
+            - Verificar se existe uma thread que acabou e se acabou mal
+            - Se acabou mal termina todas as outras threads existentes e sai do ciclo
+            - Vai removendo da lista de threads
+        Fora do while
+            - Tem de esperar que as threads terminem e em simultaneo verificar que nenhuma dá erro
+            - Se der erro termina todas as outras threads existentes e sai do ciclo
+            - Vai removendo da lista de threads
+        Por fim verifica o status final do backup e age em concordancia
+         */
+
+
+
+        if(!status) {
+            // TODO - Backup failed, delete all backup chunks and info
+            return "Backup of " + file.get_filename() + " has been done without success !";
+        }
+
         // TODO - Backup with success: update storage
-        // TODO - Backup failed, delete all backup chunks and info
 
         return "Backup of " + file.get_filename() + " has been done with success !";
     }
@@ -210,7 +272,7 @@ public class Peer implements RMI {
     public String delete(String filepath) {
         FileData file = new FileData(filepath);
 
-        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(),null,null);
+        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), null, null, null);
 
         MC.send_packet(message);
 

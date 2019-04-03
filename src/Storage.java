@@ -300,7 +300,7 @@ public class Storage {
     }
 
     static int read_chunk_info_replication(String file_id, Integer chunk_no) {
-        File directory = new File(info, file_id);
+        File directory = new File(chunks_info, file_id);
 
         if (!directory.exists())
             return 0;
@@ -375,7 +375,7 @@ public class Storage {
         }
 
         Peer.getMC().send_packet(
-                new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null));
+                new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null, null));
     }
 
     // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)

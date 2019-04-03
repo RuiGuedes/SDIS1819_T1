@@ -55,7 +55,7 @@ class DecryptMessage implements Runnable {
                 // TODO - Check if there is space available
                 Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
                 Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
-                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null));
+                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
                 break;
             case "STORED":
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
@@ -80,18 +80,16 @@ class DecryptMessage implements Runnable {
                     }
 
                     if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),0))) {
+
                         Message new_putchunk = new Message("PUTCHUNK", Peer.get_protocol_version(),
                                 Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(),
-                                Storage.read_chunk_info_replication(message.get_file_id(), message.get_chunk_no()));
-                        byte[] chunk = Storage.read_chunk(new_putchunk.get_file_id(), new_putchunk.get_chunk_no());
+                                Storage.read_chunk_info_replication(message.get_file_id(), message.get_chunk_no()),
+                                Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
 
-                        // TODO: incluir este codigo no construtor do PUTCHUNK
-                        byte[] data = new byte[new_putchunk.get_header().getBytes().length + chunk.length];
-                        System.arraycopy(new_putchunk.get_header().getBytes(), 0, data, 0, new_putchunk.get_header().getBytes().length);
-                        System.arraycopy(chunk, 0, data, new_putchunk.get_header().getBytes().length, chunk.length);
+                        byte[] data = new_putchunk.get_data();
 
                         DatagramPacket packet = new DatagramPacket(data, data.length, Peer.getMDB().getGroup(), Peer.getMDB().getPort());
-                        //****//
+
                         Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
                     }
                 }
@@ -114,16 +112,21 @@ class PutChunk implements Runnable {
     private DatagramPacket packet;
 
     /**
+     * Thread termination status: 1 = success : 0 = failed
+     */
+    private Integer termination_status;
+
+    /**
      * Put chunk constructor
      */
     PutChunk(Message message, DatagramPacket packet) {
         this.message = message;
         this.packet = packet;
+        this.termination_status = 0;
     }
 
     @Override
     public void run() {
-
         for (int i = 0; i < 5; i++) {
             Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
@@ -134,8 +137,39 @@ class PutChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree())
+            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree()) {
+                this.termination_status = 1;
                 break;
+            }
+
         }
+    }
+
+    public boolean get_termination_status() {
+        return termination_status == 1;
+    }
+
+    /**
+     * Checks if thread has terminated or not
+     * @return True if it has, false otherwise
+     */
+    public boolean is_alive() {
+        return Thread.currentThread().isAlive();
+    }
+
+    /**
+     * Interrupts current thread
+     */
+    public void interrupt() {
+        if(!Thread.currentThread().isInterrupted())
+            Thread.currentThread().interrupt();
+    }
+
+    /**
+     * Checks if thread is terminated or not
+     * @return True if it is, false otherwise
+     */
+    public boolean is_interrupted() {
+        return Thread.currentThread().isInterrupted();
     }
 }
