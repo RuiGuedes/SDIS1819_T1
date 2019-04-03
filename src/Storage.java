@@ -224,6 +224,10 @@ public class Storage {
         write_local_storage();
     }
 
+    public int get_free_space() {
+        return (int) (this.space - this.root.getTotalSpace());
+    }
+
     /**
      *
      */

@@ -53,9 +53,11 @@ class DecryptMessage implements Runnable {
         switch (message.get_message_type()) {
             case "PUTCHUNK":
                 // TODO - Check if there is space available
-                Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
-                Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
-                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
+                if (Peer.getStorage().get_free_space() >= (message.get_body().length + 3)) {
+                    Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
+                    Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
+                    Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
+                }
                 break;
             case "STORED":
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
@@ -68,10 +70,22 @@ class DecryptMessage implements Runnable {
                     Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
                             Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null,
                             Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
+
+                    try {
+                        Thread.sleep(new Random().nextInt(401));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // TODO: check if is correct to check if receive a CHUNK message before send
+                    Message received = new Message(Message.decrypt_packet(Peer.getMDR().receive_packet().getData()));
+                    if (received.get_file_id() != message.get_file_id() && received.get_chunk_no() != message.get_chunk_no())
+                        Peer.getMDR().send_packet(chunk_message);
                 }
                 break;
             case "CHUNK":
-                if (Peer.get_server_id() == message.get_server_id());
+                if (Peer.get_server_id() == message.get_server_id())
+                    break;
                 // Save the chunk
                 break;
             case "DELETE":
