@@ -61,15 +61,27 @@ class DecryptMessage implements Runnable {
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
-                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
-                // If so, send chunk
+                if (Peer.get_server_id()== message.get_server_id())
+                    break;
+
+                if (Storage.exists_chunk(message.get_file_id(), message.get_chunk_no())) {
+                    Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
+                            Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null,
+                            Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
+                }
+                break;
             case "CHUNK":
+                if (Peer.get_server_id() == message.get_server_id());
                 // Save the chunk
+                break;
             case "DELETE":
-                /*Storage.exists_file(message.get_file_id());
-                // If so, delete chunk
-                Storage.delete_file(message.get_file_id());*/
+                if(Storage.exists_file(message.get_file_id()))
+                    Storage.delete_file(message.get_file_id());
+                break;
             case "REMOVED":
+                if (Peer.get_server_id()== message.get_server_id())
+                    break;
+
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
                 if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
@@ -93,6 +105,7 @@ class DecryptMessage implements Runnable {
                         Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
                     }
                 }
+                break;
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
         }
