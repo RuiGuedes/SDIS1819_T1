@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class Peer implements RMI {
@@ -178,8 +179,15 @@ public class Peer implements RMI {
         FileData file = new FileData(filepath);
         ArrayList<PutChunk> threads = new ArrayList<>();
 
-        // TODO - Check if file is already backed up: if it is return else backup. NOTE: If file is a new version must delete old file and backup new one
-
+        // Determine if file was already backed up or updated
+        switch (getStorage().is_backed_up(file)) {
+            case "RETURN":
+                return "Backup of " + file.get_filename() + " has already been done !";
+            case "DELETE-AND-BACKUP":
+                this.delete(filepath);
+                getStorage().remove_backed_up_file(file);
+        }
+        System.out.println("BACKUP");
         while ((chunk = file.next_chunk()) != null) {
             // Checks whether a thread has terminated without success or not
             for(PutChunk thread : threads) {
@@ -206,7 +214,7 @@ public class Peer implements RMI {
             // Executes task
             MDB.getExecuter().execute(task);
         }
-
+        System.out.println("WAIT");
         // Waits for all worker threads to finish and also inspects its status
         while (true) {
             boolean still_running = false;
@@ -214,7 +222,6 @@ public class Peer implements RMI {
             for(PutChunk thread : threads) {
                 if(thread.is_running()) {
                     still_running = true;
-
                     if(!backup_status)
                         thread.terminate();
                 }
@@ -227,15 +234,14 @@ public class Peer implements RMI {
             if(!still_running)
                 break;
         }
+        System.out.println("END " + backup_status);
+        // In case of failure delete all chunks stored so far
+        if(!backup_status)
+            this.delete(filepath);
+        else
+            getStorage().store_backed_up_file(file);
 
-        if(!backup_status) {
-            // TODO - Backup failed, delete all backup chunks and info
-            return "Backup of " + file.get_filename() + " has been done without success !";
-        }
-
-        // TODO - Backup with success: update storage
-
-        return "Backup of " + file.get_filename() + " has been done with success !";
+        return "Backup of " + file.get_filename() + " has been done " + (backup_status ? "with" : "without") + " success !";
     }
 
 
@@ -254,7 +260,20 @@ public class Peer implements RMI {
 
         Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), null, null, null);
 
-        MC.send_packet(message);
+        // Sends delete message three times to prevent its loss
+        for(int i = 0; i < 3; i++) {
+            try {
+                MC.send_packet(message);
+                TimeUnit.SECONDS.sleep(new Random().nextInt(400));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Delete protocol enhancement
+        if(PROTOCOL_VERSION.equals("2.0")) {
+            // TODO - Save delete log on deleted_files file with the current date
+        }
 
         return file.get_filename() + " has been deleted with success !";
     }

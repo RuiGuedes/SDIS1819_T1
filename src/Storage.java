@@ -2,9 +2,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Storage {
 
@@ -48,6 +46,12 @@ public class Storage {
      */
     private PriorityQueue<String[]> chunks_replication;
 
+
+    private Map<String, String> backed_up_files;
+
+    /**
+     * Storage class constructor
+     */
     Storage(Integer server_id) {
         if (Files.exists(Paths.get("peer" + server_id)))
             load_storage(server_id);
@@ -146,6 +150,7 @@ public class Storage {
         backup_info = new File(this.root, "backup_info");
         this.local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
+        this.read_backed_up_files();
     }
 
     /**
@@ -161,6 +166,7 @@ public class Storage {
         this.local_storage = new File(this.root, "local_storage.txt");
         this.space = this.root.getFreeSpace();
         this.write_local_storage();
+        this.backed_up_files = new HashMap<>();
     }
 
     /**
@@ -202,7 +208,7 @@ public class Storage {
      * Change the system storage
      * @param space New space value
      */
-    public void set_storage_space(Integer space) {
+    void set_storage_space(Integer space) {
         this.space = space;
         while (this.space < this.root.getTotalSpace()) {
             if (chunks_replication.size() > 0) {
@@ -216,17 +222,78 @@ public class Storage {
 
     /**
      * Update the system storage
-     * @param space Space to increase
+     * @param space Space to increase/decrease
      */
     public void update_storage_space(Integer space) {
         this.space += space;
-
         write_local_storage();
     }
 
-    public int get_free_space() {
+    /**
+     * Get the space available to store data
+     * @return Free space
+     */
+    int get_free_space() {
         return (int) (this.space - this.root.getTotalSpace());
     }
+
+    /**
+     * Reads information about backed up files
+     */
+    private void read_backed_up_files() {
+        this.backed_up_files = new HashMap<>();
+
+        for (final File file_entry : Objects.requireNonNull(backup_info.listFiles())) {
+            if (!file_entry.isDirectory()) {
+                try {
+                    // Opens file, reads local storage and closes file
+                    BufferedReader file_reader = new BufferedReader(new FileReader(file_entry));
+                    this.backed_up_files.put(file_entry.getName(), file_reader.readLine());
+                    file_reader.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds file to backed up files and stores it in the filesystem
+     * @param file File to be stored
+     */
+    public void store_backed_up_file(FileData file) {
+        this.backed_up_files.put(file.get_filename(), file.get_file_id());
+
+        try {
+            File file_writer = new File(backup_info, file.get_filename());
+            file_writer.createNewFile();
+            write_to_file(file_writer, file.get_file_id());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void remove_backed_up_file(FileData file) {
+        this.backed_up_files.remove(file.get_filename());
+        new File(backup_info, file.get_filename()).delete();
+    }
+
+    /**
+     * Check if file is backed up or not
+     * @param file File to be checked
+     * @return True if it has, false otherwise.
+     */
+    public String is_backed_up(FileData file) {
+        if(!this.backed_up_files.isEmpty() & this.backed_up_files.containsKey(file.get_filename())) {
+            if(this.backed_up_files.get(file.get_filename()).equals(file.get_file_id()))
+                return "RETURN";
+            else
+                return "DELETE-AND-BACKUP";
+        }
+        else
+            return "BACKUP";
+    }
+
 
     /**
      *
@@ -254,6 +321,10 @@ public class Storage {
 
         return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
     }
+
+
+
+
 
     static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
         File directory = new File(chunks_info, file_id);
@@ -423,7 +494,6 @@ public class Storage {
  * Priority queue comparator
  */
 class String_array_cmp implements Comparator<String[]> {
-
     public int compare (String[] s1, String[] s2) {
         return s1[0].compareTo(s2[0]);
     }

@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-public class FileData {
+class FileData {
 
     /**
      * Name of file
@@ -32,11 +32,18 @@ public class FileData {
      */
     private String owner;
 
+    /**
+     * Encrypted fileId using SHA-256
+     */
+    private String file_id;
+
+    /**
+     * Determines end-of-file
+     */
     private Boolean EOF = false;
 
     /**
      * Default constructor
-     * @param filepath
      */
     FileData(String filepath) {
         this.file = new File(filepath);
@@ -52,27 +59,21 @@ public class FileData {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.file_id = encrypt_file(this.filename + this.last_modified + this.owner);
     }
-
-    public InputStream get_stream() {
-        return stream;
-    }
-
-    public String get_filename() { return filename; }
 
     /**
-     * Return String with filename, last_modified and owner
-     * @return
+     * Get filename
      */
-    public String get_file_id() {
-        return encrypt_file(this.filename + this.last_modified + this.owner);
-    }
+    String get_filename() {
+        return filename; }
 
-    public File get_file() {
-        return file;
+    /**
+     * Return String with filename, last_modified and owner encrypted
+     */
+    String get_file_id() {
+        return file_id;
     }
-
-    public long get_last_modified() { return last_modified; }
 
     /**
      * Encrypts fileId using SHA-256
