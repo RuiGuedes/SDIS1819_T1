@@ -253,7 +253,7 @@ public class Peer implements RMI {
     @Override
     public String restore(String filepath) {
         // Create file data
-        // TODO - Not create file but instead retrive its hash from the backup info folder
+        // TODO - Not create file but instead retrieve its hash from the backup info folder
         FileData file = new FileData(filepath);
 
         // Variables
@@ -267,7 +267,6 @@ public class Peer implements RMI {
 
             // Creates packet to be sent and task to be executed
             MC.send_packet(message);
-            System.out.println("SEND GETCHUNK: " + (chunk_no - 1));
         }
 
         // TODO - If needed resend message to improve restore protocol

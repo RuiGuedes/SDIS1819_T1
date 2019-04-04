@@ -65,11 +65,9 @@ class DecryptMessage implements Runnable {
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
-                System.out.println("RECEIVED GETCHUNK: " + message.get_chunk_no());
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
                 break;
             case "CHUNK":
-                System.out.println("RECEIVED CHUNK: " + message.get_chunk_no());
                 if(!Peer.files_to_restore.containsKey(message.get_file_id()))
                     Peer.files_to_restore.put(message.get_file_id(), new HashMap<>());
                 Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());

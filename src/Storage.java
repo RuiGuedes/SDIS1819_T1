@@ -523,12 +523,20 @@ public class Storage {
         try {
             // Creates file
             file.createNewFile();
+            FileOutputStream file_writer = new FileOutputStream(file, true);
             Map<Integer, byte[]> data = Peer.files_to_restore.get(file_id);
 
             // Writes content to file
             for(Map.Entry<Integer, byte[]> chunk : data.entrySet()) {
-                write_to_file(file, chunk.getValue());
+                try {
+                    synchronized (file) {
+                        file_writer.write(chunk.getValue());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            file_writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
