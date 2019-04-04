@@ -6,6 +6,12 @@ import java.util.*;
 
 public class Storage {
 
+    // TODO - Update local storage on file
+    // TODO - Space is only relative to chunk storage not all files involved
+
+    /**
+     * Chunk information size
+     */
     static int CHUNK_INFO_SIZE = 3;
 
     /**
@@ -44,11 +50,13 @@ public class Storage {
     private long space;
 
     /**
-     * [over_replication_degree , file_id , chunk_no]
+     * Structure containing chunks replication degree: [over_replication_degree , file_id , chunk_no]
      */
     private PriorityQueue<String[]> chunks_replication;
 
-
+    /**
+     * Structure containing backed up files information
+     */
     private Map<String, String> backed_up_files;
 
     /**

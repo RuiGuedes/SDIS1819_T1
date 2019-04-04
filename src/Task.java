@@ -52,6 +52,7 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
             case "PUTCHUNK":
+                // TODO - Check why this (Commented lines) is wrong
                 //if (Peer.getStorage().get_free_space() >= (message.get_body().length + Storage.CHUNK_INFO_SIZE)) {
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
@@ -83,17 +84,12 @@ class DecryptMessage implements Runnable {
                 }
                 break;
             case "CHUNK":
-                if (Peer.get_server_id() == message.get_server_id())
-                    break;
                 // Save the chunk
                 break;
             case "DELETE":
                 Storage.delete_file(message.get_file_id());
                 break;
             case "REMOVED":
-                if (Peer.get_server_id()== message.get_server_id())
-                    break;
-
                 Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
                 if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
