@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/Storage.java" line="149" mnemonic="2" />
+    <bookmark url="file://$PROJECT_DIR$/src/Storage.java" line="151" mnemonic="2" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/src/DecryptMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/DecryptMessage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FileData.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/FileData.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FileData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FileData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Multicast.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Multicast.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FileTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/FileTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Message.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Message.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Message.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Peer.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/PutChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/PutChunk.class" afterDir="false" />
@@ -16,6 +16,8 @@
       <change beforePath="$PROJECT_DIR$/src/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/String_array_cmp.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/String_array_cmp.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TestApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/TestApp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TestApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TestApp.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,22 +37,23 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="229" column="37" selection-start-line="229" selection-start-column="24" selection-end-line="229" selection-end-column="37" />
+            <state relative-caret-position="151">
+              <caret line="256" selection-start-line="256" selection-end-line="256" />
               <folding>
                 <element signature="e#4799#4800#0" expanded="true" />
                 <element signature="e#4829#4830#0" expanded="true" />
-                <element signature="e#8885#8886#0" expanded="true" />
+                <element signature="e#9090#9091#0" expanded="true" />
+                <element signature="e#9115#9116#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Task.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="63" column="42" selection-start-line="63" selection-start-column="42" selection-end-line="63" selection-end-column="42" />
+            <state relative-caret-position="51">
+              <caret line="65" column="26" selection-start-line="65" selection-start-column="26" selection-end-line="65" selection-end-column="26" />
               <folding>
                 <element signature="e#5254#5255#0" expanded="true" />
                 <element signature="e#5295#5296#0" expanded="true" />
@@ -62,8 +65,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Message.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="610">
-              <caret line="143" selection-start-line="143" selection-end-line="143" />
+            <state relative-caret-position="253">
+              <caret line="133" column="9" selection-start-line="133" selection-start-column="9" selection-end-line="133" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -71,16 +74,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Storage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="244" selection-start-line="244" selection-end-line="244" />
-              <folding>
-                <element signature="e#6592#6593#0" expanded="true" />
-                <element signature="e#6661#6662#0" expanded="true" />
-                <element signature="e#12084#12085#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="168">
+              <caret line="150" column="50" selection-start-line="150" selection-start-column="50" selection-end-line="150" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -102,8 +100,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Multicast.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-17">
-              <caret line="34" column="24" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+            <state relative-caret-position="236">
+              <caret line="75" column="22" selection-start-line="75" selection-start-column="22" selection-end-line="75" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -126,8 +124,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/TestApp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="663">
-              <caret line="42" selection-start-line="42" selection-end-line="42" />
+            <state relative-caret-position="270">
+              <caret line="76" column="60" selection-start-line="76" selection-start-column="60" selection-end-line="76" selection-end-column="60" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -174,13 +172,13 @@
         <option value="$PROJECT_DIR$/src/Peer/Peer.java" />
         <option value="$PROJECT_DIR$/peer1/restore/as" />
         <option value="$PROJECT_DIR$/peer1/backup/as/1" />
-        <option value="$PROJECT_DIR$/src/TestApp.java" />
-        <option value="$PROJECT_DIR$/src/Message.java" />
         <option value="$PROJECT_DIR$/src/Multicast.java" />
         <option value="$PROJECT_DIR$/src/FileData.java" />
-        <option value="$PROJECT_DIR$/src/Storage.java" />
+        <option value="$PROJECT_DIR$/src/Message.java" />
+        <option value="$PROJECT_DIR$/src/TestApp.java" />
         <option value="$PROJECT_DIR$/src/Peer.java" />
         <option value="$PROJECT_DIR$/src/Task.java" />
+        <option value="$PROJECT_DIR$/src/Storage.java" />
       </list>
     </option>
   </component>
@@ -209,6 +207,12 @@
               <item name="SDIS1819_T1" type="b2602c69:ProjectViewProjectNode" />
               <item name="SDIS1819_T1" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SDIS1819_T1" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SDIS1819_T1" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Storage.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </path>
           </expand>
           <select />
@@ -248,7 +252,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.TestApp">
+  <component name="RunManager" selected="Application.TestApp Backup">
     <configuration name="Peer1" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Peer" />
       <module name="SDIS1819_T1" />
@@ -265,10 +269,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestApp" type="Application" factoryName="Application" nameIsGenerated="true">
+    <configuration name="TestApp Backup" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TestApp" />
       <module name="SDIS1819_T1" />
-      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; BACKUP &quot;./src/FileTest.txt&quot; 1" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; BACKUP &quot;./src/FileTest.txt&quot; 2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestApp Delete" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="TestApp" />
+      <module name="SDIS1819_T1" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; DELETE &quot;./src/FileTest.txt&quot;" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -284,7 +296,8 @@
     <list>
       <item itemvalue="Application.Peer1" />
       <item itemvalue="Application.Peer2" />
-      <item itemvalue="Application.TestApp" />
+      <item itemvalue="Application.TestApp Backup" />
+      <item itemvalue="Application.TestApp Delete" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -317,12 +330,12 @@
       <workItem from="1554251145790" duration="3554000" />
       <workItem from="1554282604961" duration="3116000" />
       <workItem from="1554289334883" duration="27000" />
-      <workItem from="1554312902853" duration="6853000" />
+      <workItem from="1554312902853" duration="13753000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="135953000" />
+    <option name="totallyTimeSpent" value="142853000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -355,7 +368,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3286119" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49733475" weight="0.11756374" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50053304" side_tool="true" weight="0.34190783" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50159913" side_tool="true" weight="0.25830653" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.49946696" weight="0.34078214" />
       <window_info anchor="bottom" id="Duplicate detector" order="13" weight="0.3295129" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -428,16 +441,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/TestApp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="663">
-          <caret line="42" selection-start-line="42" selection-end-line="42" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/FileData.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -450,32 +453,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Message.java">
+    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="610">
-          <caret line="143" selection-start-line="143" selection-end-line="143" />
+        <state relative-caret-position="236">
+          <caret line="75" column="22" selection-start-line="75" selection-start-column="22" selection-end-line="75" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Storage.java">
+    <entry file="file://$PROJECT_DIR$/src/Message.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="244" selection-start-line="244" selection-end-line="244" />
+        <state relative-caret-position="253">
+          <caret line="133" column="9" selection-start-line="133" selection-start-column="9" selection-end-line="133" selection-end-column="9" />
           <folding>
-            <element signature="e#6592#6593#0" expanded="true" />
-            <element signature="e#6661#6662#0" expanded="true" />
-            <element signature="e#12084#12085#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
+    <entry file="file://$PROJECT_DIR$/src/TestApp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-17">
-          <caret line="34" column="24" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+        <state relative-caret-position="270">
+          <caret line="76" column="60" selection-start-line="76" selection-start-column="60" selection-end-line="76" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -484,24 +485,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Peer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="229" column="37" selection-start-line="229" selection-start-column="24" selection-end-line="229" selection-end-column="37" />
+        <state relative-caret-position="151">
+          <caret line="256" selection-start-line="256" selection-end-line="256" />
           <folding>
             <element signature="e#4799#4800#0" expanded="true" />
             <element signature="e#4829#4830#0" expanded="true" />
-            <element signature="e#8885#8886#0" expanded="true" />
+            <element signature="e#9090#9091#0" expanded="true" />
+            <element signature="e#9115#9116#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Task.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="63" column="42" selection-start-line="63" selection-start-column="42" selection-end-line="63" selection-end-column="42" />
+        <state relative-caret-position="51">
+          <caret line="65" column="26" selection-start-line="65" selection-start-column="26" selection-end-line="65" selection-end-column="26" />
           <folding>
             <element signature="e#5254#5255#0" expanded="true" />
             <element signature="e#5295#5296#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Storage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="150" column="50" selection-start-line="150" selection-start-column="50" selection-end-line="150" selection-end-column="50" />
         </state>
       </provider>
     </entry>

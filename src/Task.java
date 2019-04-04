@@ -52,16 +52,13 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
             case "PUTCHUNK":
-                // TODO - Check if there is space available
-                System.out.println("PUTCHUNK");
-                //if (Peer.getStorage().get_free_space() >= (message.get_body().length + 3)) {
+                //if (Peer.getStorage().get_free_space() >= (message.get_body().length + Storage.CHUNK_INFO_SIZE)) {
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
                 //}
                 break;
             case "STORED":
-                System.out.println("STORED");
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
@@ -91,8 +88,7 @@ class DecryptMessage implements Runnable {
                 // Save the chunk
                 break;
             case "DELETE":
-                if(Storage.exists_file(message.get_file_id()))
-                    Storage.delete_file(message.get_file_id());
+                Storage.delete_file(message.get_file_id());
                 break;
             case "REMOVED":
                 if (Peer.get_server_id()== message.get_server_id())

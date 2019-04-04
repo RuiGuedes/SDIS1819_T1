@@ -180,14 +180,17 @@ public class Peer implements RMI {
         ArrayList<PutChunk> threads = new ArrayList<>();
 
         // Determine if file was already backed up or updated
-        switch (getStorage().is_backed_up(file)) {
+        switch (getStorage().is_backed_up(file.get_filename(), file.get_file_id())) {
             case "RETURN":
                 return "Backup of " + file.get_filename() + " has already been done !";
             case "DELETE-AND-BACKUP":
-                this.delete(filepath);
-                getStorage().remove_backed_up_file(file);
+                this.delete_file_evidence(file.get_filename(), getStorage().get_backed_up_file_id(file));
+                break;
         }
-        System.out.println("BACKUP");
+
+        // Adds file to backed up files list
+        getStorage().store_backed_up_file(file);
+
         while ((chunk = file.next_chunk()) != null) {
             // Checks whether a thread has terminated without success or not
             for(PutChunk thread : threads) {
@@ -214,7 +217,7 @@ public class Peer implements RMI {
             // Executes task
             MDB.getExecuter().execute(task);
         }
-        System.out.println("WAIT");
+
         // Waits for all worker threads to finish and also inspects its status
         while (true) {
             boolean still_running = false;
@@ -234,12 +237,10 @@ public class Peer implements RMI {
             if(!still_running)
                 break;
         }
-        System.out.println("END " + backup_status);
+
         // In case of failure delete all chunks stored so far
         if(!backup_status)
             this.delete(filepath);
-        else
-            getStorage().store_backed_up_file(file);
 
         return "Backup of " + file.get_filename() + " has been done " + (backup_status ? "with" : "without") + " success !";
     }
@@ -258,13 +259,29 @@ public class Peer implements RMI {
     public String delete(String filepath) {
         FileData file = new FileData(filepath);
 
-        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), null, null, null);
+        return delete_file_evidence(file.get_filename(), file.get_file_id());
+    }
+
+    /**
+     * For a given filename and file_id deletes all evidence of file corresponding to these parameters
+     * @param filename Filename
+     * @param file_id File id
+     */
+    private String delete_file_evidence(String filename, String file_id) {
+        if(!getStorage().is_backed_up(filename, file_id).equals("RETURN"))
+            return "File " + filename + " could not be delete since it was no previously backed up !";
+
+        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file_id, null, null, null);
+
+        getStorage().remove_backed_up_file(filename);
+        Storage.delete_file(file_id);
 
         // Sends delete message three times to prevent its loss
         for(int i = 0; i < 3; i++) {
             try {
                 MC.send_packet(message);
-                TimeUnit.SECONDS.sleep(new Random().nextInt(400));
+
+                TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -275,7 +292,7 @@ public class Peer implements RMI {
             // TODO - Save delete log on deleted_files file with the current date
         }
 
-        return file.get_filename() + " has been deleted with success !";
+        return "Delete of " + filename + " has been done with success !";
     }
 
     @Override

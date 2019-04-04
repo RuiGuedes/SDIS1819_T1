@@ -6,6 +6,8 @@ import java.util.*;
 
 public class Storage {
 
+    static int CHUNK_INFO_SIZE = 3;
+
     /**
      * Root directory [peerX]
      */
@@ -261,7 +263,7 @@ public class Storage {
      * Adds file to backed up files and stores it in the filesystem
      * @param file File to be stored
      */
-    public void store_backed_up_file(FileData file) {
+    void store_backed_up_file(FileData file) {
         this.backed_up_files.put(file.get_filename(), file.get_file_id());
 
         try {
@@ -273,19 +275,24 @@ public class Storage {
         }
     }
 
-    public void remove_backed_up_file(FileData file) {
-        this.backed_up_files.remove(file.get_filename());
-        new File(backup_info, file.get_filename()).delete();
+    /**
+     * Removed backed up file from file system
+     * @param filename Name of the file to be removed
+     */
+    void remove_backed_up_file(String filename) {
+        this.backed_up_files.remove(filename);
+        new File(backup_info, filename).delete();
     }
 
     /**
      * Check if file is backed up or not
-     * @param file File to be checked
+     * @param filename Filename
+     * @param file_id File id
      * @return True if it has, false otherwise.
      */
-    public String is_backed_up(FileData file) {
-        if(!this.backed_up_files.isEmpty() & this.backed_up_files.containsKey(file.get_filename())) {
-            if(this.backed_up_files.get(file.get_filename()).equals(file.get_file_id()))
+    String is_backed_up(String filename, String file_id) {
+        if(!this.backed_up_files.isEmpty() & this.backed_up_files.containsKey(filename)) {
+            if(this.backed_up_files.get(filename).equals(file_id))
                 return "RETURN";
             else
                 return "DELETE-AND-BACKUP";
@@ -294,6 +301,14 @@ public class Storage {
             return "BACKUP";
     }
 
+    /**
+     * Get file id of backed up file
+     * @param file File backed up
+     * @return File id
+     */
+    String get_backed_up_file_id(FileData file) {
+        return this.backed_up_files.get(file.get_filename());
+    }
 
     /**
      *
@@ -388,23 +403,27 @@ public class Storage {
             return Integer.valueOf(read_from_file(file_reader).split("/")[1]);
     }
 
-    public static boolean exists_file(String file_id) {
-        return new File(backup, file_id).exists();
-    }
+    static void delete_file(String file_id) {
+        File chunk_backup = new File(backup, file_id);
+        File chunk_info = new File(chunks_info, file_id);
 
-    public static void delete_file(String file_id) {
-        File backup_file_directory = new File(backup, file_id);
-        File info_file_directory = new File(chunks_info, file_id);
+        // Delete backed up chunks
+        if(chunk_backup.exists()) {
+            for (File chunk : Objects.requireNonNull(chunk_backup.listFiles())) {
+                chunk.delete();
+            }
 
-        for (File chunk : backup_file_directory.listFiles()) {
-            chunk.delete();
+            chunk_backup.delete();
         }
-        backup_file_directory.delete();
 
-        for (File chunk : info_file_directory.listFiles()) {
-            chunk.delete();
+        // Delete files with information about backed up chunks
+        if(chunk_info.exists()) {
+            for (File chunk : Objects.requireNonNull(chunk_info.listFiles())) {
+                chunk.delete();
+            }
+
+            chunk_info.delete();
         }
-        info_file_directory.delete();
     }
 
     static  boolean exists_chunk(String file_id, Integer chunk_no) {

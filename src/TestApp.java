@@ -74,7 +74,7 @@ public class TestApp {
                     STUB.restore(OPND_1);
                     break;
                 case "DELETE":
-                    STUB.delete(OPND_1);
+                    System.out.println(STUB.delete(OPND_1));
                     break;
                 case "RECLAIM":
                     STUB.reclaim(Integer.parseInt(OPND_1));

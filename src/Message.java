@@ -141,9 +141,12 @@ class Message {
      * @return Byte array containing all information
      */
     byte[] get_data() {
-        byte[] data = new byte[this.get_header().getBytes().length + this.get_body().length];
-        System.arraycopy(this.get_header().getBytes(), 0, data, 0, this.get_header().getBytes().length);
-        System.arraycopy(this.get_body(), 0, data, this.get_header().getBytes().length, this.get_body().length);
+        byte[] data = new byte[get_header().getBytes().length + (get_body() != null ? get_body().length : 0)];
+        System.arraycopy(get_header().getBytes(), 0, data, 0, get_header().getBytes().length);
+
+        if(get_body() != null)
+            System.arraycopy(get_body(), 0, data, get_header().getBytes().length, get_body().length);
+
         return data;
     }
 
