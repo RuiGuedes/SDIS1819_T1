@@ -311,11 +311,11 @@ public class Storage {
 
     /**
      * Get file id of backed up file
-     * @param file File backed up
+     * @param filename Filename
      * @return File id
      */
-    String get_backed_up_file_id(FileData file) {
-        return this.backed_up_files.get(file.get_filename());
+    String get_backed_up_file_id(String filename) {
+        return this.backed_up_files.getOrDefault(filename, "");
     }
 
     /**

@@ -1,3 +1,4 @@
+import java.io.File;
 import java.net.DatagramPacket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -189,7 +190,7 @@ public class Peer implements RMI {
             case "RETURN":
                 return "Backup of " + file.get_filename() + " has already been done !";
             case "DELETE-AND-BACKUP":
-                this.delete(file.get_filename(), getStorage().get_backed_up_file_id(file));
+                this.delete(file.get_filename(), getStorage().get_backed_up_file_id(file.get_filename()));
                 break;
         }
 
@@ -252,44 +253,57 @@ public class Peer implements RMI {
 
     @Override
     public String restore(String filepath) {
-        // Create file data
-        // TODO - Not create file but instead retrieve its hash from the backup info folder
-        FileData file = new FileData(filepath);
+        // Get filename and its file id
+        String filename = new File(filepath).getName();
+        String file_id = getStorage().get_backed_up_file_id(filename);
+
+        // Checks if file was previously backed up
+        if(file_id.equals(""))
+            return "Restore of " + filename + " could not be done since it was not previously backed up !";
 
         // Variables
         int chunk_no = 0;
         boolean restore_status = false;
-        int num_chunks = Storage.get_num_chunks(file.get_file_id());
+        int num_chunks = Storage.get_num_chunks(file_id);
 
         while (chunk_no < num_chunks) {
             // Creates message to be sent with the needed variables
-            Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, null, null);
+            Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, chunk_no++, null, null);
 
             // Creates packet to be sent and task to be executed
             MC.send_packet(message);
         }
 
-        // TODO - If needed resend message to improve restore protocol
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < 5; i++) {
             try {
                 TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            if(files_to_restore.containsKey(file.get_file_id()) && (files_to_restore.get(file.get_file_id()).size() == num_chunks)) {
-                restore_status = true;
-                break;
+            if(files_to_restore.containsKey(file_id)) {
+                if(files_to_restore.get(file_id).size() == num_chunks) {
+                    restore_status = true;
+                    break;
+                }
+                else {
+                    // Improvement on restore function to be more robust on failures
+                    for(int j = 0; j < num_chunks; j++) {
+                        if(!files_to_restore.get(file_id).containsKey(j))
+                            MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
+                    }
+                }
             }
+
         }
 
         // Save file on restored files
         if(restore_status)
-            getStorage().restore_file(file.get_filename(), file.get_file_id());
+            getStorage().restore_file(filename, file_id);
         else
-            files_to_restore.remove(file.get_file_id());
+            files_to_restore.remove(file_id);
 
-        return "Restore of " + file.get_filename() + " has been done " + (restore_status ? "with" : "without") + " success !";
+        return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
     }
 
     @Override

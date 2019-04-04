@@ -70,7 +70,8 @@ class DecryptMessage implements Runnable {
             case "CHUNK":
                 if(!Peer.files_to_restore.containsKey(message.get_file_id()))
                     Peer.files_to_restore.put(message.get_file_id(), new HashMap<>());
-                Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
+                if(!Peer.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no()))
+                    Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
                 break;
             case "DELETE":
                 Storage.delete_file(message.get_file_id());
