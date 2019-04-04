@@ -69,7 +69,6 @@ public class Multicast {
     }
 
     public void send_packet(Message message) {
-
         byte[] buf;
         DatagramPacket packet;
 

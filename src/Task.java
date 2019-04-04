@@ -1,6 +1,8 @@
 import java.awt.event.PaintEvent;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -63,34 +65,20 @@ class DecryptMessage implements Runnable {
                 Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
-                if (Peer.get_server_id()== message.get_server_id())
-                    break;
-
-                if (Storage.exists_chunk(message.get_file_id(), message.get_chunk_no())) {
-                    Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
-                            Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null,
-                            Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
-
-                    try {
-                        Thread.sleep(new Random().nextInt(401));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    // TODO: check if is correct to check if receive a CHUNK message before send
-                    Message received = new Message(Message.decrypt_packet(Peer.getMDR().receive_packet().getData()));
-                    if (received.get_file_id() != message.get_file_id() && received.get_chunk_no() != message.get_chunk_no())
-                        Peer.getMDR().send_packet(chunk_message);
-                }
+                System.out.println("RECEIVED GETCHUNK: " + message.get_chunk_no());
+                Peer.getMDR().getExecuter().execute(new GetChunk(message));
                 break;
             case "CHUNK":
-                // Save the chunk
+                System.out.println("RECEIVED CHUNK: " + message.get_chunk_no());
+                if(!Peer.files_to_restore.containsKey(message.get_file_id()))
+                    Peer.files_to_restore.put(message.get_file_id(), new HashMap<>());
+                Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
                 break;
             case "DELETE":
                 Storage.delete_file(message.get_file_id());
                 break;
             case "REMOVED":
-                Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
+                /*Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
                 // Decrease count replication degree
                 if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
                     try {
@@ -112,7 +100,7 @@ class DecryptMessage implements Runnable {
 
                         Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
                     }
-                }
+                }*/
                 break;
             default:
                 System.out.println("Invalid message type: " + message.get_message_type());
@@ -197,5 +185,34 @@ class PutChunk implements Runnable {
         this.exit_flag = true;
     }
 
+}
 
+class GetChunk implements Runnable {
+
+    private Message message;
+
+    GetChunk(Message message) {
+        this.message = message;
+    }
+
+    @Override
+    public void run() {
+        if (Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
+
+            Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
+                    Peer.get_server_id(), this.message.get_file_id(), this.message.get_chunk_no(), null,
+                    Storage.read_chunk(this.message.get_file_id(), this.message.get_chunk_no()));
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if(Peer.files_to_restore.containsKey(this.message.get_file_id()) && Peer.files_to_restore.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
+                Peer.files_to_restore.remove(this.message.get_file_id());
+            else
+                Peer.getMDR().send_packet(chunk_message);
+        }
+    }
 }

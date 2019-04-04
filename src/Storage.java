@@ -319,8 +319,30 @@ public class Storage {
     }
 
     /**
-     *
+     * Deletes a backed up file and its information file
+     * @param file_id File id
      */
+    static void delete_file(String file_id) {
+        File chunk_backup = new File(backup, file_id);
+        File chunk_info = new File(chunks_info, file_id);
+
+        // Delete backed up chunks
+        if(chunk_backup.exists()) {
+            for (File chunk : Objects.requireNonNull(chunk_backup.listFiles())) {
+                chunk.delete();
+            }
+            chunk_backup.delete();
+        }
+
+        // Delete files with information about backed up chunks
+        if(chunk_info.exists()) {
+            for (File chunk : Objects.requireNonNull(chunk_info.listFiles())) {
+                chunk.delete();
+            }
+            chunk_info.delete();
+        }
+    }
+
     private void load_replication() {
         this.chunks_replication = new PriorityQueue<>(new String_array_cmp());
         File[] files_directories = chunks_info.listFiles();
@@ -335,20 +357,11 @@ public class Storage {
     }
 
     /**
-     * Calculate the over replication of a chunk
-     * @param file File with chunk replication information
-     * @return over replication degree
+     * Creates chunk information file
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     * @param replication_degree Desired replication degree
      */
-    static Integer get_chunk_replication(File file) {
-        String[] info_str = read_from_file(file).split("/");
-
-        return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
-    }
-
-
-
-
-
     static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
         File directory = new File(chunks_info, file_id);
         directory.mkdirs();
@@ -383,6 +396,7 @@ public class Storage {
         return curr_replication_degree >= desired_replication_degree;
     }
 
+
     static int read_chunk_info(String file_id, Integer chunk_no) {
         File directory = new File(chunks_info, file_id);
 
@@ -397,6 +411,17 @@ public class Storage {
             return Integer.valueOf(read_from_file(file_reader).split("/")[0]);
     }
 
+    /**
+     * Calculate the over replication of a chunk
+     * @param file File with chunk replication information
+     * @return over replication degree
+     */
+    static Integer get_chunk_replication(File file) {
+        String[] info_str = read_from_file(file).split("/");
+
+        return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
+    }
+
     static int read_chunk_info_replication(String file_id, Integer chunk_no) {
         File directory = new File(chunks_info, file_id);
 
@@ -409,41 +434,6 @@ public class Storage {
             return 0;
         else
             return Integer.valueOf(read_from_file(file_reader).split("/")[1]);
-    }
-
-    static void delete_file(String file_id) {
-        File chunk_backup = new File(backup, file_id);
-        File chunk_info = new File(chunks_info, file_id);
-
-        // Delete backed up chunks
-        if(chunk_backup.exists()) {
-            for (File chunk : Objects.requireNonNull(chunk_backup.listFiles())) {
-                chunk.delete();
-            }
-
-            chunk_backup.delete();
-        }
-
-        // Delete files with information about backed up chunks
-        if(chunk_info.exists()) {
-            for (File chunk : Objects.requireNonNull(chunk_info.listFiles())) {
-                chunk.delete();
-            }
-
-            chunk_info.delete();
-        }
-    }
-
-    static  boolean exists_chunk(String file_id, Integer chunk_no) {
-        File file_directory = new File(backup,file_id);
-
-        if (!file_directory.exists())
-            return false;
-
-        if (new File(file_directory, String.valueOf(chunk_no)).exists())
-            return true;
-
-        return false;
     }
 
     /**
@@ -468,8 +458,31 @@ public class Storage {
      */
     static byte[] read_chunk(String file_id, Integer chunk_no) {
         Path path = Paths.get(backup.getPath(), file_id, String.valueOf(chunk_no));
-
         return read_bytes_from_file(path.toFile());
+    }
+
+    /**
+     * Get the number of chunks associated to a certain file
+     * @param file_id File id
+     * @return Number of associated chunks
+     */
+    static int get_num_chunks(String file_id) {
+        File directory = new File(chunks_info, file_id);
+
+        if(directory.exists())
+            return Objects.requireNonNull(directory.listFiles()).length;
+        else
+            return 0;
+    }
+
+    /**
+     * Checks if peer backed up a certain chunk
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     * @return True if it contains chunk, false otherwise
+     */
+    static  boolean has_chunk(String file_id, Integer chunk_no) {
+        return new File(new File(backup, file_id), String.valueOf(chunk_no)).exists();
     }
 
     /**
@@ -499,17 +512,23 @@ public class Storage {
                 new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null, null));
     }
 
-    // Restore file receiving chunks array ( or MAP<chunk_no, chunk> ??)
-    static void restore_file(String filename, String[] chunks) {
-        File restored_file = new File(restore,filename);
+
+    void restore_file(String filename, String file_id) {
+        File file = new File(restore,filename);
+
+        // Delete file if it exists
+        if(file.exists())
+            file.delete();
+
         try {
-            FileWriter file = new FileWriter(restored_file);
+            // Creates file
+            file.createNewFile();
+            Map<Integer, byte[]> data = Peer.files_to_restore.get(file_id);
 
-            for (int i = 0; i< chunks.length ; i++) {
-                file.write(chunks[i]);
+            // Writes content to file
+            for(Map.Entry<Integer, byte[]> chunk : data.entrySet()) {
+                write_to_file(file, chunk.getValue());
             }
-            file.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

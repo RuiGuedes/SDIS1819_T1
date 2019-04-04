@@ -71,7 +71,7 @@ public class TestApp {
                     System.out.println(STUB.backup(OPND_1, OPND_2));
                     break;
                 case "RESTORE":
-                    STUB.restore(OPND_1);
+                    System.out.println(STUB.restore(OPND_1));
                     break;
                 case "DELETE":
                     System.out.println(STUB.delete(OPND_1));

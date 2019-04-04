@@ -1,4 +1,3 @@
-import javax.xml.crypto.Data;
 import java.net.DatagramPacket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -8,9 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Peer implements RMI {
-
-    // SERVER 1 - "vanilla" 1 "rmi-access-point" "224.0.0.2:4441" "224.0.0.3:4442" "224.0.0.4:4443"
-    // SERVER 2 - "vanilla" 2 "rmi-access-point2" "224.0.0.2:4441" "224.0.0.3:4442" "224.0.0.4:4443"
 
     /**
      * Protocol version to be used. Default = vanilla
@@ -31,7 +27,7 @@ public class Peer implements RMI {
      * Contains all multicast (MC, MDB, MDR) information in an array following the specific format:
      * String[0] - Multicast Address | String[1] - Multicast Port
      */
-    private static Map<String, String[]> MULTICAST = new HashMap<String, String[]>();
+    private static Map<String, String[]> MULTICAST = new HashMap<>();
 
     /**
      * Multicast channel used for control messages
@@ -52,6 +48,11 @@ public class Peer implements RMI {
      * Storage class
      */
     private static Storage storage;
+
+    /**
+     * Structure that contains all restoring files stats
+     */
+    static Map<String, Map<Integer, byte[]>> files_to_restore;
 
     /**
      * Default constructor
@@ -80,6 +81,7 @@ public class Peer implements RMI {
 
         // Initializes storage
         storage = new Storage(SERVER_ID);
+        files_to_restore = new HashMap<>();
 
         // Initialize remote object
         init_remote_object();
@@ -117,16 +119,17 @@ public class Peer implements RMI {
         MDB = new Multicast("MDB", MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
         MDR = new Multicast("MDR", MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
 
-        // Starts listening channels: MC & MDB
+        // Starts listening channels
         MC.getExecuter().execute(new Listener(MC));
         MDB.getExecuter().execute(new Listener(MDB));
+        MDR.getExecuter().execute(new Listener(MDR));
     }
 
     /**
      * Returns protocol version
      * @return Protocol version
      */
-    public static String get_protocol_version() {
+    static String get_protocol_version() {
         return PROTOCOL_VERSION;
     }
 
@@ -134,7 +137,7 @@ public class Peer implements RMI {
      * Returns server id
      * @return Server id
      */
-    public static Integer get_server_id() {
+    static Integer get_server_id() {
         return SERVER_ID;
     }
 
@@ -142,7 +145,7 @@ public class Peer implements RMI {
      * Retrieves MC multicast channel
      * @return Returns MC multicast channel
      */
-    public static Multicast getMC() {
+    static Multicast getMC() {
         return MC;
     }
 
@@ -150,7 +153,7 @@ public class Peer implements RMI {
      * Retrieves MDB multicast channel
      * @return Returns MDB multicast channel
      */
-    public static Multicast getMDB() {
+    static Multicast getMDB() {
         return MDB;
     }
 
@@ -158,7 +161,7 @@ public class Peer implements RMI {
      * Retrieves MDR multicast channel
      * @return Returns MDR multicast channel
      */
-    public static Multicast getMDR() {
+    static Multicast getMDR() {
         return MDR;
     }
 
@@ -166,17 +169,19 @@ public class Peer implements RMI {
      * Get peer storage structure
      * @return Storage class
      */
-    public static Storage getStorage() {
+    private static Storage getStorage() {
         return storage;
     }
 
     @Override
     public String backup(String filepath, Integer replication_degree) {
+        // Create file data
+        FileData file = new FileData(filepath);
+
         // Variables
         byte[] chunk;
         int chunk_no = 0;
         boolean backup_status = true;
-        FileData file = new FileData(filepath);
         ArrayList<PutChunk> threads = new ArrayList<>();
 
         // Determine if file was already backed up or updated
@@ -184,7 +189,7 @@ public class Peer implements RMI {
             case "RETURN":
                 return "Backup of " + file.get_filename() + " has already been done !";
             case "DELETE-AND-BACKUP":
-                this.delete_file_evidence(file.get_filename(), getStorage().get_backed_up_file_id(file));
+                this.delete(file.get_filename(), getStorage().get_backed_up_file_id(file));
                 break;
         }
 
@@ -245,54 +250,54 @@ public class Peer implements RMI {
         return "Backup of " + file.get_filename() + " has been done " + (backup_status ? "with" : "without") + " success !";
     }
 
-
     @Override
-    public String restore(String filename) {
+    public String restore(String filepath) {
+        // Create file data
+        // TODO - Not create file but instead retrive its hash from the backup info folder
+        FileData file = new FileData(filepath);
 
-        // handle MDR channel when is invoked
-        // actions needed to handle MDR
+        // Variables
+        int chunk_no = 0;
+        boolean restore_status = false;
+        int num_chunks = Storage.get_num_chunks(file.get_file_id());
 
-        return null;
+        while (chunk_no < num_chunks) {
+            // Creates message to be sent with the needed variables
+            Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, null, null);
+
+            // Creates packet to be sent and task to be executed
+            MC.send_packet(message);
+            System.out.println("SEND GETCHUNK: " + (chunk_no - 1));
+        }
+
+        // TODO - If needed resend message to improve restore protocol
+        for(int i = 0; i < 3; i++) {
+            try {
+                TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if(files_to_restore.containsKey(file.get_file_id()) && (files_to_restore.get(file.get_file_id()).size() == num_chunks)) {
+                restore_status = true;
+                break;
+            }
+        }
+
+        // Save file on restored files
+        if(restore_status)
+            getStorage().restore_file(file.get_filename(), file.get_file_id());
+        else
+            files_to_restore.remove(file.get_file_id());
+
+        return "Restore of " + file.get_filename() + " has been done " + (restore_status ? "with" : "without") + " success !";
     }
 
     @Override
     public String delete(String filepath) {
         FileData file = new FileData(filepath);
 
-        return delete_file_evidence(file.get_filename(), file.get_file_id());
-    }
-
-    /**
-     * For a given filename and file_id deletes all evidence of file corresponding to these parameters
-     * @param filename Filename
-     * @param file_id File id
-     */
-    private String delete_file_evidence(String filename, String file_id) {
-        if(!getStorage().is_backed_up(filename, file_id).equals("RETURN"))
-            return "File " + filename + " could not be delete since it was no previously backed up !";
-
-        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file_id, null, null, null);
-
-        getStorage().remove_backed_up_file(filename);
-        Storage.delete_file(file_id);
-
-        // Sends delete message three times to prevent its loss
-        for(int i = 0; i < 3; i++) {
-            try {
-                MC.send_packet(message);
-
-                TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Delete protocol enhancement
-        if(PROTOCOL_VERSION.equals("2.0")) {
-            // TODO - Save delete log on deleted_files file with the current date
-        }
-
-        return "Delete of " + filename + " has been done with success !";
+        return this.delete(file.get_filename(), file.get_file_id());
     }
 
     @Override
@@ -306,5 +311,37 @@ public class Peer implements RMI {
     @Override
     public String state() {
         return "";
+    }
+
+    /**
+     * For a given filename and file_id deletes all evidence of file corresponding to these parameters
+     * @param filename Filename
+     * @param file_id File id
+     */
+    private String delete(String filename, String file_id) {
+        if(!getStorage().is_backed_up(filename, file_id).equals("RETURN"))
+            return "File " + filename + " could not be delete since it was no previously backed up !";
+
+        Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file_id, null, null, null);
+
+        getStorage().remove_backed_up_file(filename);
+        Storage.delete_file(file_id);
+
+        // Sends delete message three times to prevent its loss
+        for(int i = 0; i < 3; i++) {
+            try {
+                MC.send_packet(message);
+                TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Delete protocol enhancement
+        if(PROTOCOL_VERSION.equals("2.0")) {
+            // TODO - Save delete log on deleted_files file with the current date
+        }
+
+        return "Delete of " + filename + " has been done with success !";
     }
 }
