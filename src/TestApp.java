@@ -80,7 +80,7 @@ public class TestApp {
                     STUB.reclaim(Integer.parseInt(OPND_1));
                     break;
                 case "STATE":
-                    STUB.state();
+                    System.out.println(STUB.state());
                     break;
                 default:
                     System.out.println("Such operation is not available: " + OPERATION + " !");

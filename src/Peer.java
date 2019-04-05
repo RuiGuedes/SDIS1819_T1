@@ -294,7 +294,6 @@ public class Peer implements RMI {
                     }
                 }
             }
-
         }
 
         // Save file on restored files
@@ -315,15 +314,12 @@ public class Peer implements RMI {
 
     @Override
     public String reclaim(Integer disk_space) {
-
-        storage.set_storage_space(disk_space);
-
-        return "Storage reclaim has been done with success !";
+        return "Storage reclaim has been done " + (storage.set_storage_space(disk_space) ? "with" : "without") + " success !";
     }
 
     @Override
     public String state() {
-        return "";
+        return getStorage().state();
     }
 
     /**

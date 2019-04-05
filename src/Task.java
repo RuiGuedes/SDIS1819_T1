@@ -154,7 +154,7 @@ class PutChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree()) {
+            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= message.get_replication_degree()) {
                 this.termination_status = true;
                 break;
             }

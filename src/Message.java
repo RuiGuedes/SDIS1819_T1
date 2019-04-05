@@ -150,8 +150,6 @@ class Message {
         return data;
     }
 
-
-
     /**
      * Transforms byte array to string
      * @param bytes Byte array
@@ -185,7 +183,7 @@ class Message {
     /**
      * Get's header
      */
-    String get_header() {
+    private String get_header() {
         return header;
     }
 

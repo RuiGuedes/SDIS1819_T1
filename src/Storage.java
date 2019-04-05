@@ -67,8 +67,6 @@ public class Storage {
             load_storage(server_id);
         else
             create_storage(server_id);
-
-        load_replication();
     }
 
     /**
@@ -161,6 +159,7 @@ public class Storage {
         this.local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
         this.read_backed_up_files();
+        this.load_replication();
     }
 
     /**
@@ -218,7 +217,7 @@ public class Storage {
      * Change the system storage
      * @param space New space value
      */
-    void set_storage_space(Integer space) {
+    boolean set_storage_space(Integer space) {
         this.space = space;
         while (this.space < this.root.getTotalSpace()) {
             if (chunks_replication.size() > 0) {
@@ -228,7 +227,10 @@ public class Storage {
         }
 
         write_local_storage();
+        return true;
     }
+
+    //////////////////////////////////////////////
 
     /**
      * Update the system storage
@@ -246,6 +248,8 @@ public class Storage {
     int get_free_space() {
         return (int) (this.space - this.root.getTotalSpace());
     }
+
+    //////////////////////////////////////////////
 
     /**
      * Reads information about backed up files
@@ -343,16 +347,17 @@ public class Storage {
         }
     }
 
+
     private void load_replication() {
         this.chunks_replication = new PriorityQueue<>(new String_array_cmp());
         File[] files_directories = chunks_info.listFiles();
 
-        for (File file_directory : files_directories) {
+        for (File file_directory : Objects.requireNonNull(files_directories)) {
             File[] chunks_info_files = file_directory.listFiles();
 
-            for (File chunk_file : chunks_info_files)
+            for (File chunk_file : Objects.requireNonNull(chunks_info_files))
                 this.chunks_replication.add(new String[]
-                        {String.valueOf(get_chunk_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
+                        {String.valueOf(get_chunk_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
         }
     }
 
@@ -396,8 +401,14 @@ public class Storage {
         return curr_replication_degree >= desired_replication_degree;
     }
 
-
-    static int read_chunk_info(String file_id, Integer chunk_no) {
+    /**
+     * Reads chunk perceived replication degree
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     * @param replication_type Replication degree type: 0 for perceived replication : 1 for desired replication
+     * @return Perceived replication degree
+     */
+    static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
         File directory = new File(chunks_info, file_id);
 
         if (!directory.exists())
@@ -408,32 +419,18 @@ public class Storage {
         if(!file_reader.exists())
             return 0;
         else
-            return Integer.valueOf(read_from_file(file_reader).split("/")[0]);
+            return Integer.valueOf(read_from_file(file_reader).split("/")[replication_type]);
     }
 
     /**
      * Calculate the over replication of a chunk
      * @param file File with chunk replication information
-     * @return over replication degree
+     * @return Over replication degree
      */
-    static Integer get_chunk_replication(File file) {
+    private static Integer get_chunk_over_replication(File file) {
         String[] info_str = read_from_file(file).split("/");
 
         return (Integer.valueOf(info_str[0]) - Integer.valueOf(info_str[1]));
-    }
-
-    static int read_chunk_info_replication(String file_id, Integer chunk_no) {
-        File directory = new File(chunks_info, file_id);
-
-        if (!directory.exists())
-            return 0;
-
-        File file_reader = new File(directory, String.valueOf(chunk_no));
-
-        if(!file_reader.exists())
-            return 0;
-        else
-            return Integer.valueOf(read_from_file(file_reader).split("/")[1]);
     }
 
     /**
@@ -490,7 +487,7 @@ public class Storage {
      * @param file_id File id
      * @param chunk_no Chunk number
      */
-    static void delete_chunk(String file_id, Integer chunk_no) {
+    private static void delete_chunk(String file_id, Integer chunk_no) {
         File backup_file_directory = new File(backup, file_id);
         File info_file_directory = new File(chunks_info, file_id);
 
@@ -512,7 +509,11 @@ public class Storage {
                 new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null, null));
     }
 
-
+    /**
+     * Restores file with a given name and id
+     * @param filename Filename
+     * @param file_id File id
+     */
     void restore_file(String filename, String file_id) {
         File file = new File(restore,filename);
 
@@ -541,6 +542,77 @@ public class Storage {
             e.printStackTrace();
         }
     }
+
+    String state() {
+        String peer_state = ":::::::::::::::::::::\n"
+                          + ":: BACKED UP FILES ::\n"
+                          + ":::::::::::::::::::::\n\n";
+
+        if(backup_info.exists()) {
+            if(Objects.requireNonNull(backup_info.listFiles()).length == 0)
+                peer_state += "No backed up files\n\n";
+            else {
+                for (File file : Objects.requireNonNull(backup_info.listFiles())) {
+                    String pathname = file.getPath();
+                    String file_id = read_from_file(file);
+                    int desired_replication_degree = read_chunk_info(file_id, 0, 1);
+
+                    peer_state += "File Pathname: " + pathname + "\n"
+                            + "Backup Service ID: " + file_id + "\n"
+                            + "Desired Replication Degree: " + desired_replication_degree + "\n"
+                            + "Stored Chunks:\n";
+
+                    File[] chunk_files = new File(chunks_info, file_id).listFiles();
+                    Arrays.sort(Objects.requireNonNull(chunk_files), Comparator.comparingInt(f -> Integer.parseInt(f.getName())));
+
+                    for (File chunk : chunk_files) {
+                        String id = chunk.getName();
+                        String replication_degree = String.valueOf(read_chunk_info(file_id, Integer.parseInt(id), 0));
+                        peer_state += "-> Chunk number " + id + " with perceived replication degree of " + replication_degree + "\n";
+                    }
+                    peer_state += "\n";
+                }
+            }
+        }
+
+        peer_state += ":::::::::::::::::::\n"
+                    + ":: CHUNKS STORED ::\n"
+                    + ":::::::::::::::::::\n\n";
+
+        if(backup.exists()) {
+            if(Objects.requireNonNull(backup.listFiles()).length == 0)
+                peer_state += "No chunks stored\n\n";
+            else {
+                for (File file : Objects.requireNonNull(backup.listFiles())) {
+                    String file_id = file.getName();
+
+                    peer_state += "File ID: " + file_id + "\nStored Chunks:\n";
+
+                    File[] chunk_files = new File(backup, file_id).listFiles();
+                    Arrays.sort(Objects.requireNonNull(chunk_files), Comparator.comparingInt(f -> Integer.parseInt(f.getName())));
+
+                    for (File chunk : chunk_files) {
+                        String id = chunk.getName();
+                        String size = String.valueOf(chunk.length());
+                        String replication_degree = String.valueOf(read_chunk_info(file_id, Integer.parseInt(id), 0));
+
+                        peer_state += "-> Chunk number " + id + " with " + size + " bytes has a perceived replication degree of " + replication_degree + "\n";
+                    }
+                    peer_state += "\n";
+                }
+            }
+        }
+
+        peer_state += ":::::::::::::\n"
+                    + ":: STORAGE ::\n"
+                    + ":::::::::::::\n\n";
+
+        // TODO - After local storage is well defined
+        // The peer's storage capacity, i.e. the maximum amount of disk space that can be used to store chunks, and the amount of storage (both in KBytes) used to backup the chunks.
+
+        return peer_state;
+    }
+
 }
 
 
