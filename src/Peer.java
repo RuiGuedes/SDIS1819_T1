@@ -196,6 +196,9 @@ public class Peer implements RMI {
         // Adds file to backed up files list
         getStorage().store_backed_up_file(file);
 
+        //
+        Storage.chunks_info_struct.put(file.get_file_id(), new HashMap<>());
+
         while ((chunk = file.next_chunk()) != null) {
             // Creates message to be sent with the needed variables
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree, chunk);

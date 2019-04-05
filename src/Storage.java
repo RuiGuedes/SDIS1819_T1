@@ -54,7 +54,7 @@ public class Storage {
      */
     private PriorityQueue<String[]> chunks_replication;
 
-    static Map<String, Map<Integer, Integer[]>> chunks_info_struct;
+    static Map<String, Map<Integer, ArrayList<Integer>>> chunks_info_struct = new HashMap<>();
 
     /**
      * Structure containing backed up files information
@@ -166,7 +166,6 @@ public class Storage {
         this.read_local_storage();
         this.read_backed_up_files();
         this.load_replication();
-        chunks_info_struct = new HashMap<>();
     }
 
     /**
@@ -183,7 +182,6 @@ public class Storage {
         this.space = this.root.getFreeSpace();
         this.write_local_storage();
         this.backed_up_files = new HashMap<>();
-        chunks_info_struct = new HashMap<>();
     }
 
     /**
@@ -403,10 +401,10 @@ public class Storage {
         File directory = new File(chunks_info, file_id);
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
-
-        if(!read_from_file(file_writer).equals("")) {
-            int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + increment;
-            int desired_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[1]);
+        String data = read_from_file(file_writer);
+        if(!data.equals("")) {
+            int curr_replication_degree = Integer.valueOf(data.split("/")[0]) + increment;
+            int desired_replication_degree = Integer.valueOf(data.split("/")[1]);
             write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
 
             return curr_replication_degree >= desired_replication_degree;
@@ -416,9 +414,9 @@ public class Storage {
     }
 
     static void store_chunks_info_of_file(String file_id) {
-        for(Map.Entry<Integer, Integer[]> chunk : chunks_info_struct.get(file_id).entrySet()) {
-            create_chunk_info(file_id, chunk.getKey(), chunk.getValue()[1]);
-            store_chunk_info(file_id, chunk.getKey(), chunk.getValue()[0]);
+        for(Map.Entry<Integer, ArrayList<Integer>> chunk : chunks_info_struct.get(file_id).entrySet()) {
+            create_chunk_info(file_id, chunk.getKey(), chunk.getValue().get(1));
+            store_chunk_info(file_id, chunk.getKey(), chunk.getValue().get(0));
         }
         chunks_info_struct.remove(file_id);
     }

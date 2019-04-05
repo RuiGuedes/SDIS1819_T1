@@ -63,8 +63,9 @@ class DecryptMessage implements Runnable {
                 break;
             case "STORED":
                 if(Storage.chunks_info_struct.containsKey(message.get_file_id()))
-                    Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no())[0]++;
-                Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
+                    Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no()).add(0, Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no()).get(0) + 1);
+                else
+                    Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
             case "GETCHUNK":
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
@@ -143,12 +144,17 @@ class PutChunk implements Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < 5; i++) {
-            if(!Storage.chunks_info_struct.containsKey(this.message.get_file_id()))
-                Storage.chunks_info_struct.put(this.message.get_file_id(), new HashMap<>());
 
-            if(!Storage.chunks_info_struct.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
-                Storage.chunks_info_struct.get(this.message.get_file_id()).put(this.message.get_chunk_no(), new Integer[] {0, this.message.get_replication_degree()});
+        int replication_degree = this.message.get_replication_degree();
+
+        for (int i = 0; i < 5; i++) {
+
+            Storage.chunks_info_struct.get(this.message.get_file_id()).putIfAbsent(this.message.get_chunk_no(), new ArrayList<>(){
+                {
+                    add(0);
+                    add(replication_degree);
+                }
+            });
 
             //Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
@@ -160,7 +166,7 @@ class PutChunk implements Runnable {
             }
 
             //if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= this.message.get_replication_degree())
-            if(Storage.chunks_info_struct.get(this.message.get_file_id()).get(this.message.get_chunk_no())[0] >= this.message.get_replication_degree())
+            if(Storage.chunks_info_struct.get(this.message.get_file_id()).get(this.message.get_chunk_no()).get(0) >= replication_degree)
                 break;
         }
 
