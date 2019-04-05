@@ -113,14 +113,16 @@ public class Storage {
     private static String read_from_file(File file) {
         StringBuilder data = new StringBuilder();
         try {
-            BufferedReader file_reader = new BufferedReader(new FileReader(file));
+            synchronized (file) {
+                BufferedReader file_reader = new BufferedReader(new FileReader(file));
 
-            String curr_line;
-            while ((curr_line = file_reader.readLine()) != null) {
-                data.append(curr_line);
+                String curr_line;
+                while ((curr_line = file_reader.readLine()) != null) {
+                    data.append(curr_line);
+                }
+
+                file_reader.close();
             }
-
-            file_reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -136,10 +138,12 @@ public class Storage {
         byte[] chunk = new byte[64000];
         int bytes_read = 0;
         try {
-            FileInputStream file_reader = new FileInputStream(file);
-            bytes_read = file_reader.readNBytes(chunk,0,64000);
+            synchronized (file) {
+                FileInputStream file_reader = new FileInputStream(file);
+                bytes_read = file_reader.readNBytes(chunk,0,64000);
 
-            file_reader.close();
+                file_reader.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -368,6 +372,9 @@ public class Storage {
      * @param replication_degree Desired replication degree
      */
     static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
+        if(has_chunk_info(file_id, chunk_no))
+            return;
+
         File directory = new File(chunks_info, file_id);
         directory.mkdirs();
 
@@ -379,7 +386,7 @@ public class Storage {
             e.printStackTrace();
         }
 
-        write_to_file(file_writer, 0 + "/" + replication_degree);
+        write_to_file(file_writer,  "0/" + replication_degree);
     }
 
     /**
@@ -390,15 +397,18 @@ public class Storage {
      */
     static boolean store_chunk_info(String file_id, Integer chunk_no, Integer increment) {
         File directory = new File(chunks_info, file_id);
-        directory.mkdirs();
 
         File file_writer = new File(directory, String.valueOf(chunk_no));
 
-        int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + increment;
-        int desired_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[1]);
-        write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
+        if(!read_from_file(file_writer).equals("")) {
+            int curr_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[0]) + increment;
+            int desired_replication_degree = Integer.valueOf(read_from_file(file_writer).split("/")[1]);
+            write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
 
-        return curr_replication_degree >= desired_replication_degree;
+            return curr_replication_degree >= desired_replication_degree;
+        }
+
+        return false;
     }
 
     /**
@@ -416,10 +426,14 @@ public class Storage {
 
         File file_reader = new File(directory, String.valueOf(chunk_no));
 
-        if(!file_reader.exists())
-            return 0;
-        else
+        if(file_reader.exists() && !read_from_file(file_reader).equals(""))
             return Integer.valueOf(read_from_file(file_reader).split("/")[replication_type]);
+
+        return 0;
+    }
+
+    static boolean has_chunk_info(String file_id, Integer chunk_no) {
+        return  new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
 
     /**

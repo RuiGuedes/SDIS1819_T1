@@ -142,9 +142,6 @@ class PutChunk implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 5; i++) {
-            if(this.exit_flag)
-                break;
-
             Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
 
@@ -154,10 +151,8 @@ class PutChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= message.get_replication_degree()) {
-                this.termination_status = true;
+            if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= this.message.get_replication_degree())
                 break;
-            }
         }
 
         this.exit_flag = true;

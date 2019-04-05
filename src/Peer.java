@@ -182,7 +182,6 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
-        boolean backup_status = true;
         ArrayList<PutChunk> threads = new ArrayList<>();
 
         // Determine if file was already backed up or updated
@@ -198,15 +197,6 @@ public class Peer implements RMI {
         getStorage().store_backed_up_file(file);
 
         while ((chunk = file.next_chunk()) != null) {
-            // Checks whether a thread has terminated without success or not
-            for(PutChunk thread : threads) {
-                if(!thread.is_running() && !thread.get_termination_status())
-                    backup_status = false;
-            }
-
-            if(!backup_status)
-                break;
-
             // Creates message to be sent with the needed variables
             Message message = new Message("PUTCHUNK", PROTOCOL_VERSION, SERVER_ID, file.get_file_id(), chunk_no++, replication_degree, chunk);
 
@@ -224,31 +214,20 @@ public class Peer implements RMI {
             MDB.getExecuter().execute(task);
         }
 
-        // Waits for all worker threads to finish and also inspects its status
+        // Waits for all worker threads to finish
         while (true) {
             boolean still_running = false;
 
             for(PutChunk thread : threads) {
-                if(thread.is_running()) {
+                if(thread.is_running())
                     still_running = true;
-                    if(!backup_status)
-                        thread.terminate();
-                }
-                else {
-                    if(!thread.get_termination_status())
-                        backup_status = false;
-                }
             }
 
             if(!still_running)
                 break;
         }
 
-        // In case of failure delete all chunks stored so far
-        if(!backup_status)
-            this.delete(filepath);
-
-        return "Backup of " + file.get_filename() + " has been done " + (backup_status ? "with" : "without") + " success !";
+        return "Backup of " + file.get_filename() + " has been done with success !";
     }
 
     @Override
