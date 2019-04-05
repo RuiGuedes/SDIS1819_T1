@@ -2,20 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/String_array_cmp.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/String_array_cmp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GetChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/GetChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Message.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Message.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Peer.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PutChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/PutChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/String_array_cmp.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/String_array_cmp.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -36,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2975">
-              <caret line="193" column="9" selection-start-line="193" selection-start-column="9" selection-end-line="193" selection-end-column="9" />
+            <state relative-caret-position="545">
+              <caret line="229" column="62" selection-start-line="229" selection-start-column="62" selection-end-line="229" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#9310#9311#0" expanded="true" />
@@ -50,7 +38,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Message.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1972">
+            <state relative-caret-position="17">
               <caret line="119" selection-start-line="119" selection-end-line="119" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -59,11 +47,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Task.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="44" column="7" selection-start-line="44" selection-start-column="7" selection-end-line="44" selection-end-column="7" />
+            <state relative-caret-position="239">
+              <caret line="66" column="33" selection-start-line="66" selection-start-column="33" selection-end-line="66" selection-end-column="33" />
               <folding>
                 <element signature="e#5684#5685#0" expanded="true" />
                 <element signature="e#5725#5726#0" expanded="true" />
@@ -76,11 +64,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Storage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="391" column="7" selection-start-line="391" selection-start-column="7" selection-end-line="391" selection-end-column="7" />
+            <state relative-caret-position="295">
+              <caret line="401" column="19" selection-start-line="401" selection-start-column="19" selection-end-line="401" selection-end-column="19" />
               <folding>
                 <element signature="e#7327#7328#0" expanded="true" />
                 <element signature="e#7396#7397#0" expanded="true" />
@@ -187,8 +175,8 @@
         <option value="$PROJECT_DIR$/src/TestApp.java" />
         <option value="$PROJECT_DIR$/src/Message.java" />
         <option value="$PROJECT_DIR$/src/Peer.java" />
-        <option value="$PROJECT_DIR$/src/Task.java" />
         <option value="$PROJECT_DIR$/src/Storage.java" />
+        <option value="$PROJECT_DIR$/src/Task.java" />
       </list>
     </option>
   </component>
@@ -256,7 +244,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.TestApp Backup">
+  <component name="RunManager" selected="Application.TestApp Restore">
     <configuration name="Peer1" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Peer" />
       <module name="SDIS1819_T1" />
@@ -284,7 +272,7 @@
     <configuration name="TestApp Backup" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TestApp" />
       <module name="SDIS1819_T1" />
-      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; BACKUP &quot;./src/Ep.mkv&quot; 1" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; BACKUP &quot;./src/Report.pdf&quot; 1" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -300,7 +288,7 @@
     <configuration name="TestApp Restore" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="TestApp" />
       <module name="SDIS1819_T1" />
-      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; RESTORE &quot;./src/img.jpg&quot;" />
+      <option name="PROGRAM_PARAMETERS" value="&quot;rmi-access-point&quot; RESTORE &quot;./src/Report.pdf&quot;" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -355,12 +343,12 @@
       <workItem from="1554289334883" duration="27000" />
       <workItem from="1554312902853" duration="14744000" />
       <workItem from="1554478423041" duration="1119000" />
-      <workItem from="1554480242204" duration="598000" />
+      <workItem from="1554480242204" duration="3623000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="166673000" />
+    <option name="totallyTimeSpent" value="169698000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -463,43 +451,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Peer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2975">
-          <caret line="193" column="9" selection-start-line="193" selection-start-column="9" selection-end-line="193" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#9310#9311#0" expanded="true" />
-            <element signature="e#9353#9354#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1972">
-          <caret line="119" selection-start-line="119" selection-end-line="119" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Task.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="44" column="7" selection-start-line="44" selection-start-column="7" selection-end-line="44" selection-end-column="7" />
-          <folding>
-            <element signature="e#5684#5685#0" expanded="true" />
-            <element signature="e#5725#5726#0" expanded="true" />
-            <element signature="e#5816#5817#0" expanded="true" />
-            <element signature="e#5854#5855#0" expanded="true" />
-            <element signature="e#5948#5949#0" expanded="true" />
-            <element signature="e#5985#5986#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/FileData.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1156">
@@ -542,15 +493,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Storage.java">
+    <entry file="file://$PROJECT_DIR$/src/Message.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
-          <caret line="391" column="7" selection-start-line="391" selection-start-column="7" selection-end-line="391" selection-end-column="7" />
+          <caret line="119" selection-start-line="119" selection-end-line="119" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Peer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="545">
+          <caret line="229" column="62" selection-start-line="229" selection-start-column="62" selection-end-line="229" selection-end-column="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#9310#9311#0" expanded="true" />
+            <element signature="e#9353#9354#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Storage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="295">
+          <caret line="401" column="19" selection-start-line="401" selection-start-column="19" selection-end-line="401" selection-end-column="19" />
           <folding>
             <element signature="e#7327#7328#0" expanded="true" />
             <element signature="e#7396#7397#0" expanded="true" />
             <element signature="e#9679#9680#0" expanded="true" />
             <element signature="e#9749#9750#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Task.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="66" column="33" selection-start-line="66" selection-start-column="33" selection-end-line="66" selection-end-column="33" />
+          <folding>
+            <element signature="e#5684#5685#0" expanded="true" />
+            <element signature="e#5725#5726#0" expanded="true" />
+            <element signature="e#5816#5817#0" expanded="true" />
+            <element signature="e#5854#5855#0" expanded="true" />
+            <element signature="e#5948#5949#0" expanded="true" />
+            <element signature="e#5985#5986#0" expanded="true" />
           </folding>
         </state>
       </provider>

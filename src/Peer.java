@@ -227,6 +227,8 @@ public class Peer implements RMI {
                 break;
         }
 
+        Storage.store_chunks_info_of_file(file.get_file_id());
+
         return "Backup of " + file.get_filename() + " has been done with success !";
     }
 

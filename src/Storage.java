@@ -54,6 +54,8 @@ public class Storage {
      */
     private PriorityQueue<String[]> chunks_replication;
 
+    static Map<String, Map<Integer, Integer[]>> chunks_info_struct;
+
     /**
      * Structure containing backed up files information
      */
@@ -164,6 +166,7 @@ public class Storage {
         this.read_local_storage();
         this.read_backed_up_files();
         this.load_replication();
+        chunks_info_struct = new HashMap<>();
     }
 
     /**
@@ -180,6 +183,7 @@ public class Storage {
         this.space = this.root.getFreeSpace();
         this.write_local_storage();
         this.backed_up_files = new HashMap<>();
+        chunks_info_struct = new HashMap<>();
     }
 
     /**
@@ -411,6 +415,14 @@ public class Storage {
         return false;
     }
 
+    static void store_chunks_info_of_file(String file_id) {
+        for(Map.Entry<Integer, Integer[]> chunk : chunks_info_struct.get(file_id).entrySet()) {
+            create_chunk_info(file_id, chunk.getKey(), chunk.getValue()[1]);
+            store_chunk_info(file_id, chunk.getKey(), chunk.getValue()[0]);
+        }
+        chunks_info_struct.remove(file_id);
+    }
+
     /**
      * Reads chunk perceived replication degree
      * @param file_id File id
@@ -435,6 +447,7 @@ public class Storage {
     static boolean has_chunk_info(String file_id, Integer chunk_no) {
         return  new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
+
 
     /**
      * Calculate the over replication of a chunk
