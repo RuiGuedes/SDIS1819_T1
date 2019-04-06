@@ -53,6 +53,8 @@ public class Peer implements RMI {
      */
     private static Storage storage;
 
+    volatile static Map<String, Boolean> file_backup_status;
+
     /**
      * Default constructor
      */
@@ -80,6 +82,7 @@ public class Peer implements RMI {
 
         // Initializes storage
         storage = new Storage(SERVER_ID);
+        file_backup_status = new HashMap<>();
 
         // Initialize remote object
         init_remote_object();
@@ -179,7 +182,6 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
-        boolean backup_status = true;
         Set<Callable<Boolean>> threads = new HashSet<>();
 
         // Determine if file was already backed up or updated
@@ -193,6 +195,9 @@ public class Peer implements RMI {
 
         // Adds file to backed up files list
         getStorage().store_backed_up_file(file);
+        synchronized (file_backup_status) {
+            file_backup_status.put(file.get_file_id(), true);
+        }
 
         // Adds file to structure that contains chunks information
         Storage.chunks_info_struct.put(file.get_file_id(), new HashMap<>());
@@ -214,20 +219,15 @@ public class Peer implements RMI {
 
         // Invoke all tasks and check their status
         try {
-            List<Future<Boolean>> threads_status = MDB.getExecuter().invokeAll(threads);
-
-            for(Future<Boolean> thread : threads_status) {
-                try {
-                    if(!thread.get()) {
-                        backup_status = false;
-                        break;
-                    }
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
+            MDB.getExecuter().invokeAll(threads);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+
+        // Get backup status
+        boolean backup_status;
+        synchronized (file_backup_status) {
+            backup_status = file_backup_status.get(file.get_file_id());
         }
 
         if(backup_status)

@@ -69,7 +69,7 @@ class DecryptMessage implements Runnable {
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
                 break;
             case "CHUNK":
-                if(Storage.files_to_restore.containsKey(message.get_file_id()))
+                if(!Storage.files_to_restore.containsKey(message.get_file_id()))
                     Storage.files_to_restore.put(message.get_file_id(), new HashMap<>());
 
                 if(!Storage.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no()))
@@ -150,7 +150,14 @@ class PutChunk implements Callable<Boolean> {
                 break;
         }
 
-        return current_replication_degree > 0;
+        // If there exists a chunk that was not replicated
+        if(current_replication_degree == 0) {
+            synchronized (Peer.file_backup_status) {
+                Peer.file_backup_status.put(message.get_file_id(), false);
+            }
+        }
+
+        return true;
     }
 
 }
