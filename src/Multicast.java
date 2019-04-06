@@ -37,7 +37,7 @@ public class Multicast {
             e.printStackTrace();
         }
 
-        this.executer = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        this.executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
     }
 
     public ThreadPoolExecutor getExecuter() {

@@ -1,9 +1,6 @@
 import java.awt.event.PaintEvent;
 import java.net.DatagramPacket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -62,8 +59,14 @@ class DecryptMessage implements Runnable {
                 //}
                 break;
             case "STORED":
-                if(Storage.chunks_info_struct.containsKey(message.get_file_id()))
-                    Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no()).add(0, Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no()).get(0) + 1);
+                if(Storage.syncronized_contains_chunk_info(message.get_file_id(),null)) {
+                    /*Integer[] c = Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no());
+                    if (c != null)
+                        c[0]++;
+                    else
+                        System.out.println("22: " + message.get_chunk_no());*/
+                    Storage.syncronized_inc_chunk_info(message.get_file_id(), message.get_chunk_no());
+                }
                 else
                     Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
@@ -71,10 +74,12 @@ class DecryptMessage implements Runnable {
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
                 break;
             case "CHUNK":
-                if(!Peer.files_to_restore.containsKey(message.get_file_id()))
+                if(!Peer.files_to_restore.containsKey(message.get_file_id())){
                     Peer.files_to_restore.put(message.get_file_id(), new HashMap<>());
-                if(!Peer.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no()))
+                }
+                if(!Peer.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no())){
                     Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
+                }
                 break;
             case "DELETE":
                 Storage.delete_file(message.get_file_id());
@@ -145,16 +150,12 @@ class PutChunk implements Runnable {
     @Override
     public void run() {
 
-        int replication_degree = this.message.get_replication_degree();
-
         for (int i = 0; i < 5; i++) {
 
-            Storage.chunks_info_struct.get(this.message.get_file_id()).putIfAbsent(this.message.get_chunk_no(), new ArrayList<>(){
-                {
-                    add(0);
-                    add(replication_degree);
-                }
-            });
+//            if (!Storage.chunks_info_struct.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
+//                Storage.chunks_info_struct.get(this.message.get_file_id()).put(this.message.get_chunk_no(), new Integer[]{0,this.message.get_replication_degree()});
+            if (Storage.syncronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
+                Storage.syncronized_put_chunk_info(this.message.get_file_id(),this.message.get_chunk_no(),0);
 
             //Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
@@ -165,8 +166,10 @@ class PutChunk implements Runnable {
                 e.printStackTrace();
             }
 
+            Integer c = Storage.syncronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no());
+
             //if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= this.message.get_replication_degree())
-            if(Storage.chunks_info_struct.get(this.message.get_file_id()).get(this.message.get_chunk_no()).get(0) >= replication_degree)
+            if(c >= this.message.get_replication_degree())
                 break;
         }
 
@@ -218,8 +221,10 @@ class GetChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if(Peer.files_to_restore.containsKey(this.message.get_file_id()) && Peer.files_to_restore.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
-                Peer.files_to_restore.remove(this.message.get_file_id());
+            if(Peer.files_to_restore.containsKey(this.message.get_file_id())) {
+                if (Peer.files_to_restore.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
+                    Peer.files_to_restore.remove(this.message.get_file_id());
+            }
             else
                 Peer.getMDR().send_packet(chunk_message);
         }

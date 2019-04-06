@@ -218,6 +218,7 @@ public class Peer implements RMI {
         }
 
         // Waits for all worker threads to finish
+        System.out.println("threads: " + threads.size());
         while (true) {
             boolean still_running = false;
 
@@ -230,7 +231,7 @@ public class Peer implements RMI {
                 break;
         }
 
-        Storage.store_chunks_info_of_file(file.get_file_id());
+        Storage.store_chunks_info_of_file(file.get_file_id(), replication_degree);
 
         return "Backup of " + file.get_filename() + " has been done with success !";
     }
@@ -266,6 +267,7 @@ public class Peer implements RMI {
             }
 
             if(files_to_restore.containsKey(file_id)) {
+                System.out.println();
                 if(files_to_restore.get(file_id).size() == num_chunks) {
                     restore_status = true;
                     break;
@@ -273,12 +275,16 @@ public class Peer implements RMI {
                 else {
                     // Improvement on restore function to be more robust on failures
                     for(int j = 0; j < num_chunks; j++) {
-                        if(!files_to_restore.get(file_id).containsKey(j))
+
+                        if(!files_to_restore.get(file_id).containsKey(j)) {
                             MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
+                        }
                     }
                 }
             }
         }
+
+        System.out.println("NUM: " + (num_chunks - files_to_restore.get(file_id).size()));
 
         // Save file on restored files
         if(restore_status)

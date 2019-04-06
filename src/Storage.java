@@ -54,7 +54,7 @@ public class Storage {
      */
     private PriorityQueue<String[]> chunks_replication;
 
-    static Map<String, Map<Integer, ArrayList<Integer>>> chunks_info_struct = new HashMap<>();
+    volatile static Map<String, Map<Integer, Integer>> chunks_info_struct = new HashMap<>();
 
     /**
      * Structure containing backed up files information
@@ -398,9 +398,13 @@ public class Storage {
      * @param increment Value to increment (positive or negative)
      */
     static boolean store_chunk_info(String file_id, Integer chunk_no, Integer increment) {
-        File directory = new File(chunks_info, file_id);
 
+        if (!has_chunk_info(file_id,chunk_no))
+            return false;
+
+        File directory = new File(chunks_info, file_id);
         File file_writer = new File(directory, String.valueOf(chunk_no));
+
         String data = read_from_file(file_writer);
         if(!data.equals("")) {
             int curr_replication_degree = Integer.valueOf(data.split("/")[0]) + increment;
@@ -413,10 +417,10 @@ public class Storage {
         return false;
     }
 
-    static void store_chunks_info_of_file(String file_id) {
-        for(Map.Entry<Integer, ArrayList<Integer>> chunk : chunks_info_struct.get(file_id).entrySet()) {
-            create_chunk_info(file_id, chunk.getKey(), chunk.getValue().get(1));
-            store_chunk_info(file_id, chunk.getKey(), chunk.getValue().get(0));
+    static void store_chunks_info_of_file(String file_id, Integer replication_degree) {
+        for(Map.Entry<Integer, Integer> chunk : chunks_info_struct.get(file_id).entrySet()) {
+            create_chunk_info(file_id, chunk.getKey(), replication_degree);
+            store_chunk_info(file_id, chunk.getKey(), chunk.getValue());
         }
         chunks_info_struct.remove(file_id);
     }
@@ -446,6 +450,45 @@ public class Storage {
         return  new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
 
+    static void syncronized_put_chunk_info(String file_id, Integer chunk_no, Integer info) {
+
+        synchronized (chunks_info_struct) {
+            chunks_info_struct.get(file_id).put(chunk_no, info);
+        }
+    }
+
+    static Integer syncronized_get_chunk_info(String file_id, Integer chunk_no) {
+
+        synchronized (chunks_info_struct) {
+            if (chunks_info_struct.get(file_id).containsKey(chunk_no))
+                return chunks_info_struct.get(file_id).get(chunk_no);
+            else{
+                chunks_info_struct.get(file_id).put(chunk_no, 0);
+                return 0;
+            }
+        }
+    }
+
+    static boolean syncronized_contains_chunk_info(String file_id, Integer chunk_no) {
+
+        synchronized (chunks_info_struct) {
+            if (chunk_no == null)
+                return chunks_info_struct.containsKey(file_id);
+            else
+                return chunks_info_struct.get(file_id).containsKey(chunk_no);
+        }
+    }
+
+    static void syncronized_inc_chunk_info(String file_id, Integer chunk_no) {
+
+        synchronized (chunks_info_struct) {
+            if (chunks_info_struct.get(file_id).containsKey(chunk_no)){
+                Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
+                chunks_info_struct.get(file_id).put(chunk_no, old_rep);
+            } else
+                chunks_info_struct.get(file_id).put(chunk_no,1);
+        }
+    }
 
     /**
      * Calculate the over replication of a chunk
