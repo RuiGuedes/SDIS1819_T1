@@ -34,7 +34,7 @@ public class TestApp {
      * Initializes the client program to execute a certain operation
      * @param args Contains all needed variables for setup the client program
      */
-    public static <string> void main(String[] args) throws RemoteException, NotBoundException {
+    public static void main(String[] args) throws RemoteException, NotBoundException {
         // Check arguments
         if (args.length < 2) {
             System.out.println("Usage: java TestApp <peer_ap> <operation> <opnd_1> [<opnd_2>]");
@@ -77,7 +77,7 @@ public class TestApp {
                     System.out.println(STUB.delete(OPND_1));
                     break;
                 case "RECLAIM":
-                    STUB.reclaim(Integer.parseInt(OPND_1));
+                    System.out.println(STUB.reclaim(Integer.parseInt(OPND_1)*1000));
                     break;
                 case "STATE":
                     System.out.println(STUB.state());

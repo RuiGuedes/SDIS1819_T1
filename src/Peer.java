@@ -168,7 +168,7 @@ public class Peer implements RMI {
      * Get peer storage structure
      * @return Storage class
      */
-    private static Storage getStorage() {
+    static Storage getStorage() {
         return storage;
     }
 
@@ -301,7 +301,8 @@ public class Peer implements RMI {
 
     @Override
     public String reclaim(Integer disk_space) {
-        return "Storage reclaim has been done " + (storage.set_storage_space(disk_space) ? "with" : "without") + " success !";
+        storage.set_storage_space(disk_space);
+        return "Storage reclaim has been done with success !";
     }
 
     @Override

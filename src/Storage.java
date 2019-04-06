@@ -4,10 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class Storage {
-
-    // TODO - Update local storage on file
-    // TODO - Space is only relative to chunk storage not all files involved
+class Storage {
 
     /**
      * Chunk information size
@@ -42,12 +39,12 @@ public class Storage {
     /**
      * Local storage file
      */
-    private File local_storage;
+    private static File local_storage;
 
     /**
      * Local space to storage in bytes
      */
-    private long space;
+    private static long space;
 
     /**
      * Structure containing chunks replication degree: [over_replication_degree , file_id , chunk_no]
@@ -170,7 +167,7 @@ public class Storage {
         restore = new File(this.root, "restore");
         chunks_info = new File(this.root,"chunks_info");
         backup_info = new File(this.root, "backup_info");
-        this.local_storage = new File(this.root, "local_storage.txt");
+        local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
         this.read_backed_up_files();
         this.load_replication();
@@ -186,9 +183,9 @@ public class Storage {
         restore = new File(this.root, "restore"); restore.mkdirs();
         chunks_info = new File(this.root, "chunks_info"); chunks_info.mkdirs();
         backup_info = new File(this.root, "backup_info"); backup_info.mkdirs();
-        this.local_storage = new File(this.root, "local_storage.txt");
-        this.space = this.root.getFreeSpace();
-        this.write_local_storage();
+        local_storage = new File(this.root, "local_storage.txt");
+        space = backup.getFreeSpace();
+        write_local_storage();
         this.backed_up_files = new HashMap<>();
     }
 
@@ -198,13 +195,13 @@ public class Storage {
     private void read_local_storage() {
         try {
             // Opens file, reads local storage and closes file
-            BufferedReader file_reader = new BufferedReader(new FileReader(this.local_storage));
-            this.space = Long.parseLong(file_reader.readLine());
+            BufferedReader file_reader = new BufferedReader(new FileReader(local_storage));
+            space = Long.parseLong(file_reader.readLine());
             file_reader.close();
 
             // Checks if the current local system running the peer has lower memory than required
-            if(this.space > this.root.getFreeSpace())
-                this.space = this.root.getFreeSpace();
+            if(space > backup.getFreeSpace())
+                space = this.root.getFreeSpace();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -214,56 +211,18 @@ public class Storage {
     /**
      * Writes local storage to its respective file
      */
-    private void write_local_storage() {
+    private static void write_local_storage() {
         try {
             // Opens file, writes respective content and closes it
-            synchronized (this.local_storage) {
-                BufferedWriter file_writer = new BufferedWriter(new FileWriter(this.local_storage));
-                file_writer.write(String.valueOf(this.space));
+            synchronized (local_storage) {
+                BufferedWriter file_writer = new BufferedWriter(new FileWriter(local_storage));
+                file_writer.write(String.valueOf(space));
                 file_writer.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    /**
-     * Change the system storage
-     * @param space New space value
-     */
-    boolean set_storage_space(Integer space) {
-        this.space = space;
-        while (this.space < this.root.getTotalSpace()) {
-            if (chunks_replication.size() > 0) {
-                String[] info = chunks_replication.poll();
-                delete_chunk(info[1], Integer.parseInt(info[2]));
-            }
-        }
-
-        write_local_storage();
-        return true;
-    }
-
-    //////////////////////////////////////////////
-
-    /**
-     * Update the system storage
-     * @param space Space to increase/decrease
-     */
-    public void update_storage_space(Integer space) {
-        this.space += space;
-        write_local_storage();
-    }
-
-    /**
-     * Get the space available to store data
-     * @return Free space
-     */
-    int get_free_space() {
-        return (int) (this.space - this.root.getTotalSpace());
-    }
-
-    //////////////////////////////////////////////
 
     /**
      * Reads information about backed up files
@@ -362,20 +321,6 @@ public class Storage {
         }
     }
 
-
-    private void load_replication() {
-        this.chunks_replication = new PriorityQueue<>(new String_array_cmp());
-        File[] files_directories = chunks_info.listFiles();
-
-        for (File file_directory : Objects.requireNonNull(files_directories)) {
-            File[] chunks_info_files = file_directory.listFiles();
-
-            for (File chunk_file : Objects.requireNonNull(chunks_info_files))
-                this.chunks_replication.add(new String[]
-                        {String.valueOf(get_chunk_over_replication(chunk_file)),file_directory.getName(),chunk_file.getName()});
-        }
-    }
-
     /**
      * Creates chunk information file
      * @param file_id File id
@@ -426,6 +371,11 @@ public class Storage {
         return false;
     }
 
+    /**
+     * Stores dynamic data to file system and removes it from the chunk_info_struct
+     * @param file_id File id
+     * @param replication_degree Replication degree desired
+     */
     static void store_chunks_info_of_file(String file_id, Integer replication_degree) {
         for(Map.Entry<Integer, Integer> chunk : chunks_info_struct.get(file_id).entrySet()) {
             create_chunk_info(file_id, chunk.getKey(), replication_degree);
@@ -465,12 +415,24 @@ public class Storage {
         return  new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
 
+    /**
+     * Synchronized access to chunk info structure to put data
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     * @param info Data
+     */
     static void synchronized_put_chunk_info(String file_id, Integer chunk_no, Integer info) {
         synchronized (chunks_info_struct) {
             chunks_info_struct.get(file_id).put(chunk_no, info);
         }
     }
 
+    /**
+     * Synchronized access to chunk info structure to get data
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     * @return Replication degree
+     */
     static Integer synchronized_get_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             if (chunks_info_struct.get(file_id).containsKey(chunk_no))
@@ -482,6 +444,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Synchronized access to chunk info structure to check elements presence
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     * @return True if it contains false otherwise
+     */
     static boolean synchronized_contains_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             if (chunk_no == null)
@@ -495,6 +463,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Synchronized access to chunk info structure to update elements by incrementing their value
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     */
     static void synchronized_inc_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
@@ -563,33 +536,11 @@ public class Storage {
     }
 
     /**
-     * Remove a chunk file of the storage and remove empty folders
-     * @param file_id File id
+     * Synchronized access to files to restore structure to check elements
+     * @param file_id File ID
      * @param chunk_no Chunk number
+     * @return True if it contains false otherwise
      */
-    private static void delete_chunk(String file_id, Integer chunk_no) {
-        File backup_file_directory = new File(backup, file_id);
-        File info_file_directory = new File(chunks_info, file_id);
-
-        // Check if directories exist
-        if (!backup_file_directory.exists() || !info_file_directory.exists())
-            return;
-
-        // Delete chunk files
-        new File(backup_file_directory, String.valueOf(chunk_no)).delete();
-        new File(info_file_directory, String.valueOf(chunk_no)).delete();
-
-        // Delete directory if empty
-        if (backup_file_directory.getTotalSpace() == 0) {
-            backup_file_directory.delete();
-            info_file_directory.delete();
-        }
-
-        Peer.getMC().send_packet(
-                new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null, null));
-    }
-
-
     static boolean synchronized_contains_files_to_restore(String file_id, Integer chunk_no) {
         synchronized (files_to_restore) {
             if(chunk_no == null)
@@ -603,6 +554,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Synchronized access to files to restore structure to put elements
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     */
     static void synchronized_put_files_to_restore(String file_id, Integer chunk_no, byte[] chunk_body) {
         synchronized (files_to_restore) {
             if(chunk_no == null)
@@ -614,12 +570,20 @@ public class Storage {
         }
     }
 
+    /**
+     * Synchronized access to files to restore structure to remove elements
+     * @param file_id File ID
+     */
     static void synchronized_remove_files_to_restore(String file_id) {
         synchronized (files_to_restore) {
             files_to_restore.remove(file_id);
         }
     }
 
+    /**
+     * Synchronized access to files to restore structure to get its size
+     * @param file_id File ID
+     */
     static int synchronized_size_files_to_restore(String file_id) {
         synchronized (files_to_restore) {
             if(files_to_restore.containsKey(file_id))
@@ -661,6 +625,92 @@ public class Storage {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Loads chunks replication to easily reclaim space
+     */
+    private void load_replication() {
+        Comparator<String[]> chunk_comparator = Comparator.comparing(s -> Integer.parseInt(s[0]));
+        this.chunks_replication = new PriorityQueue<>(chunk_comparator.reversed());
+
+        File[] files_directories = chunks_info.listFiles();
+
+        for (File file_directory : Objects.requireNonNull(files_directories)) {
+            File[] chunks_info_files = file_directory.listFiles();
+
+            for (File chunk_file : Objects.requireNonNull(chunks_info_files))
+                this.chunks_replication.add(new String[]
+                        {String.valueOf(get_chunk_over_replication(chunk_file)), file_directory.getName(), chunk_file.getName()});
+        }
+    }
+
+    /**
+     * Get the space available to store data
+     * @return Free space
+     */
+    int get_free_space() {
+        return (int) (space - get_directory_used_space(backup));
+    }
+
+    /**
+     * Change the system storage
+     * @param new_space New space value
+     */
+    void set_storage_space(Integer new_space) {
+        space = new_space;
+        while (space < get_directory_used_space(backup)) {
+            if (!chunks_replication.isEmpty()) {
+                String[] info = chunks_replication.poll();
+                delete_chunk(info[1], Integer.parseInt(info[2]));
+            }
+            else
+                break;
+        }
+
+        write_local_storage();
+    }
+
+    /**
+     * Remove a chunk file of the storage and remove empty folders
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     */
+    private static void delete_chunk(String file_id, Integer chunk_no) {
+        File backup_file_directory = new File(backup, file_id);
+        File info_file_directory = new File(chunks_info, file_id);
+
+        // Check if directories exist
+        if (!backup_file_directory.exists() || !info_file_directory.exists())
+            return;
+
+        // Delete chunk files
+        new File(backup_file_directory, String.valueOf(chunk_no)).delete();
+        new File(info_file_directory, String.valueOf(chunk_no)).delete();
+
+        // Delete directory if empty
+        if (get_directory_used_space(backup_file_directory) == 0) {
+            backup_file_directory.delete();
+            info_file_directory.delete();
+        }
+
+        Peer.getMC().send_packet(new Message("REMOVED", Peer.get_protocol_version(), Peer.get_server_id(), file_id, chunk_no,null, null));
+    }
+
+    /**
+     * Get directory used space
+     * @param directory Directory to check
+     * @return Return used spaced
+     */
+    private static long get_directory_used_space(File directory) {
+        long length = 0;
+        for (File file : Objects.requireNonNull(directory.listFiles())) {
+            if (file.isFile())
+                length += file.length();
+            else
+                length += get_directory_used_space(file);
+        }
+        return length;
     }
 
     /**
@@ -731,20 +781,24 @@ public class Storage {
                     + ":: STORAGE ::\n"
                     + ":::::::::::::\n\n";
 
-        // TODO - After local storage is well defined
-        // The peer's storage capacity, i.e. the maximum amount of disk space that can be used to store chunks, and the amount of storage (both in KBytes) used to backup the chunks.
+        peer_state += "Used Space: " + humanReadableByteCount(get_directory_used_space(backup), true) +  "\nPeer Maximum Allocated Space: " +  humanReadableByteCount(space, true) + "\n";
 
         return peer_state;
     }
 
-}
-
-
-/**
- * Priority queue comparator
- */
-class String_array_cmp implements Comparator<String[]> {
-    public int compare (String[] s1, String[] s2) {
-        return s1[0].compareTo(s2[0]);
+    /**
+     * Displays memory usage in a friendly way.
+     * @param bytes Amount of bytes
+     * @param si Display mode
+     * @return Bytes formatted
+     * @author aioobe
+     */
+    private static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
+
 }
