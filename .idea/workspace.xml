@@ -3,40 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/DecryptMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/DecryptMessage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/FileTest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Listener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Listener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Multicast.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Multicast.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Peer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/RMI.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Report.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/String_array_cmp.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/String_array_cmp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/img.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/1.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/3.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DecryptMessage.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FileData.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FileTest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GetChunk.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Listener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Message.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Multicast.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Peer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PutChunk$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PutChunk.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RMI.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RMI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Report.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Storage.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Peer/Peer.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Peer/Peer.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/TestApp/Backup.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/Backup.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/TestApp/Restore.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/Restore.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Multicast.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Multicast.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/String_array_cmp.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TestApp.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/img.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -56,22 +29,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
-              <caret line="198" column="10" selection-start-line="198" selection-start-column="10" selection-end-line="198" selection-end-column="10" />
+            <state relative-caret-position="424">
+              <caret line="232" column="49" selection-start-line="232" selection-start-column="49" selection-end-line="232" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Message.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1972">
-              <caret line="119" selection-start-line="119" selection-end-line="119" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#9991#9992#0" expanded="true" />
+                <element signature="e#10034#10035#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -80,8 +43,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Task.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2363">
-              <caret line="146" selection-start-line="146" selection-end-line="146" />
+            <state relative-caret-position="285">
+              <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Message.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="524">
+              <caret line="119" selection-start-line="119" selection-end-line="119" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -89,8 +64,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Storage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="176" column="64" selection-start-line="176" selection-start-column="64" selection-end-line="176" selection-end-column="64" />
+            <state relative-caret-position="370">
+              <caret line="67" column="52" selection-start-line="67" selection-start-column="52" selection-end-line="67" selection-end-column="52" />
+              <folding>
+                <element signature="e#9773#9774#0" expanded="true" />
+                <element signature="e#9843#9844#0" expanded="true" />
+                <element signature="e#23414#23415#0" expanded="true" />
+                <element signature="e#23459#23460#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -112,8 +93,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Multicast.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="493">
-              <caret line="34" column="24" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+            <state relative-caret-position="102">
+              <caret line="30" selection-start-line="30" selection-end-line="30" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -187,20 +168,20 @@
         <option value="$PROJECT_DIR$/peer1/restore/as" />
         <option value="$PROJECT_DIR$/peer1/backup/as/1" />
         <option value="$PROJECT_DIR$/src/FileData.java" />
-        <option value="$PROJECT_DIR$/src/Multicast.java" />
         <option value="$PROJECT_DIR$/src/TestApp.java" />
         <option value="$PROJECT_DIR$/src/Message.java" />
         <option value="$PROJECT_DIR$/src/Peer.java" />
+        <option value="$PROJECT_DIR$/src/Multicast.java" />
         <option value="$PROJECT_DIR$/src/Task.java" />
         <option value="$PROJECT_DIR$/src/Storage.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="105" />
-    <option name="y" value="30" />
-    <option name="width" value="2190" />
-    <option name="height" value="1225" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1066" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -365,12 +346,12 @@
       <workItem from="1554312902853" duration="14744000" />
       <workItem from="1554478423041" duration="1119000" />
       <workItem from="1554480242204" duration="5853000" />
-      <workItem from="1554544282586" duration="3752000" />
+      <workItem from="1554544282586" duration="10112000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="175534000" />
+    <option name="totallyTimeSpent" value="181894000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -394,7 +375,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3279743" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49840087" visible="true" weight="0.3504823" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4978678" visible="true" weight="0.03215434" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -403,7 +384,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3286119" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49733475" weight="0.11756374" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50159913" side_tool="true" weight="0.25830653" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5021322" side_tool="true" weight="0.3504823" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.49946696" weight="0.3397642" />
       <window_info anchor="bottom" id="Duplicate detector" order="13" weight="0.3295129" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -417,39 +398,6 @@
       <window_info anchor="right" id="Database" order="8" />
       <window_info anchor="right" id="Coverage" order="9" side_tool="true" weight="0.32995737" />
     </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12550336" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Designer" order="3" />
-      <window_info id="UI Designer" order="4" />
-      <window_info id="Capture Tool" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3279743" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49840087" visible="true" weight="0.3504823" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4986577" weight="0.3279743" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3286119" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49733475" weight="0.11756374" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50159913" side_tool="true" weight="0.25830653" />
-      <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.49946696" weight="0.3397642" />
-      <window_info anchor="bottom" id="Duplicate detector" order="13" weight="0.3295129" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info anchor="right" id="Maven" order="5" />
-      <window_info anchor="right" id="Capture Analysis" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="7" />
-      <window_info anchor="right" id="Database" order="8" />
-      <window_info anchor="right" id="Coverage" order="9" side_tool="true" weight="0.32995737" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -513,16 +461,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="34" column="24" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/RMI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -543,9 +481,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Multicast.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="30" selection-start-line="30" selection-end-line="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Task.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="63" column="28" selection-start-line="63" selection-start-column="28" selection-end-line="63" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Message.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1972">
+        <state relative-caret-position="524">
           <caret line="119" selection-start-line="119" selection-end-line="119" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -555,25 +510,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Peer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="198" column="10" selection-start-line="198" selection-start-column="10" selection-end-line="198" selection-end-column="10" />
+        <state relative-caret-position="424">
+          <caret line="232" column="49" selection-start-line="232" selection-start-column="49" selection-end-line="232" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#9991#9992#0" expanded="true" />
+            <element signature="e#10034#10035#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Task.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2363">
-          <caret line="146" selection-start-line="146" selection-end-line="146" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Storage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="176" column="64" selection-start-line="176" selection-start-column="64" selection-end-line="176" selection-end-column="64" />
+        <state relative-caret-position="370">
+          <caret line="67" column="52" selection-start-line="67" selection-start-column="52" selection-end-line="67" selection-end-column="52" />
+          <folding>
+            <element signature="e#9773#9774#0" expanded="true" />
+            <element signature="e#9843#9844#0" expanded="true" />
+            <element signature="e#23414#23415#0" expanded="true" />
+            <element signature="e#23459#23460#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

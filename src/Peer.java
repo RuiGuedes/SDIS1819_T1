@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 
@@ -182,7 +183,7 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
-        ArrayList<PutChunk> threads = new ArrayList<>();
+        Set<Callable<Boolean>> threads = new HashSet<>();
 
         // Determine if file was already backed up or updated
         switch (getStorage().is_backed_up(file.get_filename(), file.get_file_id())) {
@@ -196,7 +197,7 @@ public class Peer implements RMI {
         // Adds file to backed up files list
         getStorage().store_backed_up_file(file);
 
-        //
+        // Adds file to structure that contains chunks information
         Storage.chunks_info_struct.put(file.get_file_id(), new HashMap<>());
 
         while ((chunk = file.next_chunk()) != null) {
@@ -210,25 +211,14 @@ public class Peer implements RMI {
             DatagramPacket packet = new DatagramPacket(data, data.length, MDB.getGroup(), MDB.getPort());
             PutChunk task = new PutChunk(message, packet);
 
-            // Adds task to running threads
+            // Adds task to threads list
             threads.add(task);
-
-            // Executes task
-            MDB.getExecuter().execute(task);
         }
 
-        // Waits for all worker threads to finish
-        System.out.println("threads: " + threads.size());
-        while (true) {
-            boolean still_running = false;
-
-            for(PutChunk thread : threads) {
-                if(thread.is_running())
-                    still_running = true;
-            }
-
-            if(!still_running)
-                break;
+        try {
+            MDB.getExecuter().invokeAll(threads);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         Storage.store_chunks_info_of_file(file.get_file_id(), replication_degree);

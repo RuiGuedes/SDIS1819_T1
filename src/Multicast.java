@@ -24,7 +24,7 @@ public class Multicast {
      * @param address
      * @param port
      */
-    public Multicast(String name, String address, String port)  {
+    Multicast(String name, String address, String port)  {
         this.name = name;
         this.address = address;
         this.port = Integer.parseInt(port);
@@ -37,7 +37,7 @@ public class Multicast {
             e.printStackTrace();
         }
 
-        this.executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(100);
+        this.executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
     }
 
     public ThreadPoolExecutor getExecuter() {

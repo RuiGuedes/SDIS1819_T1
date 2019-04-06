@@ -65,7 +65,7 @@ public class Storage {
      * Storage class constructor
      */
     Storage(Integer server_id) {
-        if (Files.exists(Paths.get("peer" + server_id)))
+        if (Files.exists(Paths.get("../../peers/peer" + server_id)))
             load_storage(server_id);
         else
             create_storage(server_id);
@@ -157,7 +157,7 @@ public class Storage {
      * @param server_id Server identifier
      */
     private void load_storage(Integer server_id) {
-        this.root = new File("peer" + server_id);
+        this.root = new File("../../peers/peer" + server_id);
         backup = new File(this.root, "backup");
         restore = new File(this.root, "restore");
         chunks_info = new File(this.root,"chunks_info");
@@ -264,6 +264,7 @@ public class Storage {
         this.backed_up_files = new HashMap<>();
 
         for (final File file_entry : Objects.requireNonNull(backup_info.listFiles())) {
+
             if (!file_entry.isDirectory()) {
                 try {
                     // Opens file, reads local storage and closes file
@@ -480,13 +481,9 @@ public class Storage {
     }
 
     static void syncronized_inc_chunk_info(String file_id, Integer chunk_no) {
-
         synchronized (chunks_info_struct) {
-            if (chunks_info_struct.get(file_id).containsKey(chunk_no)){
-                Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
-                chunks_info_struct.get(file_id).put(chunk_no, old_rep);
-            } else
-                chunks_info_struct.get(file_id).put(chunk_no,1);
+            Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
+            chunks_info_struct.get(file_id).put(chunk_no, old_rep);
         }
     }
 

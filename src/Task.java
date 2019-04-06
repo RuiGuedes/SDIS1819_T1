@@ -1,6 +1,7 @@
 import java.awt.event.PaintEvent;
 import java.net.DatagramPacket;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 
@@ -59,14 +60,8 @@ class DecryptMessage implements Runnable {
                 //}
                 break;
             case "STORED":
-                if(Storage.syncronized_contains_chunk_info(message.get_file_id(),null)) {
-                    /*Integer[] c = Storage.chunks_info_struct.get(message.get_file_id()).get(message.get_chunk_no());
-                    if (c != null)
-                        c[0]++;
-                    else
-                        System.out.println("22: " + message.get_chunk_no());*/
+                if(Storage.syncronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no()))
                     Storage.syncronized_inc_chunk_info(message.get_file_id(), message.get_chunk_no());
-                }
                 else
                     Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 break;
@@ -115,7 +110,7 @@ class DecryptMessage implements Runnable {
     }
 }
 
-class PutChunk implements Runnable {
+class PutChunk implements Callable<Boolean> {
 
     /**
      * Message containing information to be sent
@@ -128,36 +123,19 @@ class PutChunk implements Runnable {
     private DatagramPacket packet;
 
     /**
-     * Thread termination status: true = success : false = failed
-     */
-    private Boolean termination_status;
-
-    /**
-     * Determines whether thread exited run method
-     */
-    private Boolean exit_flag;
-
-    /**
      * Put chunk constructor
      */
     PutChunk(Message message, DatagramPacket packet) {
         this.message = message;
         this.packet = packet;
-        this.termination_status = false;
-        this.exit_flag = false;
     }
 
     @Override
-    public void run() {
-
+    public Boolean call() {
         for (int i = 0; i < 5; i++) {
-
-//            if (!Storage.chunks_info_struct.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
-//                Storage.chunks_info_struct.get(this.message.get_file_id()).put(this.message.get_chunk_no(), new Integer[]{0,this.message.get_replication_degree()});
             if (Storage.syncronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
                 Storage.syncronized_put_chunk_info(this.message.get_file_id(),this.message.get_chunk_no(),0);
 
-            //Storage.create_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), this.message.get_replication_degree());
             Peer.getMDB().send_packet(packet);
 
             try {
@@ -166,35 +144,11 @@ class PutChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            Integer c = Storage.syncronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no());
-
-            //if (Storage.read_chunk_info(message.get_file_id(), message.get_chunk_no(), 0) >= this.message.get_replication_degree())
-            if(c >= this.message.get_replication_degree())
+            if(Storage.syncronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no()) >= this.message.get_replication_degree())
                 break;
         }
 
-        this.exit_flag = true;
-    }
-
-    /**
-     * Returns thread exit status
-     */
-    boolean get_termination_status() {
-        return termination_status;
-    }
-
-    /**
-     * Checks whether thread is running or not
-     */
-    boolean is_running() {
-        return !this.exit_flag;
-    }
-
-    /**
-     * Terminates this thread by activating exit_flag
-     */
-    void terminate() {
-        this.exit_flag = true;
+        return true;
     }
 
 }
