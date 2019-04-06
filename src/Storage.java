@@ -173,7 +173,7 @@ public class Storage {
      * @param server_id Server identifier
      */
     private void create_storage(Integer server_id) {
-        this.root = new File("peer" + server_id); this.root.mkdirs();
+        this.root = new File("../../peers/peer" + server_id); this.root.mkdirs();
         backup = new File(this.root, "backup"); backup.mkdirs();
         restore = new File(this.root, "restore"); restore.mkdirs();
         chunks_info = new File(this.root, "chunks_info"); chunks_info.mkdirs();

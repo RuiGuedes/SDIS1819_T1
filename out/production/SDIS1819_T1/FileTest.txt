@@ -1,3 +1,0 @@
-File used to test backup feature.
-
-This is a test without replication degree ?
