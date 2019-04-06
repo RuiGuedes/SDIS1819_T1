@@ -54,6 +54,14 @@ public class Storage {
      */
     private PriorityQueue<String[]> chunks_replication;
 
+    /**
+     * Structure that contains all restoring files stats
+     */
+    volatile static Map<String, Map<Integer, byte[]>> files_to_restore = new HashMap<>();
+
+    /**
+     * Structure that contains all chunk information
+     */
     volatile static Map<String, Map<Integer, Integer>> chunks_info_struct = new HashMap<>();
 
     /**
@@ -475,8 +483,12 @@ public class Storage {
         synchronized (chunks_info_struct) {
             if (chunk_no == null)
                 return chunks_info_struct.containsKey(file_id);
-            else
-                return chunks_info_struct.get(file_id).containsKey(chunk_no);
+            else {
+                if(chunks_info_struct.containsKey(file_id))
+                    return chunks_info_struct.get(file_id).containsKey(chunk_no);
+                else
+                    return false;
+            }
         }
     }
 
@@ -590,7 +602,7 @@ public class Storage {
             // Creates file
             file.createNewFile();
             FileOutputStream file_writer = new FileOutputStream(file, true);
-            Map<Integer, byte[]> data = Peer.files_to_restore.get(file_id);
+            Map<Integer, byte[]> data = files_to_restore.get(file_id);
 
             // Writes content to file
             for(Map.Entry<Integer, byte[]> chunk : data.entrySet()) {

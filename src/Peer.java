@@ -5,6 +5,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -52,11 +54,6 @@ public class Peer implements RMI {
     private static Storage storage;
 
     /**
-     * Structure that contains all restoring files stats
-     */
-    static Map<String, Map<Integer, byte[]>> files_to_restore;
-
-    /**
      * Default constructor
      */
     private Peer() {}
@@ -83,7 +80,6 @@ public class Peer implements RMI {
 
         // Initializes storage
         storage = new Storage(SERVER_ID);
-        files_to_restore = new HashMap<>();
 
         // Initialize remote object
         init_remote_object();
@@ -183,6 +179,7 @@ public class Peer implements RMI {
         // Variables
         byte[] chunk;
         int chunk_no = 0;
+        boolean backup_status = true;
         Set<Callable<Boolean>> threads = new HashSet<>();
 
         // Determine if file was already backed up or updated
@@ -215,15 +212,30 @@ public class Peer implements RMI {
             threads.add(task);
         }
 
+        // Invoke all tasks and check their status
         try {
-            MDB.getExecuter().invokeAll(threads);
+            List<Future<Boolean>> threads_status = MDB.getExecuter().invokeAll(threads);
+
+            for(Future<Boolean> thread : threads_status) {
+                try {
+                    if(!thread.get()) {
+                        backup_status = false;
+                        break;
+                    }
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        Storage.store_chunks_info_of_file(file.get_file_id(), replication_degree);
+        if(backup_status)
+            Storage.store_chunks_info_of_file(file.get_file_id(), replication_degree);
+        else
+            this.delete(file.get_filename(), file.get_file_id());
 
-        return "Backup of " + file.get_filename() + " has been done with success !";
+        return "Backup of " + file.get_filename() + " has been done " + (backup_status ? "with" : "without") + " success !";
     }
 
     @Override
@@ -256,9 +268,8 @@ public class Peer implements RMI {
                 e.printStackTrace();
             }
 
-            if(files_to_restore.containsKey(file_id)) {
-                System.out.println();
-                if(files_to_restore.get(file_id).size() == num_chunks) {
+            if(Storage.files_to_restore.containsKey(file_id)) {
+                if(Storage.files_to_restore.get(file_id).size() == num_chunks) {
                     restore_status = true;
                     break;
                 }
@@ -266,7 +277,7 @@ public class Peer implements RMI {
                     // Improvement on restore function to be more robust on failures
                     for(int j = 0; j < num_chunks; j++) {
 
-                        if(!files_to_restore.get(file_id).containsKey(j)) {
+                        if(!Storage.files_to_restore.get(file_id).containsKey(j)) {
                             MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
                         }
                     }
@@ -274,13 +285,13 @@ public class Peer implements RMI {
             }
         }
 
-        System.out.println("NUM: " + (num_chunks - files_to_restore.get(file_id).size()));
+        System.out.println("NUM: " + (num_chunks - Storage.files_to_restore.get(file_id).size()));
 
         // Save file on restored files
         if(restore_status)
             getStorage().restore_file(filename, file_id);
         else
-            files_to_restore.remove(file_id);
+            Storage.files_to_restore.remove(file_id);
 
         return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
     }

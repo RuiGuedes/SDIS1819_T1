@@ -69,12 +69,11 @@ class DecryptMessage implements Runnable {
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
                 break;
             case "CHUNK":
-                if(!Peer.files_to_restore.containsKey(message.get_file_id())){
-                    Peer.files_to_restore.put(message.get_file_id(), new HashMap<>());
-                }
-                if(!Peer.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no())){
-                    Peer.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
-                }
+                if(Storage.files_to_restore.containsKey(message.get_file_id()))
+                    Storage.files_to_restore.put(message.get_file_id(), new HashMap<>());
+
+                if(!Storage.files_to_restore.get(message.get_file_id()).containsKey(message.get_chunk_no()))
+                    Storage.files_to_restore.get(message.get_file_id()).put(message.get_chunk_no(), message.get_body());
                 break;
             case "DELETE":
                 Storage.delete_file(message.get_file_id());
@@ -132,6 +131,9 @@ class PutChunk implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
+
+        int current_replication_degree = 0;
+
         for (int i = 0; i < 5; i++) {
             if (Storage.syncronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
                 Storage.syncronized_put_chunk_info(this.message.get_file_id(),this.message.get_chunk_no(),0);
@@ -144,11 +146,11 @@ class PutChunk implements Callable<Boolean> {
                 e.printStackTrace();
             }
 
-            if(Storage.syncronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no()) >= this.message.get_replication_degree())
+            if((current_replication_degree = Storage.syncronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no())) >= this.message.get_replication_degree())
                 break;
         }
 
-        return true;
+        return current_replication_degree > 0;
     }
 
 }
@@ -175,9 +177,11 @@ class GetChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if(Peer.files_to_restore.containsKey(this.message.get_file_id())) {
-                if (Peer.files_to_restore.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
-                    Peer.files_to_restore.remove(this.message.get_file_id());
+            if(Storage.files_to_restore.containsKey(this.message.get_file_id())) {
+                if (Storage.files_to_restore.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no()))
+                    Storage.files_to_restore.remove(this.message.get_file_id());
+                else
+                    Peer.getMDR().send_packet(chunk_message);
             }
             else
                 Peer.getMDR().send_packet(chunk_message);
