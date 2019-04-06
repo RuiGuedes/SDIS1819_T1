@@ -5,8 +5,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -268,8 +266,8 @@ public class Peer implements RMI {
                 e.printStackTrace();
             }
 
-            if(Storage.files_to_restore.containsKey(file_id)) {
-                if(Storage.files_to_restore.get(file_id).size() == num_chunks) {
+            if(Storage.synchronized_contains_files_to_restore(file_id, null)) {
+                if(Storage.synchronized_size_files_to_restore(file_id) == num_chunks) {
                     restore_status = true;
                     break;
                 }
@@ -277,7 +275,7 @@ public class Peer implements RMI {
                     // Improvement on restore function to be more robust on failures
                     for(int j = 0; j < num_chunks; j++) {
 
-                        if(!Storage.files_to_restore.get(file_id).containsKey(j)) {
+                        if(!Storage.synchronized_contains_files_to_restore(file_id, j)) {
                             MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
                         }
                     }
@@ -285,13 +283,11 @@ public class Peer implements RMI {
             }
         }
 
-        System.out.println("NUM: " + (num_chunks - Storage.files_to_restore.get(file_id).size()));
-
         // Save file on restored files
         if(restore_status)
             getStorage().restore_file(filename, file_id);
         else
-            Storage.files_to_restore.remove(file_id);
+            Storage.synchronized_remove_files_to_restore(file_id);
 
         return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
     }

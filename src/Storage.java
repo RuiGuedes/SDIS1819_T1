@@ -57,7 +57,7 @@ public class Storage {
     /**
      * Structure that contains all restoring files stats
      */
-    volatile static Map<String, Map<Integer, byte[]>> files_to_restore = new HashMap<>();
+    private volatile static Map<String, Map<Integer, byte[]>> files_to_restore = new HashMap<>();
 
     /**
      * Structure that contains all chunk information
@@ -441,7 +441,7 @@ public class Storage {
      * @param replication_type Replication degree type: 0 for perceived replication : 1 for desired replication
      * @return Perceived replication degree
      */
-    static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
+    private static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
         File directory = new File(chunks_info, file_id);
 
         if (!directory.exists())
@@ -455,19 +455,23 @@ public class Storage {
         return 0;
     }
 
-    static boolean has_chunk_info(String file_id, Integer chunk_no) {
+    /**
+     * Checks if chunk info is stored in file system
+     * @param file_id File id
+     * @param chunk_no Chunk number
+     * @return True if exists false otherwise
+     */
+    private static boolean has_chunk_info(String file_id, Integer chunk_no) {
         return  new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
 
-    static void syncronized_put_chunk_info(String file_id, Integer chunk_no, Integer info) {
-
+    static void synchronized_put_chunk_info(String file_id, Integer chunk_no, Integer info) {
         synchronized (chunks_info_struct) {
             chunks_info_struct.get(file_id).put(chunk_no, info);
         }
     }
 
-    static Integer syncronized_get_chunk_info(String file_id, Integer chunk_no) {
-
+    static Integer synchronized_get_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             if (chunks_info_struct.get(file_id).containsKey(chunk_no))
                 return chunks_info_struct.get(file_id).get(chunk_no);
@@ -478,8 +482,7 @@ public class Storage {
         }
     }
 
-    static boolean syncronized_contains_chunk_info(String file_id, Integer chunk_no) {
-
+    static boolean synchronized_contains_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             if (chunk_no == null)
                 return chunks_info_struct.containsKey(file_id);
@@ -492,7 +495,7 @@ public class Storage {
         }
     }
 
-    static void syncronized_inc_chunk_info(String file_id, Integer chunk_no) {
+    static void synchronized_inc_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
             Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
             chunks_info_struct.get(file_id).put(chunk_no, old_rep);
@@ -586,6 +589,46 @@ public class Storage {
                 new Message("REMOVED", Peer.get_protocol_version(),Peer.get_server_id(), file_id, chunk_no,null, null));
     }
 
+
+    static boolean synchronized_contains_files_to_restore(String file_id, Integer chunk_no) {
+        synchronized (files_to_restore) {
+            if(chunk_no == null)
+                return files_to_restore.containsKey(file_id);
+            else {
+                if(files_to_restore.containsKey(file_id))
+                    return files_to_restore.get(file_id).containsKey(chunk_no);
+                else
+                    return false;
+            }
+        }
+    }
+
+    static void synchronized_put_files_to_restore(String file_id, Integer chunk_no, byte[] chunk_body) {
+        synchronized (files_to_restore) {
+            if(chunk_no == null)
+                files_to_restore.put(file_id, new HashMap<>());
+            else {
+                if(files_to_restore.containsKey(file_id))
+                    files_to_restore.get(file_id).put(chunk_no, chunk_body);
+            }
+        }
+    }
+
+    static void synchronized_remove_files_to_restore(String file_id) {
+        synchronized (files_to_restore) {
+            files_to_restore.remove(file_id);
+        }
+    }
+
+    static int synchronized_size_files_to_restore(String file_id) {
+        synchronized (files_to_restore) {
+            if(files_to_restore.containsKey(file_id))
+                return files_to_restore.get(file_id).size();
+            else
+                return 0;
+        }
+    }
+
     /**
      * Restores file with a given name and id
      * @param filename Filename
@@ -620,6 +663,10 @@ public class Storage {
         }
     }
 
+    /**
+     * Displays formatted information about a certain peer
+     * @return Formatted string
+     */
     String state() {
         String peer_state = ":::::::::::::::::::::\n"
                           + ":: BACKED UP FILES ::\n"
