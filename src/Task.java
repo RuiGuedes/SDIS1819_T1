@@ -1,4 +1,5 @@
 import java.net.DatagramPacket;
+import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -51,11 +52,18 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
             case "PUTCHUNK":
-                if (Peer.getStorage().get_free_space() >= (message.get_body().length + Storage.CHUNK_INFO_SIZE)) {
+                if (Peer.getStorage().get_free_space() >= (message.get_body().length + Storage.CHUNK_INFO_SIZE) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
                 }
+                else {
+                    if(!Storage.putchunk_messages.containsKey(message.get_file_id()))
+                        Storage.putchunk_messages.put(message.get_file_id(), new HashMap<>());
+
+                    Storage.putchunk_messages.get(message.get_file_id()).put(message.get_chunk_no(), true);
+                }
+
                 break;
             case "STORED":
                 if(Storage.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no()))
@@ -115,7 +123,10 @@ class PutChunk implements Callable<Boolean> {
             if (Storage.synchronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
                 Storage.synchronized_put_chunk_info(this.message.get_file_id(),this.message.get_chunk_no(),0);
 
-            Peer.getMDB().send_packet(packet);
+            if((current_replication_degree = Storage.synchronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no())) >= this.message.get_replication_degree())
+                break;
+            else
+                Peer.getMDB().send_packet(packet);
 
             try {
                 TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
@@ -199,10 +210,20 @@ class Removed implements Runnable {
         if(Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
             // Decrease count replication degree
             if (!(Storage.store_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), -1))) {
+
+                if(!Storage.putchunk_messages.containsKey(this.message.get_file_id()))
+                    Storage.putchunk_messages.put(this.message.get_file_id(), new HashMap<>());
+
                 try {
                     TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                }
+
+                // Check if a put chunk was received
+                if(Storage.putchunk_messages.get(this.message.get_file_id()).containsKey(this.message.get_chunk_no())) {
+                    Storage.putchunk_messages.get(this.message.get_file_id()).remove(this.message.get_chunk_no());
+                    return;
                 }
 
                 // Checks if another peer has already backed up the given chunk
@@ -216,8 +237,19 @@ class Removed implements Runnable {
                     byte[] data = putchunk_message.get_data();
                     DatagramPacket packet = new DatagramPacket(data, data.length, Peer.getMDB().getGroup(), Peer.getMDB().getPort());
 
-                    PutChunk task = new PutChunk(putchunk_message, packet);
-                    Peer.getMDB().getExecuter().submit(task);
+                    // Put Chunk backup protocol simplified
+                    for (int i = 0; i < 5; i++) {
+                        Peer.getMDB().send_packet(packet);
+
+                        try {
+                            TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        if(Storage.read_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), 0) >= putchunk_message.get_replication_degree())
+                            break;
+                    }
                 }
             }
         }

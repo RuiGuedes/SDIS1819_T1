@@ -62,6 +62,11 @@ class Storage {
     volatile static Map<String, Map<Integer, Integer>> chunks_info_struct = new HashMap<>();
 
     /**
+     * Structure that contains all putchunk messages
+     */
+    volatile static Map<String, Map<Integer, Boolean>> putchunk_messages = new HashMap<>();
+
+    /**
      * Structure containing backed up files information
      */
     private Map<String, String> backed_up_files;
@@ -170,7 +175,6 @@ class Storage {
         local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
         this.read_backed_up_files();
-        this.load_replication();
     }
 
     /**
@@ -394,17 +398,16 @@ class Storage {
      * @return Perceived replication degree
      */
     static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
-        File directory = new File(chunks_info, file_id);
-
-        if (!directory.exists())
+        if(!has_chunk_info(file_id, chunk_no))
             return 0;
 
+        File directory = new File(chunks_info, file_id);
         File file_reader = new File(directory, String.valueOf(chunk_no));
 
-        if(file_reader.exists() && !read_from_file(file_reader).equals(""))
-            return Integer.valueOf(read_from_file(file_reader).split("/")[replication_type]);
-
-        return 0;
+        if(!read_from_file(file_reader).equals(""))
+            return Integer.parseInt(read_from_file(file_reader).split("/")[replication_type]);
+        else
+            return 0;
     }
 
     /**
@@ -661,6 +664,9 @@ class Storage {
      */
     void set_storage_space(Integer new_space) {
         space = new_space;
+
+        load_replication();
+
         while (space < get_directory_used_space(backup)) {
             if (!chunks_replication.isEmpty()) {
                 String[] info = chunks_replication.poll();
