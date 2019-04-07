@@ -352,7 +352,6 @@ class Storage {
      * @param increment Value to increment (positive or negative)
      */
     static boolean store_chunk_info(String file_id, Integer chunk_no, Integer increment) {
-
         if (!has_chunk_info(file_id,chunk_no))
             return false;
 
@@ -363,12 +362,15 @@ class Storage {
         if(!data.equals("")) {
             int curr_replication_degree = Integer.valueOf(data.split("/")[0]) + increment;
             int desired_replication_degree = Integer.valueOf(data.split("/")[1]);
-            write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
+
+            // Only if it needs to modify the file
+            if(increment != 0)
+                write_to_file(file_writer, curr_replication_degree + "/" + desired_replication_degree);
 
             return curr_replication_degree >= desired_replication_degree;
         }
-
-        return false;
+        else
+            return false;
     }
 
     /**
@@ -391,7 +393,7 @@ class Storage {
      * @param replication_type Replication degree type: 0 for perceived replication : 1 for desired replication
      * @return Perceived replication degree
      */
-    private static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
+    static int read_chunk_info(String file_id, Integer chunk_no, int replication_type) {
         File directory = new File(chunks_info, file_id);
 
         if (!directory.exists())

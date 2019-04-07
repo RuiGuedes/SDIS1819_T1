@@ -77,32 +77,11 @@ class DecryptMessage implements Runnable {
                 Storage.delete_file(message.get_file_id());
                 break;
             case "REMOVED":
-                /*Storage.exists_chunk(message.get_file_id(), message.get_chunk_no());
-                // Decrease count replication degree
-                if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),-1))) {
-                    try {
-                        Thread.sleep(new Random().nextInt(401));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (!(Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),0))) {
-
-                        Message new_putchunk = new Message("PUTCHUNK", Peer.get_protocol_version(),
-                                Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(),
-                                Storage.read_chunk_info_replication(message.get_file_id(), message.get_chunk_no()),
-                                Storage.read_chunk(message.get_file_id(), message.get_chunk_no()));
-
-                        byte[] data = new_putchunk.get_data();
-
-                        DatagramPacket packet = new DatagramPacket(data, data.length, Peer.getMDB().getGroup(), Peer.getMDB().getPort());
-
-                        Peer.getMDB().getExecuter().execute(new PutChunk(new_putchunk, packet));
-                    }
-                }*/
+                Peer.getMC().getExecuter().execute(new Removed(message));
                 break;
             default:
-                System.out.println("Invalid message type: " + message.get_message_type());
+                System.out.println("Unknown message type: " + message.get_message_type());
+                break;
         }
     }
 }
@@ -162,8 +141,14 @@ class PutChunk implements Callable<Boolean> {
 
 class GetChunk implements Runnable {
 
+    /**
+     * Message containing information
+     */
     private Message message;
 
+    /**
+     * Get chunk constructor
+     */
     GetChunk(Message message) {
         this.message = message;
     }
@@ -190,6 +175,51 @@ class GetChunk implements Runnable {
             }
             else
                 Peer.getMDR().send_packet(chunk_message);
+        }
+    }
+}
+
+class Removed implements Runnable {
+
+    /**
+     * Message containing information
+     */
+    private Message message;
+
+    /**
+     * Removed constructor
+     */
+    Removed(Message message) {
+        this.message = message;
+    }
+
+    @Override
+    public void run() {
+        // Checks if current peer has stored a certain chunk
+        if(Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
+            // Decrease count replication degree
+            if (!(Storage.store_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), -1))) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                // Checks if another peer has already backed up the given chunk
+                if (!(Storage.store_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), 0))) {
+
+                    Message putchunk_message = new Message("PUTCHUNK", Peer.get_protocol_version(),
+                            Peer.get_server_id(), this.message.get_file_id(), this.message.get_chunk_no(),
+                            Storage.read_chunk_info(this.message.get_file_id(), this.message.get_chunk_no(), 1),
+                            Storage.read_chunk(this.message.get_file_id(), this.message.get_chunk_no()));
+
+                    byte[] data = putchunk_message.get_data();
+                    DatagramPacket packet = new DatagramPacket(data, data.length, Peer.getMDB().getGroup(), Peer.getMDB().getPort());
+
+                    PutChunk task = new PutChunk(putchunk_message, packet);
+                    Peer.getMDB().getExecuter().submit(task);
+                }
+            }
         }
     }
 }
