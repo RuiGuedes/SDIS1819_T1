@@ -1,5 +1,4 @@
 import java.net.DatagramPacket;
-import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -52,18 +51,17 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
             case "PUTCHUNK":
-                if (Peer.getStorage().get_free_space() >= (message.get_body().length + Storage.CHUNK_INFO_SIZE) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
+                if ((Peer.getStorage().get_free_space() >= message.get_body().length) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
                 }
                 else {
-                    if(!Storage.putchunk_messages.containsKey(message.get_file_id()))
+                    if(!Storage.putchunk_messages.containsKey(message.get_file_id())) {
                         Storage.putchunk_messages.put(message.get_file_id(), new HashMap<>());
-
+                    }
                     Storage.putchunk_messages.get(message.get_file_id()).put(message.get_chunk_no(), true);
                 }
-
                 break;
             case "STORED":
                 if(Storage.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no()))
@@ -86,6 +84,9 @@ class DecryptMessage implements Runnable {
                 break;
             case "REMOVED":
                 Peer.getMC().getExecuter().execute(new Removed(message));
+                break;
+            case "DELETEDFILES": // Protocol Version 2.0
+                Peer.getMC().getExecuter().execute(new DeletedFiles(message));
                 break;
             default:
                 System.out.println("Unknown message type: " + message.get_message_type());
@@ -253,5 +254,38 @@ class Removed implements Runnable {
                 }
             }
         }
+    }
+}
+
+class DeletedFiles implements Runnable {
+
+    /**
+     * Message containing information
+     */
+    private int date;
+
+    /**
+     * DeletedFiles constructor
+     */
+    DeletedFiles(Message message) {
+        this.date = message.get_chunk_no();
+    }
+
+    @Override
+    public void run() {
+
+        ArrayList<String> deleted_files = new ArrayList<>();
+
+        // Get deleted files after a certain date
+        for(Map.Entry<Long, String> file : Storage.deleted_files_log.entrySet()) {
+            if(file.getKey() > date)
+                deleted_files.add(file.getValue());
+        }
+
+        // Execute delete protocol
+        for(String file : deleted_files) {
+            Peer.getMC().send_packet(new Message("DELETE", Peer.get_protocol_version(), Peer.get_server_id(), file, null, null, null));
+        }
+
     }
 }

@@ -2,17 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Removed.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/DecryptMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/DecryptMessage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/GetChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/PutChunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/Storage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SDIS1819_T1/TestApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SDIS1819_T1/TestApp.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/Rui.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/Rui.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/Peer/InitPeers.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Peer/InitPeers.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/TestApp/Backup.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/Backup.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/TestApp/Reclaim.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/Reclaim.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/TestApp/State.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/State.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/Peer/Peer.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/Peer/Peer.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/TestApp/Delete.bat" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/TestApp/Delete.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Peer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Storage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Task.java" afterDir="false" />
     </list>
@@ -34,10 +28,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
-              <caret line="199" column="23" selection-start-line="199" selection-start-column="23" selection-end-line="199" selection-end-column="23" />
+            <state relative-caret-position="272">
+              <caret line="92" column="140" selection-start-line="92" selection-start-column="140" selection-end-line="92" selection-end-column="140" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#4564#4565#0" expanded="true" />
+                <element signature="e#4700#4701#0" expanded="true" />
+                <element signature="e#4855#4856#0" expanded="true" />
+                <element signature="e#5014#5015#0" expanded="true" />
+                <element signature="e#5173#5174#0" expanded="true" />
+                <element signature="e#5317#5318#0" expanded="true" />
+                <element signature="e#10407#10408#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -46,11 +47,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Task.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="715">
-              <caret line="249" column="156" lean-forward="true" selection-start-line="249" selection-start-column="156" selection-end-line="249" selection-end-column="156" />
+            <state relative-caret-position="1326">
+              <caret line="87" column="56" selection-start-line="87" selection-start-column="56" selection-end-line="87" selection-end-column="56" />
               <folding>
+                <element signature="imports" expanded="true" />
                 <element signature="e#7262#7263#0" expanded="true" />
                 <element signature="e#7289#7290#0" expanded="true" />
+                <element signature="e#9656#9657#0" expanded="true" />
+                <element signature="e#9693#9694#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -59,11 +63,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Storage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4291">
-              <caret line="404" selection-start-line="404" selection-end-line="404" />
+            <state relative-caret-position="975">
+              <caret line="836" column="32" selection-start-line="836" selection-start-column="32" selection-end-line="836" selection-end-column="32" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#21533#21534#0" expanded="true" />
+                <element signature="e#9850#9851#0" expanded="true" />
+                <element signature="e#22281#22282#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -119,6 +124,18 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Message.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="630">
+              <caret line="99" selection-start-line="99" selection-end-line="99" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -137,6 +154,8 @@
       <find>String_array_cmp</find>
       <find>to_st</find>
       <find>Integer.val</find>
+      <find>new File(</find>
+      <find>rest</find>
     </findStrings>
     <replaceStrings>
       <replace>backup_statu</replace>
@@ -166,10 +185,10 @@
         <option value="$PROJECT_DIR$/src/FileData.java" />
         <option value="$PROJECT_DIR$/src/Message.java" />
         <option value="$PROJECT_DIR$/src/Multicast.java" />
-        <option value="$PROJECT_DIR$/src/Peer.java" />
         <option value="$PROJECT_DIR$/src/TestApp.java" />
         <option value="$PROJECT_DIR$/src/Storage.java" />
         <option value="$PROJECT_DIR$/src/Task.java" />
+        <option value="$PROJECT_DIR$/src/Peer.java" />
       </list>
     </option>
   </component>
@@ -345,12 +364,12 @@
       <workItem from="1554544282586" duration="14790000" />
       <workItem from="1554566647256" duration="3476000" />
       <workItem from="1554573994044" duration="5065000" />
-      <workItem from="1554636276215" duration="9448000" />
+      <workItem from="1554636276215" duration="18086000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="204561000" />
+    <option name="totallyTimeSpent" value="213199000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -365,7 +384,7 @@
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13646056" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13646056" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -481,16 +500,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Message.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="157" column="37" selection-start-line="157" selection-start-column="32" selection-end-line="157" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/TestApp.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -501,10 +510,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Peer.java">
+    <entry file="file://$PROJECT_DIR$/src/Message.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="199" column="23" selection-start-line="199" selection-start-column="23" selection-end-line="199" selection-end-column="23" />
+        <state relative-caret-position="630">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -513,22 +522,43 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Storage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4291">
-          <caret line="404" selection-start-line="404" selection-end-line="404" />
+        <state relative-caret-position="975">
+          <caret line="836" column="32" selection-start-line="836" selection-start-column="32" selection-end-line="836" selection-end-column="32" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21533#21534#0" expanded="true" />
+            <element signature="e#9850#9851#0" expanded="true" />
+            <element signature="e#22281#22282#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Peer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="92" column="140" selection-start-line="92" selection-start-column="140" selection-end-line="92" selection-end-column="140" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4564#4565#0" expanded="true" />
+            <element signature="e#4700#4701#0" expanded="true" />
+            <element signature="e#4855#4856#0" expanded="true" />
+            <element signature="e#5014#5015#0" expanded="true" />
+            <element signature="e#5173#5174#0" expanded="true" />
+            <element signature="e#5317#5318#0" expanded="true" />
+            <element signature="e#10407#10408#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Task.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="715">
-          <caret line="249" column="156" lean-forward="true" selection-start-line="249" selection-start-column="156" selection-end-line="249" selection-end-column="156" />
+        <state relative-caret-position="1326">
+          <caret line="87" column="56" selection-start-line="87" selection-start-column="56" selection-end-line="87" selection-end-column="56" />
           <folding>
+            <element signature="imports" expanded="true" />
             <element signature="e#7262#7263#0" expanded="true" />
             <element signature="e#7289#7290#0" expanded="true" />
+            <element signature="e#9656#9657#0" expanded="true" />
+            <element signature="e#9693#9694#0" expanded="true" />
           </folding>
         </state>
       </provider>

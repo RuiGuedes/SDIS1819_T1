@@ -7,11 +7,6 @@ import java.util.*;
 class Storage {
 
     /**
-     * Chunk information size
-     */
-    static int CHUNK_INFO_SIZE = 3;
-
-    /**
      * Root directory [peerX]
      */
     private File root;
@@ -42,14 +37,29 @@ class Storage {
     private static File local_storage;
 
     /**
+     * File with information about deleted files
+     */
+    private static File deleted_files;
+
+    /**
      * Local space to storage in bytes
      */
     private static long space;
 
     /**
+     * Last execution date
+     */
+    static long last_execution_date = 0;
+
+    /**
      * Structure containing chunks replication degree: [over_replication_degree , file_id , chunk_no]
      */
     private PriorityQueue<String[]> chunks_replication;
+
+    /**
+     * Structure that contains information about deleted files and its respective date
+     */
+    static Map<Long, String> deleted_files_log = new HashMap<>();
 
     /**
      * Structure that contains all restoring files stats
@@ -175,6 +185,11 @@ class Storage {
         local_storage = new File(this.root, "local_storage.txt");
         this.read_local_storage();
         this.read_backed_up_files();
+        if(Peer.get_protocol_version().equals("2.0")) {
+            deleted_files = new File(this.root, "deleted_files.txt");
+            this.read_deleted_files();
+        }
+
     }
 
     /**
@@ -191,6 +206,15 @@ class Storage {
         space = backup.getFreeSpace();
         write_local_storage();
         this.backed_up_files = new HashMap<>();
+
+        if(Peer.get_protocol_version().equals("2.0")) {
+            try {
+                deleted_files = new File(this.root, "deleted_files.txt");
+                deleted_files.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -792,6 +816,46 @@ class Storage {
         peer_state += "Used Space: " + humanReadableByteCount(get_directory_used_space(backup), true) +  "\nPeer Maximum Allocated Space: " +  humanReadableByteCount(space, true) + "\n";
 
         return peer_state;
+    }
+
+    /**
+     * Read deleted files and initializes correspondent structure
+     */
+    private void read_deleted_files() {
+        try {
+            BufferedReader file_reader = new BufferedReader(new FileReader(deleted_files));
+
+            String data;
+            while ((data = file_reader.readLine()) != null) {
+                String[] info = data.split("%");
+
+                if(info.length < 2 && !info[0].isEmpty())
+                    last_execution_date = Long.parseLong(info[0]);
+                else if(info.length == 2)
+                    deleted_files_log.put(Long.valueOf(info[0]), info[1]);
+            }
+            file_reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Add deleted file
+     * @param file_id File ID
+     */
+    static void add_deleted_file(String file_id) {
+        long time = new Date().getTime();
+        deleted_files_log.put(time, file_id);
+
+        try {
+            FileWriter file_writer = new FileWriter(deleted_files, true);
+            file_writer.write(time + "%" + file_id + "\n");
+            file_writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

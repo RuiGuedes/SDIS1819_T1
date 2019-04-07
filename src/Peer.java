@@ -87,6 +87,14 @@ public class Peer implements RMI {
 
         // Initializes multicast channels
         init_multicast_channels();
+
+        // Checks if there are files to be removed
+        if(PROTOCOL_VERSION.equals("2.0") && Storage.last_execution_date != 0) {
+            // Reuse of previous protocol message to send date instead chunk number and ignoring fileID because its not needed for this case
+            MC.send_packet(new Message("DELETEDFILES", PROTOCOL_VERSION, SERVER_ID, null, (int) Storage.last_execution_date, null, null));
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Storage.add_deleted_file("\n")));
     }
 
     /**
@@ -335,9 +343,8 @@ public class Peer implements RMI {
         }
 
         // Delete protocol enhancement
-        if(PROTOCOL_VERSION.equals("2.0")) {
-            // TODO - Save delete log on deleted_files file with the current date
-        }
+        if(PROTOCOL_VERSION.equals("2.0"))
+            Storage.add_deleted_file(file_id);
 
         return "Delete of " + filename + " has been done with success !";
     }
