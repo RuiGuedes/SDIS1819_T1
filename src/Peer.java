@@ -94,6 +94,7 @@ public class Peer implements RMI {
             MC.send_packet(new Message("DELETEDFILES", PROTOCOL_VERSION, SERVER_ID, null, (int) Storage.last_execution_date, null, null));
         }
 
+        // Before terminating, save last execution date in "delete_files" file
         Runtime.getRuntime().addShutdownHook(new Thread(() -> Storage.add_deleted_file("\n")));
     }
 
@@ -206,7 +207,7 @@ public class Peer implements RMI {
         }
 
         // Adds file to structure that contains chunks information
-        Storage.chunks_info_struct.put(file.get_file_id(), new HashMap<>());
+        Synchronized.chunks_info_struct.put(file.get_file_id(), new HashMap<>());
 
         while ((chunk = file.next_chunk()) != null) {
             // Creates message to be sent with the needed variables
@@ -267,6 +268,7 @@ public class Peer implements RMI {
             MC.send_packet(message);
         }
 
+        // Minor improvement to make restore more robust on possible failures
         for(int i = 0; i < 5; i++) {
             try {
                 TimeUnit.SECONDS.sleep((long) Math.pow(2,i));
@@ -274,16 +276,14 @@ public class Peer implements RMI {
                 e.printStackTrace();
             }
 
-            if(Storage.synchronized_contains_files_to_restore(file_id, null)) {
-                if(Storage.synchronized_size_files_to_restore(file_id) == num_chunks) {
+            if(Synchronized.synchronized_contains_files_to_restore(file_id, null)) {
+                if(Synchronized.synchronized_size_files_to_restore(file_id) == num_chunks) {
                     restore_status = true;
                     break;
                 }
                 else {
-                    // Improvement on restore function to be more robust on failures
                     for(int j = 0; j < num_chunks; j++) {
-
-                        if(!Storage.synchronized_contains_files_to_restore(file_id, j)) {
+                        if(!Synchronized.synchronized_contains_files_to_restore(file_id, j)) {
                             MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
                         }
                     }
@@ -295,7 +295,7 @@ public class Peer implements RMI {
         if(restore_status)
             getStorage().restore_file(filename, file_id);
         else
-            Storage.synchronized_remove_files_to_restore(file_id);
+            Synchronized.synchronized_remove_files_to_restore(file_id);
 
         return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
     }
