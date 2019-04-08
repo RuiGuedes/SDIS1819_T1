@@ -51,8 +51,21 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
             case "PUTCHUNK":
+                if(Peer.get_protocol_version().equals("2.0")) {
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 if ((Peer.getStorage().get_free_space() >= message.get_body().length) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
-                    Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), message.get_replication_degree());
+                    if(Peer.get_protocol_version().equals("2.0") && Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree())
+                        break;
+
+                    int current_replication = Peer.get_protocol_version().equals("2.0") ? Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) : 0;
+                    
+                    Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), current_replication, message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
                 }
@@ -66,8 +79,13 @@ class DecryptMessage implements Runnable {
             case "STORED":
                 if(Synchronized.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no()))
                     Synchronized.synchronized_inc_chunk_info(message.get_file_id(), message.get_chunk_no());
-                else
-                    Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
+                else {
+                    if(Peer.get_protocol_version().equals("2.0") && !Storage.has_chunk_info(message.get_file_id(), message.get_chunk_no()))
+                        Synchronized.synchronized_inc_stored_message(message.get_file_id(), message.get_chunk_no());
+                    else
+                        Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
+                }
+
                 break;
             case "GETCHUNK":
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));

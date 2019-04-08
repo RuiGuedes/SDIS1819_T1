@@ -13,6 +13,11 @@ class Synchronized {
      */
     volatile static Map<String, Map<Integer, Integer>> chunks_info_struct = new HashMap<>();
 
+    /**
+     * Structure that contains all chunk information
+     */
+    private volatile static Map<String, Map<Integer, Integer>> stored_messages = new HashMap<>();
+
     /*
     BACKUP ENHANCEMENT
     - Criar uma estrutura de acesso syncronizado
@@ -76,8 +81,8 @@ class Synchronized {
      */
     static void synchronized_inc_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
-            Integer old_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
-            chunks_info_struct.get(file_id).put(chunk_no, old_rep);
+            Integer new_rep = chunks_info_struct.get(file_id).get(chunk_no) + 1;
+            chunks_info_struct.get(file_id).put(chunk_no, new_rep);
         }
     }
 
@@ -138,5 +143,48 @@ class Synchronized {
                 return 0;
         }
     }
+
+    /**
+     * Synchronized access to stored_messages structure to get data
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     * @return Replication degree
+     */
+    static Integer synchronized_get_stored_message(String file_id, Integer chunk_no) {
+        synchronized (stored_messages) {
+            if(!stored_messages.containsKey(file_id)) {
+                stored_messages.put(file_id, new HashMap<>());
+                return 0;
+            }
+            else {
+                if (stored_messages.get(file_id).containsKey(chunk_no))
+                    return stored_messages.get(file_id).get(chunk_no);
+                else{
+                    stored_messages.get(file_id).put(chunk_no, 0);
+                    return 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * Synchronized access to stored_messages structure to update elements by incrementing their value
+     * @param file_id File ID
+     * @param chunk_no Chunk number
+     */
+    static void synchronized_inc_stored_message(String file_id, Integer chunk_no) {
+        synchronized (stored_messages) {
+            if(!stored_messages.containsKey(file_id))
+                stored_messages.put(file_id, new HashMap<>());
+
+            int new_rep = 1;
+
+            if (stored_messages.get(file_id).containsKey(chunk_no))
+                new_rep = stored_messages.get(file_id).get(chunk_no) + 1;
+
+            stored_messages.get(file_id).put(chunk_no, new_rep);
+        }
+    }
+
 
 }

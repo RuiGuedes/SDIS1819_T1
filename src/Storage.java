@@ -345,7 +345,7 @@ class Storage {
      * @param chunk_no Chunk number
      * @param replication_degree Desired replication degree
      */
-    static void create_chunk_info(String file_id, Integer chunk_no, Integer replication_degree) {
+    static void create_chunk_info(String file_id, Integer chunk_no, Integer current_replication, Integer replication_degree) {
         if(has_chunk_info(file_id, chunk_no))
             return;
 
@@ -360,7 +360,7 @@ class Storage {
             e.printStackTrace();
         }
 
-        write_to_file(file_writer,  "0/" + replication_degree);
+        write_to_file(file_writer,  current_replication + "/" + replication_degree);
     }
 
     /**
@@ -398,7 +398,7 @@ class Storage {
      */
     static void store_chunks_info_of_file(String file_id, Integer replication_degree) {
         for(Map.Entry<Integer, Integer> chunk : Synchronized.chunks_info_struct.get(file_id).entrySet()) {
-            create_chunk_info(file_id, chunk.getKey(), replication_degree);
+            create_chunk_info(file_id, chunk.getKey(), 0, replication_degree);
             store_chunk_info(file_id, chunk.getKey(), chunk.getValue());
         }
         Synchronized.chunks_info_struct.remove(file_id);
@@ -430,7 +430,7 @@ class Storage {
      * @param chunk_no Chunk number
      * @return True if exists false otherwise
      */
-    private static boolean has_chunk_info(String file_id, Integer chunk_no) {
+    static boolean has_chunk_info(String file_id, Integer chunk_no) {
         return new File(new File(chunks_info, file_id), String.valueOf(chunk_no)).exists();
     }
 
