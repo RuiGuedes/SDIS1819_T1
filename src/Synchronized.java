@@ -40,10 +40,8 @@ class Synchronized {
         synchronized (chunks_info_struct) {
             if (chunks_info_struct.get(file_id).containsKey(chunk_no))
                 return chunks_info_struct.get(file_id).get(chunk_no);
-            else{
-                chunks_info_struct.get(file_id).put(chunk_no, 0);
+            else
                 return 0;
-            }
         }
     }
 

@@ -85,8 +85,10 @@ class Message {
         if(this.message_type.equals("PUTCHUNK"))
             this.replication_degree = Integer.parseInt(fields[5]);
 
-        if(this.message_type.equals("PUTCHUNK") || this.message_type.equals("CHUNK"))
-            this.body = Arrays.copyOf(packet_info.get(1), packet_info.get(1).length);
+        if(this.message_type.equals("PUTCHUNK") || this.message_type.equals("CHUNK")) {
+            this.body = packet_info.get(1).length == 0 ? null : Arrays.copyOf(packet_info.get(1), packet_info.get(1).length);
+        }
+
     }
 
     /**

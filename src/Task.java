@@ -80,8 +80,9 @@ class DecryptMessage implements Runnable {
                 }
                 break;
             case "STORED":
-                if(Synchronized.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no()))
+                if(Synchronized.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no())) {
                     Synchronized.synchronized_inc_chunk_info(message.get_file_id(), message.get_chunk_no());
+                }
                 else {
                     if(Peer.get_protocol_version().equals("2.0") && !Storage.has_chunk_info(message.get_file_id(), message.get_chunk_no()))
                         Synchronized.synchronized_inc_stored_message(message.get_file_id(), message.get_chunk_no());
@@ -95,11 +96,6 @@ class DecryptMessage implements Runnable {
             case "CHUNK":
                 if(!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), null))
                     Synchronized.synchronized_put_files_to_restore(message.get_file_id(), null, null);
-
-                if(message.get_body() == null)
-                    System.out.println("NULL BODY");
-                else
-                    System.out.println("SOLID BODY: " + message.get_body().toString());
 
                 if(!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), message.get_chunk_no()))
                     Synchronized.synchronized_put_files_to_restore(message.get_file_id(), message.get_chunk_no(), message.get_body());
@@ -146,7 +142,7 @@ class PutChunk implements Callable<Boolean> {
         int current_replication_degree = 0;
 
         for (int i = 0; i < 5; i++) {
-            if (Synchronized.synchronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
+            if (!Synchronized.synchronized_contains_chunk_info(this.message.get_file_id(),this.message.get_chunk_no()))
                 Synchronized.synchronized_put_chunk_info(this.message.get_file_id(),this.message.get_chunk_no(),0);
 
             if((current_replication_degree = Synchronized.synchronized_get_chunk_info(this.message.get_file_id(), this.message.get_chunk_no())) >= this.message.get_replication_degree())
@@ -228,7 +224,13 @@ class GetChunk implements Runnable {
                     while (!client_socket.isConnected());
 
                     Peer.getMDR().send_packet(chunk_message);
-                    System.out.println("SENDING CHUNK TO SERVER");
+
+                    try {
+                        // Time used to synchronize actions
+                        TimeUnit.MILLISECONDS.sleep(new Random().nextInt(15));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     OutputStream out_to_server = client_socket.getOutputStream();
                     out_to_server.write(chunk_message.get_chunk_no());
@@ -376,22 +378,26 @@ class ServerSocketThread implements Runnable {
 
         int current_chunks_stored = Synchronized.synchronized_size_files_to_restore(file_id);
 
-        while (current_chunks_stored < this.stored_chunks && Synchronized.synchronized_contains_null_value(file_id)) {
+        while (current_chunks_stored < this.stored_chunks || Synchronized.synchronized_contains_null_value(file_id)) {
             try {
                 Socket connection_socket = this.server_socket.accept();
 
                 InputStream in_from_client = connection_socket.getInputStream();
 
                 int chunk_no = in_from_client.read();
-                System.out.println("SIZE: " + current_chunks_stored + "/" + this.stored_chunks + "  RECEIVE CHUNK TO SERVER: " + chunk_no);
+
+                try {
+                    // Time used to synchronize actions
+                    TimeUnit.MILLISECONDS.sleep(new Random().nextInt(15));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 Synchronized.synchronized_put_files_to_restore(file_id, chunk_no, in_from_client.readAllBytes());
                 current_chunks_stored = Synchronized.synchronized_size_files_to_restore(file_id);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        System.out.println("END");
-
     }
 }

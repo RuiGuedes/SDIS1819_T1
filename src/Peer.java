@@ -285,10 +285,11 @@ public class Peer implements RMI {
             }
 
             if(Synchronized.synchronized_contains_files_to_restore(file_id, null)) {
-                if(Synchronized.synchronized_size_files_to_restore(file_id) == num_chunks && !Synchronized.synchronized_contains_null_value(file_id)) {
-                    System.out.println("ENTROYU");
-                    restore_status = true;
-                    break;
+                if(Synchronized.synchronized_size_files_to_restore(file_id) == num_chunks) {
+                    if(!Peer.get_protocol_version().equals("2.0") || !Synchronized.synchronized_contains_null_value(file_id)) {
+                        restore_status = true;
+                        break;
+                    }
                 }
                 else {
                     for(int j = 0; j < num_chunks; j++) {
