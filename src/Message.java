@@ -166,6 +166,10 @@ class Message {
         return message_type;
     }
 
+    String get_protocol_version() {
+        return protocol_version;
+    }
+
     /**
      * Get's server id
      */

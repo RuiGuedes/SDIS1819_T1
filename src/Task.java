@@ -1,4 +1,7 @@
+import java.io.*;
 import java.net.DatagramPacket;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +67,7 @@ class DecryptMessage implements Runnable {
                         break;
 
                     int current_replication = Peer.get_protocol_version().equals("2.0") ? Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) : 0;
-                    
+
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), current_replication, message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
@@ -85,7 +88,6 @@ class DecryptMessage implements Runnable {
                     else
                         Storage.store_chunk_info(message.get_file_id(), message.get_chunk_no(),1);
                 }
-
                 break;
             case "GETCHUNK":
                 Peer.getMDR().getExecuter().execute(new GetChunk(message));
@@ -93,6 +95,11 @@ class DecryptMessage implements Runnable {
             case "CHUNK":
                 if(!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), null))
                     Synchronized.synchronized_put_files_to_restore(message.get_file_id(), null, null);
+
+                if(message.get_body() == null)
+                    System.out.println("NULL BODY");
+                else
+                    System.out.println("SOLID BODY: " + message.get_body().toString());
 
                 if(!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), message.get_chunk_no()))
                     Synchronized.synchronized_put_files_to_restore(message.get_file_id(), message.get_chunk_no(), message.get_body());
@@ -187,9 +194,12 @@ class GetChunk implements Runnable {
     public void run() {
         if (Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
 
+            byte[] chunk_body = Storage.read_chunk(this.message.get_file_id(), this.message.get_chunk_no());
+            byte[] message_body = this.message.get_protocol_version().equals("2.0") && Peer.get_protocol_version().equals("2.0") ? null : chunk_body;
+
             Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(),
                     Peer.get_server_id(), this.message.get_file_id(), this.message.get_chunk_no(), null,
-                    Storage.read_chunk(this.message.get_file_id(), this.message.get_chunk_no()));
+                    message_body);
 
             try {
                 TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
@@ -197,14 +207,48 @@ class GetChunk implements Runnable {
                 e.printStackTrace();
             }
 
-            if(Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), null)) {
-                if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), this.message.get_chunk_no()))
-                    Synchronized.synchronized_remove_files_to_restore(this.message.get_file_id());
+            if(this.message.get_protocol_version().equals("2.0") && Peer.get_protocol_version().equals("2.0")) {
+                try {
+                    Socket client_socket = new Socket();
+
+                    do {
+                        if(Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), null)) {
+                            if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), this.message.get_chunk_no())) {
+                                Synchronized.synchronized_remove_files_to_restore(this.message.get_file_id());
+                                return;
+                            }
+                        }
+
+                        try {
+                            client_socket = new Socket("DESKTOP-Q4SJA80", 4444);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    while (!client_socket.isConnected());
+
+                    Peer.getMDR().send_packet(chunk_message);
+                    System.out.println("SENDING CHUNK TO SERVER");
+
+                    OutputStream out_to_server = client_socket.getOutputStream();
+                    out_to_server.write(chunk_message.get_chunk_no());
+                    out_to_server.write(chunk_body);
+                    client_socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                if(Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), null)) {
+                    if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), this.message.get_chunk_no()))
+                        Synchronized.synchronized_remove_files_to_restore(this.message.get_file_id());
+                    else
+                        Peer.getMDR().send_packet(chunk_message);
+                }
                 else
                     Peer.getMDR().send_packet(chunk_message);
             }
-            else
-                Peer.getMDR().send_packet(chunk_message);
+
         }
     }
 }
@@ -304,6 +348,50 @@ class DeletedFiles implements Runnable {
         for(String file : deleted_files) {
             Peer.getMC().send_packet(new Message("DELETE", Peer.get_protocol_version(), Peer.get_server_id(), file, null, null, null));
         }
+
+    }
+}
+
+class ServerSocketThread implements Runnable {
+
+    private String file_id;
+
+    private Integer stored_chunks;
+
+    private ServerSocket server_socket;
+
+    ServerSocketThread(String file_id, Integer stored_chunks) {
+        this.file_id = file_id;
+        this.stored_chunks = stored_chunks;
+
+        try {
+            this.server_socket = new ServerSocket(4444);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+
+        int current_chunks_stored = Synchronized.synchronized_size_files_to_restore(file_id);
+
+        while (current_chunks_stored < this.stored_chunks && Synchronized.synchronized_contains_null_value(file_id)) {
+            try {
+                Socket connection_socket = this.server_socket.accept();
+
+                InputStream in_from_client = connection_socket.getInputStream();
+
+                int chunk_no = in_from_client.read();
+                System.out.println("SIZE: " + current_chunks_stored + "/" + this.stored_chunks + "  RECEIVE CHUNK TO SERVER: " + chunk_no);
+                Synchronized.synchronized_put_files_to_restore(file_id, chunk_no, in_from_client.readAllBytes());
+                current_chunks_stored = Synchronized.synchronized_size_files_to_restore(file_id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("END");
 
     }
 }

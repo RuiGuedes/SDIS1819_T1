@@ -1,5 +1,6 @@
 import java.io.File;
 import java.net.DatagramPacket;
+import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -260,6 +261,13 @@ public class Peer implements RMI {
         boolean restore_status = false;
         int num_chunks = Storage.get_num_chunks(file_id);
 
+        // Restore protocol enhancement
+        if(Peer.get_protocol_version().equals("2.0"))
+            Peer.getMDR().getExecuter().execute(new ServerSocketThread(file_id, num_chunks));
+
+        if(Synchronized.synchronized_contains_null_value(file_id))
+            System.out.println("TENHO NULLS");
+
         while (chunk_no < num_chunks) {
             // Creates message to be sent with the needed variables
             Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, chunk_no++, null, null);
@@ -277,7 +285,8 @@ public class Peer implements RMI {
             }
 
             if(Synchronized.synchronized_contains_files_to_restore(file_id, null)) {
-                if(Synchronized.synchronized_size_files_to_restore(file_id) == num_chunks) {
+                if(Synchronized.synchronized_size_files_to_restore(file_id) == num_chunks && !Synchronized.synchronized_contains_null_value(file_id)) {
+                    System.out.println("ENTROYU");
                     restore_status = true;
                     break;
                 }

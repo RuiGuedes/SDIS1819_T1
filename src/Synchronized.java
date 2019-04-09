@@ -18,14 +18,6 @@ class Synchronized {
      */
     private volatile static Map<String, Map<Integer, Integer>> stored_messages = new HashMap<>();
 
-    /*
-    BACKUP ENHANCEMENT
-    - Criar uma estrutura de acesso syncronizado
-    - Quando se recebe um put chunk efetua-se um random delay
-    - Sempre que se recebe um stored atualiza-se a estrutura sincronizada
-    - Só se efetua o putchunk caso o conteudo da estrutura (rep degree) seja menor que o desejado que se encontra na mensagem
-     */
-
     /**
      * Synchronized access to chunk info structure to put data
      * @param file_id File ID
@@ -102,6 +94,25 @@ class Synchronized {
                 else
                     return false;
             }
+        }
+    }
+
+    /**
+     * Synchronized access to files to restore structure to check for null elements
+     * @param file_id File ID
+     * @return True if it contains false otherwise
+     */
+    static boolean synchronized_contains_null_value(String file_id) {
+        synchronized (files_to_restore) {
+            if(files_to_restore.containsKey(file_id)) {
+                 for(Map.Entry<Integer, byte[]> data : files_to_restore.get(file_id).entrySet()) {
+                     if(data.getValue() == null)
+                         return true;
+                 }
+                 return false;
+            }
+            else
+                return false;
         }
     }
 
