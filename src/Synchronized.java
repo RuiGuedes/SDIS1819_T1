@@ -38,10 +38,7 @@ class Synchronized {
      */
     static Integer synchronized_get_chunk_info(String file_id, Integer chunk_no) {
         synchronized (chunks_info_struct) {
-            if (chunks_info_struct.get(file_id).containsKey(chunk_no))
-                return chunks_info_struct.get(file_id).get(chunk_no);
-            else
-                return 0;
+            return chunks_info_struct.get(file_id).getOrDefault(chunk_no, 0);
         }
     }
 
@@ -194,6 +191,5 @@ class Synchronized {
             stored_messages.get(file_id).put(chunk_no, new_rep);
         }
     }
-
 
 }

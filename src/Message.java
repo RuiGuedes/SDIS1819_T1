@@ -168,6 +168,9 @@ class Message {
         return message_type;
     }
 
+    /**
+     * Get's protocol version
+     */
     String get_protocol_version() {
         return protocol_version;
     }

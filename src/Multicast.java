@@ -5,62 +5,73 @@ import java.net.MulticastSocket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class Multicast {
+class Multicast {
 
-    private String name;
-
-    private String address;
-
+    /**
+     * Multicast port
+     */
     private Integer port;
 
+    /**
+     * Multicast group
+     */
     private InetAddress group;
 
+    /**
+     * Multicast associated socket
+     */
     private MulticastSocket socket;
 
-    private ThreadPoolExecutor executer;
+    /**
+     * Multicast thread pool executor
+     */
+    private ThreadPoolExecutor executor;
 
     /**
      * Default constructor
-     * @param address
-     * @param port
+     * @param address Multicast address
+     * @param port Port number
      */
-    Multicast(String name, String address, String port)  {
-        this.name = name;
-        this.address = address;
+    Multicast(String address, String port)  {
         this.port = Integer.parseInt(port);
 
         try {
-            this.group = InetAddress.getByName(this.address);
+            this.group = InetAddress.getByName(address);
             this.socket = new MulticastSocket(this.port);
             this.socket.joinGroup(this.group);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        this.executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
+        this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
     }
 
-    public ThreadPoolExecutor getExecuter() {
-        return executer;
+    /**
+     * Get's multicast executor
+     */
+    ThreadPoolExecutor getExecutor() {
+        return executor;
     }
 
-    public MulticastSocket getSocket() {
-        return socket;
-    }
-
-    public InetAddress getGroup() {
+    /**
+     * Get's multicast group
+     */
+    InetAddress getGroup() {
         return group;
     }
 
-    public Integer getPort() {
+    /**
+     * Get's multicast port
+     */
+    Integer getPort() {
         return port;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void send_packet(DatagramPacket packet) {
+    /**
+     * Sends packet to multicast group
+     * @param packet Packet to be sent
+     */
+    void send_packet(DatagramPacket packet) {
         try {
             this.socket.send(packet);
         } catch (IOException e) {
@@ -68,7 +79,11 @@ public class Multicast {
         }
     }
 
-    public void send_packet(Message message) {
+    /**
+     * Another version of send_packet but receiving a Message argument
+     * @param message Message to be converted into datagram packet and afterwards sent
+     */
+    void send_packet(Message message) {
         byte[] buf;
         DatagramPacket packet;
 
@@ -77,7 +92,11 @@ public class Multicast {
         this.send_packet(packet);
     }
 
-    public DatagramPacket receive_packet() {
+    /**
+     * Receives packet and returns it
+     * @return Received packet
+     */
+    DatagramPacket receive_packet() {
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 

@@ -27,7 +27,7 @@ class Listener implements Runnable {
         while(true) {
             DatagramPacket packet = this.M.receive_packet();
             Message message = new Message(Message.decrypt_packet(Arrays.copyOf(packet.getData(), packet.getLength())));
-            this.M.getExecuter().execute(new DecryptMessage(message));
+            this.M.getExecutor().execute(new DecryptMessage(message));
         }
     }
 }
@@ -91,7 +91,7 @@ class DecryptMessage implements Runnable {
                 }
                 break;
             case "GETCHUNK":
-                Peer.getMDR().getExecuter().execute(new GetChunk(message));
+                Peer.getMDR().getExecutor().execute(new GetChunk(message));
                 break;
             case "CHUNK":
                 if(!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), null))
@@ -104,10 +104,10 @@ class DecryptMessage implements Runnable {
                 Storage.delete_file(message.get_file_id());
                 break;
             case "REMOVED":
-                Peer.getMC().getExecuter().execute(new Removed(message));
+                Peer.getMC().getExecutor().execute(new Removed(message));
                 break;
             case "DELETEDFILES": // Protocol Version 2.0
-                Peer.getMC().getExecuter().execute(new DeletedFiles(message));
+                Peer.getMC().getExecutor().execute(new DeletedFiles(message));
                 break;
             default:
                 System.out.println("Unknown message type: " + message.get_message_type());
@@ -356,12 +356,24 @@ class DeletedFiles implements Runnable {
 
 class ServerSocketThread implements Runnable {
 
+    /**
+     * Message file_id
+     */
     private String file_id;
 
+    /**
+     * Number of chunks needed to store
+     */
     private Integer stored_chunks;
 
+    /**
+     * Server socket
+     */
     private ServerSocket server_socket;
 
+    /**
+     * ServerSocketThread class constructor
+     */
     ServerSocketThread(String file_id, Integer stored_chunks) {
         this.file_id = file_id;
         this.stored_chunks = stored_chunks;

@@ -686,7 +686,7 @@ class Storage {
                     + ":: STORAGE ::\n"
                     + ":::::::::::::\n\n";
 
-        peer_state += "Used Space: " + humanReadableByteCount(get_directory_used_space(backup), true) +  "\nPeer Maximum Allocated Space: " +  humanReadableByteCount(space, true) + "\n";
+        peer_state += "Used Space: " + human_readable_byte_count(get_directory_used_space(backup), true) +  "\nPeer Maximum Allocated Space: " +  human_readable_byte_count(space, true) + "\n";
 
         return peer_state;
     }
@@ -738,7 +738,7 @@ class Storage {
      * @return Bytes formatted
      * @author aioobe
      */
-    private static String humanReadableByteCount(long bytes, boolean si) {
+    private static String human_readable_byte_count(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(unit));

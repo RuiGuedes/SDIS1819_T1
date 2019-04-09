@@ -13,19 +13,9 @@ class FileData {
     private String filename;
 
     /**
-     * Object file
-     */
-    private File file;
-
-    /**
      * File stream
      */
     private InputStream stream;
-
-    /**
-     * Date of last modification
-     */
-    private long last_modified;
 
     /**
      * Owner of the file
@@ -46,20 +36,20 @@ class FileData {
      * Default constructor
      */
     FileData(String filepath) {
-        this.file = new File(filepath);
-        this.filename = this.file.getName();
+        File file = new File(filepath);
+        this.filename = file.getName();
         try {
-            this.stream = new FileInputStream(this.file);
+            this.stream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        this.last_modified = this.file.lastModified();
+        long last_modified = file.lastModified();
         try {
             this.owner = String.valueOf(Files.getOwner(file.toPath()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.file_id = encrypt_file(this.filename + this.last_modified + this.owner);
+        this.file_id = encrypt_file(this.filename + last_modified + this.owner);
     }
 
     /**

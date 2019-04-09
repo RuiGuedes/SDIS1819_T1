@@ -1,6 +1,5 @@
 import java.io.File;
 import java.net.DatagramPacket;
-import java.net.ServerSocket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class Peer implements RMI {
 
     /**
-     * Protocol version to be used. Default = vanilla
+     * Protocol version to be used. Default = 1.0
      */
     private static String PROTOCOL_VERSION;
 
@@ -52,6 +51,9 @@ public class Peer implements RMI {
      */
     private static Storage storage;
 
+    /**
+     * Structure that indicates backup status: true for success and false otherwise
+     */
     volatile static Map<String, Boolean> file_backup_status;
 
     /**
@@ -124,14 +126,14 @@ public class Peer implements RMI {
      */
     private static void init_multicast_channels() {
         // Creates each multicast channel
-        MC = new Multicast("MC", MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
-        MDB = new Multicast("MDB", MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
-        MDR = new Multicast("MDR", MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
+        MC = new Multicast(MULTICAST.get("MC")[0], MULTICAST.get("MC")[1]);
+        MDB = new Multicast(MULTICAST.get("MDB")[0], MULTICAST.get("MDB")[1]);
+        MDR = new Multicast(MULTICAST.get("MDR")[0], MULTICAST.get("MDR")[1]);
 
         // Starts listening channels
-        MC.getExecuter().execute(new Listener(MC));
-        MDB.getExecuter().execute(new Listener(MDB));
-        MDR.getExecuter().execute(new Listener(MDR));
+        MC.getExecutor().execute(new Listener(MC));
+        MDB.getExecutor().execute(new Listener(MDB));
+        MDR.getExecutor().execute(new Listener(MDR));
     }
 
     /**
@@ -227,7 +229,7 @@ public class Peer implements RMI {
 
         // Invoke all tasks and check their status
         try {
-            MDB.getExecuter().invokeAll(threads);
+            MDB.getExecutor().invokeAll(threads);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -263,10 +265,7 @@ public class Peer implements RMI {
 
         // Restore protocol enhancement
         if(Peer.get_protocol_version().equals("2.0"))
-            Peer.getMDR().getExecuter().execute(new ServerSocketThread(file_id, num_chunks));
-
-        if(Synchronized.synchronized_contains_null_value(file_id))
-            System.out.println("TENHO NULLS");
+            Peer.getMDR().getExecutor().execute(new ServerSocketThread(file_id, num_chunks));
 
         while (chunk_no < num_chunks) {
             // Creates message to be sent with the needed variables
