@@ -1,7 +1,5 @@
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -185,6 +183,15 @@ class GetChunk implements Runnable {
         this.message = message;
     }
 
+    private String getHostName() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void run() {
         if (Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
@@ -215,7 +222,7 @@ class GetChunk implements Runnable {
                         }
 
                         try {
-                            client_socket = new Socket("Rui-Notebook", 4444);
+                            client_socket = new Socket(this.getHostName(), 4444);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
