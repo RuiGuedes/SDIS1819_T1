@@ -551,8 +551,8 @@ class Storage {
      * Get the space available to store data
      * @return Free space
      */
-    int get_free_space() {
-        return (int) (space - get_directory_used_space(backup));
+    long get_free_space() {
+        return space - get_directory_used_space(backup);
     }
 
     /**
@@ -609,6 +609,7 @@ class Storage {
      */
     private static long get_directory_used_space(File directory) {
         long length = 0;
+
         for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (file.isFile())
                 length += file.length();

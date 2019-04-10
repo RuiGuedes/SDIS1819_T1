@@ -61,13 +61,12 @@ class DecryptMessage implements Runnable {
                         e.printStackTrace();
                     }
                 }
-
+                
                 if ((Peer.getStorage().get_free_space() >= message.get_body().length) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
                     if(Peer.get_protocol_version().equals("2.0") && Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree())
                         break;
 
                     int current_replication = Peer.get_protocol_version().equals("2.0") ? Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) : 0;
-
                     Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), current_replication, message.get_replication_degree());
                     Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
                     Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
@@ -216,7 +215,7 @@ class GetChunk implements Runnable {
                         }
 
                         try {
-                            client_socket = new Socket("DESKTOP-Q4SJA80", 4444);
+                            client_socket = new Socket("Rui-Notebook", 4444);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

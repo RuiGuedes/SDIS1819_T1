@@ -72,10 +72,13 @@ class Multicast {
      * @param packet Packet to be sent
      */
     void send_packet(DatagramPacket packet) {
-        try {
-            this.socket.send(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
+        boolean flag = false;
+
+        while(!flag) {
+            try {                     
+                this.socket.send(packet);
+                flag = true;
+            } catch (IOException e) {}
         }
     }
 
@@ -100,7 +103,7 @@ class Multicast {
         byte[] buf = new byte[Message.MESSAGE_SIZE];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
-        try {
+        try {        
             this.socket.receive(packet);
         } catch (IOException e) {
             System.out.println("MULTICAST: Receive packet exception: " + e.toString());

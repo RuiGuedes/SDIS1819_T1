@@ -157,7 +157,7 @@ class Synchronized {
      * @return Replication degree
      */
     static Integer synchronized_get_stored_message(String file_id, Integer chunk_no) {
-        synchronized (stored_messages) {
+        synchronized (stored_messages) {        
             if(!stored_messages.containsKey(file_id)) {
                 stored_messages.put(file_id, new HashMap<>());
                 return 0;
