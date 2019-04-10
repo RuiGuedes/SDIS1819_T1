@@ -264,8 +264,10 @@ public class Peer implements RMI {
         int num_chunks = Storage.get_num_chunks(file_id);
 
         // Restore protocol enhancement
+        ServerSocketThread tcp_server = new ServerSocketThread(file_id, num_chunks);
+
         if(Peer.get_protocol_version().equals("2.0"))
-            Peer.getMDR().getExecutor().execute(new ServerSocketThread(file_id, num_chunks));
+            Peer.getMDR().getExecutor().execute(tcp_server);
 
         while (chunk_no < num_chunks) {
             // Creates message to be sent with the needed variables
@@ -305,6 +307,9 @@ public class Peer implements RMI {
             getStorage().restore_file(filename, file_id);
         else
             Synchronized.synchronized_remove_files_to_restore(file_id);
+
+        if(Peer.get_protocol_version().equals("2.0"))
+            tcp_server.close_socket();
 
         return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
     }
