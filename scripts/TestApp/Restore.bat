@@ -3,6 +3,6 @@ set MAIN="TestApp"
 set RMI-ACESS_POINT="rmi-access-point1"
 set FILE="..\..\files\IMG.jpg"
 
-"%JAVA%" --class-path %CLASS-PATH% %MAIN% %RMI-ACESS_POINT% "RESTORE" %FILE% %REPLICATION-DEGREE%
+"%JAVA%" --class-path %CLASS-PATH% %MAIN% %RMI-ACESS_POINT% "RESTORE" %FILE%
 
 cmd \k
