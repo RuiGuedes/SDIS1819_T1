@@ -183,6 +183,9 @@ class GetChunk implements Runnable {
         this.message = message;
     }
 
+    /**
+     * Retrieves localhost hostname
+     */
     private String getHostName() {
         try {
             return InetAddress.getLocalHost().getHostName();
