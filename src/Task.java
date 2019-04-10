@@ -428,7 +428,7 @@ class ServerSocketThread implements Runnable {
                 Synchronized.synchronized_put_files_to_restore(file_id, chunk_no, in_from_client.readAllBytes());
                 current_chunks_stored = Synchronized.synchronized_size_files_to_restore(file_id);
             } catch (IOException e) {
-                e.printStackTrace();
+                break;
             }
         }
     }
