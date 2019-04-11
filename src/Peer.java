@@ -308,7 +308,7 @@ public class Peer implements RMI {
                 else {
                     for(int j = 0; j < num_chunks; j++) {
                         if(!Synchronized.synchronized_contains_files_to_restore(file_id, j)) {
-                            MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, null));
+                            MC.send_packet(new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, j, null, message_body));
                         }
                     }
                 }
