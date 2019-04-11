@@ -53,6 +53,9 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
         case "PUTCHUNK":
+            if(Peer.getStorage().is_backed_up(message.get_file_id()).equals("RETURN"))
+                break;
+
             if (Peer.get_protocol_version().equals("2.0")) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
@@ -212,7 +215,7 @@ class GetChunk implements Runnable {
             byte[] chunk_body = Storage.read_chunk(this.message.get_file_id(), this.message.get_chunk_no());
             byte[] message_body = this.message.get_protocol_version().equals("2.0")
                     && Peer.get_protocol_version().equals("2.0") ? null : chunk_body;
-
+            
             Message chunk_message = new Message("CHUNK", Peer.get_protocol_version(), Peer.get_server_id(),
                     this.message.get_file_id(), this.message.get_chunk_no(), null, message_body);
 
@@ -236,7 +239,7 @@ class GetChunk implements Runnable {
                         }
 
                         try {
-                            client_socket = new Socket(this.getHostName(), 4444);
+                            client_socket = new Socket(new String(message.get_body(), "UTF-8"), 4444);
                         } catch (IOException e) {}
                     } while (!client_socket.isConnected());
 

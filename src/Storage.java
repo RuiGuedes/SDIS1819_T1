@@ -294,9 +294,9 @@ class Storage {
      * @param file_id File id
      * @return True if it has, false otherwise.
      */
-    String is_backed_up(String filename, String file_id) {
-        if(!this.backed_up_files.isEmpty() & this.backed_up_files.containsKey(filename)) {
-            if(this.backed_up_files.get(filename).equals(file_id))
+    String is_backed_up(String file_id) {
+        if(!this.backed_up_files.isEmpty()) {
+            if(this.backed_up_files.containsValue(file_id)) 
                 return "RETURN";
             else
                 return "DELETE-AND-BACKUP";

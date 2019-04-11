@@ -1,5 +1,8 @@
 import java.io.File;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -195,7 +198,7 @@ public class Peer implements RMI {
         Set<Callable<Boolean>> threads = new HashSet<>();
 
         // Determine if file was already backed up or updated
-        switch (getStorage().is_backed_up(file.get_filename(), file.get_file_id())) {
+        switch (getStorage().is_backed_up(file.get_file_id())) {
             case "RETURN":
                 return "Backup of " + file.get_filename() + " has already been done !";
             case "DELETE-AND-BACKUP":
@@ -262,16 +265,26 @@ public class Peer implements RMI {
         int chunk_no = 0;
         boolean restore_status = false;
         int num_chunks = Storage.get_num_chunks(file_id);
+        String localhost_ip = null; 
 
         // Restore protocol enhancement
         ServerSocketThread tcp_server = new ServerSocketThread(file_id, num_chunks);
 
-        if(Peer.get_protocol_version().equals("2.0"))
+        if(Peer.get_protocol_version().equals("2.0")) {
             Peer.getMDR().getExecutor().execute(tcp_server);
+            try {
+                localhost_ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }   
+        }
+        
+        // Message body
+        byte[] message_body = Peer.get_protocol_version().equals("2.0") ? localhost_ip.getBytes() : null;
 
         while (chunk_no < num_chunks) {
             // Creates message to be sent with the needed variables
-            Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, chunk_no++, null, null);
+            Message message = new Message("GETCHUNK", PROTOCOL_VERSION, SERVER_ID, file_id, chunk_no++, null, message_body);
 
             // Creates packet to be sent and task to be executed
             MC.send_packet(message);
@@ -338,7 +351,7 @@ public class Peer implements RMI {
      * @param file_id File id
      */
     private String delete(String filename, String file_id) {
-        if(!getStorage().is_backed_up(filename, file_id).equals("RETURN"))
+        if(!getStorage().is_backed_up(file_id).equals("RETURN"))
             return "File " + filename + " could not be delete since it was no previously backed up !";
 
         Message message = new Message("DELETE", PROTOCOL_VERSION, SERVER_ID, file_id, null, null, null);
