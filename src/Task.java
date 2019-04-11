@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +54,7 @@ class DecryptMessage implements Runnable {
 
         switch (message.get_message_type()) {
         case "PUTCHUNK":
-            if(Peer.getStorage().is_backed_up(message.get_file_id()).equals("RETURN"))
+            if(Peer.getStorage().is_backed_up(null, message.get_file_id()).equals("RETURN"))
                 break;
 
             if (Peer.get_protocol_version().equals("2.0")) {
@@ -64,21 +65,14 @@ class DecryptMessage implements Runnable {
                 }
             }
 
-            if ((Peer.getStorage().get_free_space() >= message.get_body().length)
-                    && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
-                if (Peer.get_protocol_version().equals("2.0")
-                        && Synchronized.synchronized_get_stored_message(message.get_file_id(),
-                                message.get_chunk_no()) >= message.get_replication_degree())
+            if ((Peer.getStorage().get_free_space() >= message.get_body().length) && !Storage.has_chunk(message.get_file_id(), message.get_chunk_no())) {
+                if (Peer.get_protocol_version().equals("2.0") && Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) >= message.get_replication_degree())
                     break;
 
-                int current_replication = Peer.get_protocol_version().equals("2.0")
-                        ? Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no())
-                        : 0;
-                Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), current_replication,
-                        message.get_replication_degree());
+                int current_replication = Peer.get_protocol_version().equals("2.0") ? Synchronized.synchronized_get_stored_message(message.get_file_id(), message.get_chunk_no()) : 0;
+                Storage.create_chunk_info(message.get_file_id(), message.get_chunk_no(), current_replication, message.get_replication_degree());
                 Storage.store_chunk(message.get_file_id(), message.get_chunk_no(), message.get_body());
-                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(),
-                        message.get_file_id(), message.get_chunk_no(), null, null));
+                Peer.getMC().send_packet(new Message("STORED", Peer.get_protocol_version(), Peer.get_server_id(), message.get_file_id(), message.get_chunk_no(), null, null));
             } else {
                 if (!Storage.putchunk_messages.containsKey(message.get_file_id())) {
                     Storage.putchunk_messages.put(message.get_file_id(), new HashMap<>());
@@ -105,8 +99,7 @@ class DecryptMessage implements Runnable {
                 Synchronized.synchronized_put_files_to_restore(message.get_file_id(), null, null);
 
             if (!Synchronized.synchronized_contains_files_to_restore(message.get_file_id(), message.get_chunk_no()))
-                Synchronized.synchronized_put_files_to_restore(message.get_file_id(), message.get_chunk_no(),
-                        message.get_body());
+                Synchronized.synchronized_put_files_to_restore(message.get_file_id(), message.get_chunk_no(), message.get_body());
             break;
         case "DELETE":
             Storage.delete_file(message.get_file_id());
@@ -196,18 +189,6 @@ class GetChunk implements Runnable {
         this.message = message;
     }
 
-    /**
-     * Retrieves localhost hostname
-     */
-    private String getHostName() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Override
     public void run() {
         if (Storage.has_chunk(this.message.get_file_id(), this.message.get_chunk_no())) {
@@ -231,16 +212,15 @@ class GetChunk implements Runnable {
 
                     do {
                         if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), null)) {
-                            if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(),
-                                    this.message.get_chunk_no())) {
+                            if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), this.message.get_chunk_no())) {
                                 Synchronized.synchronized_remove_files_to_restore(this.message.get_file_id());
                                 return;
                             }
                         }
 
                         try {
-                            client_socket = new Socket(new String(message.get_body(), "UTF-8"), 4444);
-                        } catch (IOException e) {}
+                            client_socket = new Socket(new String(message.get_body(), StandardCharsets.UTF_8), 4444);
+                        } catch (IOException ignored) {}
                     } while (!client_socket.isConnected());
 
                     Peer.getMDR().send_packet(chunk_message);
@@ -261,8 +241,7 @@ class GetChunk implements Runnable {
                 }
             } else {
                 if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), null)) {
-                    if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(),
-                            this.message.get_chunk_no()))
+                    if (Synchronized.synchronized_contains_files_to_restore(this.message.get_file_id(), this.message.get_chunk_no()))
                         Synchronized.synchronized_remove_files_to_restore(this.message.get_file_id());
                     else
                         Peer.getMDR().send_packet(chunk_message);
@@ -439,7 +418,7 @@ class ServerSocketThread implements Runnable {
     /**
      * Closes TCP connection
      */
-    public void close_socket() {
+    void close_socket() {
         try {
             this.server_socket.close();
         } catch (IOException e) {

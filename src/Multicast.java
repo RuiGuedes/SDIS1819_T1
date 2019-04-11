@@ -78,7 +78,7 @@ class Multicast {
             try {                     
                 this.socket.send(packet);
                 flag = true;
-            } catch (IOException e) {}
+            } catch (IOException ignored) {}
         }
     }
 
