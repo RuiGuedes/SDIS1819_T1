@@ -81,6 +81,14 @@ class DecryptMessage implements Runnable {
             }
             break;
         case "STORED":
+            if (Peer.get_protocol_version().equals("1.0")) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             if (Synchronized.synchronized_contains_chunk_info(message.get_file_id(), message.get_chunk_no())) {
                 Synchronized.synchronized_inc_chunk_info(message.get_file_id(), message.get_chunk_no());
             } else {
