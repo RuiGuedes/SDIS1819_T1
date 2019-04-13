@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROTOCOL_VERSION="2.0"
+PROTOCOL_VERSION="1.0"
 
 gnome-terminal -- ./RMI.sh
 
