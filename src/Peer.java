@@ -267,9 +267,10 @@ public class Peer implements RMI {
         String localhost_ip = null; 
 
         // Restore protocol enhancement
-        ServerSocketThread tcp_server = new ServerSocketThread(file_id, num_chunks);
+        ServerSocketThread tcp_server = null;
 
         if(Peer.get_protocol_version().equals("2.0")) {
+            tcp_server = new ServerSocketThread(file_id, num_chunks);
             Peer.getMDR().getExecutor().execute(tcp_server);
             try {
                 localhost_ip = InetAddress.getLocalHost().getHostAddress();
@@ -320,7 +321,7 @@ public class Peer implements RMI {
         else
             Synchronized.synchronized_remove_files_to_restore(file_id);
 
-        if(Peer.get_protocol_version().equals("2.0"))
+        if(Peer.get_protocol_version().equals("2.0") && tcp_server != null)
             tcp_server.close_socket();
 
         return "Restore of " + filename + " has been done " + (restore_status ? "with" : "without") + " success !";
