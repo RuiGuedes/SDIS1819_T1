@@ -1,4 +1,4 @@
-package Storage;
+package storage;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousFileChannel;
