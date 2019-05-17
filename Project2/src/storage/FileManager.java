@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,8 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -27,6 +30,30 @@ public class FileManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static boolean createOwner(String filePath, ArrayList<String> chunkIds, boolean isShareble) {
+        final Path backupFile = Paths.get(filePath);
+
+        if (!Files.isRegularFile(backupFile)) return false;
+
+        try {
+            final List<String> fileMetadata = new LinkedList<>();
+            fileMetadata.add(backupFile.getFileName().toString());
+            fileMetadata.add(String.valueOf(Files.size(backupFile)));
+            fileMetadata.addAll(chunkIds);
+
+            StorageManager.getOwnerStorage().storeOwner(fileMetadata);
+
+            if (isShareble) {
+                Files.write(backupFile.getFileName(), fileMetadata, StandardCharsets.UTF_8,
+                        StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
 
     private static ArrayList<CompletableFuture<String>> UploadChunks(Path backupFile) throws IOException {
@@ -50,8 +77,7 @@ public class FileManager {
                             // TODO Upload Chunk
 
                             // Chunks will be backed up locally for testing purposes
-                            if (StorageManager.getChunkStorage().storeChunk(chunkId, chunkData) != Chunk.CHUNK_SIZE)
-                                throw new IOException();
+                            StorageManager.getChunkStorage().storeChunk(chunkId, chunkData);
 
                             attachment.complete(chunkId);
                         } catch (NoSuchAlgorithmException | IOException | InterruptedException | ExecutionException e) {
@@ -74,11 +100,11 @@ public class FileManager {
         static int CHUNK_SIZE = 264144;
 
         static String generateId(ByteBuffer dataBuffer) throws NoSuchAlgorithmException {
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            final byte[] data = new byte[dataBuffer.arrayOffset()];
-
+            final byte[] data = new byte[dataBuffer.remaining()];
             dataBuffer.get(data);
-            byte[] digest = sha256.digest();
+
+            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            byte[] digest = sha256.digest(data);
 
             return String.format("%064x", new BigInteger(1, digest));
         }

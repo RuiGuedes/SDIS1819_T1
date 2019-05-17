@@ -81,28 +81,31 @@ public class RequestListener implements Runnable {
                     return false;
             }
 
-            ArrayList<CompletableFuture<String>> chunkUploads = FileManager.backup(filePath);
-
+            final ArrayList<CompletableFuture<String>> chunkUploads = FileManager.backup(filePath);
             if (chunkUploads == null)   return false;
 
-            out.println(chunkUploads.size() + " chunks");
+            final ArrayList<String> chunkIds = new ArrayList<>(chunkUploads.size());
 
+            out.println(chunkUploads.size() + " chunks");
             for (int i = 0; i < chunkUploads.size(); i++) {
                 final int chunkIndex = i;
                 chunkUploads.get(i).whenComplete((chunkId, e) -> {
-                    // TODO Retrieve chunkId for files
-
+                    chunkIds.add(chunkIndex, chunkId);
                     out.println(chunkIndex);
                 });
             }
 
             CompletableFuture.allOf(chunkUploads.toArray(new CompletableFuture[0])).whenComplete((r, e) -> {
-                // TODO create ownerfile and metadata file
+                if (e != null) {
+                    e.printStackTrace();
+                    out.println("Backup failed.");
+                    return;
+                }
 
                 out.println("Backup successful.");
             }).join();
 
-            return true;
+            return FileManager.createOwner(filePath, chunkIds, isShareble);
         }
     }
 }

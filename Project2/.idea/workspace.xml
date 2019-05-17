@@ -2,22 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b045b97-7341-4eb8-8628-0167f2dd8fe6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/storage/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Project1/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Project1/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/client/Connection.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/client/Connection.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener$RequestHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener$RequestHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/ChunkStorage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/ChunkStorage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/OwnerStorage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/OwnerStorage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/Storage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/Storage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/StorageManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/StorageManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/Connection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/RequestListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/RequestListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/storage/ChunkStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/ChunkStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/storage/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/storage/OwnerStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/OwnerStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/storage/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/Storage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/storage/StorageManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/StorageManager.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -58,8 +47,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="83" column="91" selection-start-line="83" selection-start-column="91" selection-end-line="83" selection-end-column="91" />
+            <state relative-caret-position="702">
+              <caret line="102" column="17" lean-forward="true" selection-start-line="102" selection-start-column="17" selection-end-line="102" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -70,8 +59,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/storage/FileManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="671">
-              <caret line="77" column="65" selection-start-line="77" selection-start-column="65" selection-end-line="77" selection-end-column="65" />
+            <state relative-caret-position="680">
+              <caret line="65" column="62" selection-start-line="65" selection-start-column="62" selection-end-line="65" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,8 +71,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/storage/StorageManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="31" selection-start-line="22" selection-start-column="31" selection-end-line="22" selection-end-column="31" />
+            <state relative-caret-position="187">
+              <caret line="11" column="45" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1257#1258#0" expanded="true" />
@@ -98,8 +87,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="671">
-              <caret line="51" column="26" lean-forward="true" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
+            <state relative-caret-position="756">
+              <caret line="45" column="24" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/storage/OwnerStorage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -157,12 +158,12 @@
         <option value="$PROJECT_DIR$/src/peer/Peer.java" />
         <option value="$PROJECT_DIR$/src/client/Connection.java" />
         <option value="$PROJECT_DIR$/src/storage/Storage.java" />
-        <option value="$PROJECT_DIR$/src/storage/OwnerStorage.java" />
         <option value="$PROJECT_DIR$/peer.bat" />
         <option value="$PROJECT_DIR$/src/storage/StorageManager.java" />
         <option value="$PROJECT_DIR$/src/middleware/RequestListener.java" />
         <option value="$PROJECT_DIR$/src/storage/ChunkStorage.java" />
         <option value="$PROJECT_DIR$/src/storage/FileManager.java" />
+        <option value="$PROJECT_DIR$/src/storage/OwnerStorage.java" />
       </list>
     </option>
   </component>
@@ -287,12 +288,12 @@
       <workItem from="1557940128635" duration="5563000" />
       <workItem from="1557998767985" duration="135000" />
       <workItem from="1558017382371" duration="22391000" />
-      <workItem from="1558103636328" duration="5682000" />
+      <workItem from="1558103636328" duration="12273000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52523000" />
+    <option name="totallyTimeSpent" value="59114000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -370,23 +371,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/storage/OwnerStorage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="16" selection-start-column="16" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/peer.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/nio/channels/AsynchronousFileChannel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="762">
@@ -415,37 +399,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
+    <entry file="file://$PROJECT_DIR$/peer.bat">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="671">
-          <caret line="51" column="26" lean-forward="true" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/storage/StorageManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="31" selection-start-line="22" selection-start-column="31" selection-end-line="22" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1257#1258#0" expanded="true" />
-            <element signature="e#1292#1293#0" expanded="true" />
-            <element signature="e#1344#1345#0" expanded="true" />
-            <element signature="e#1379#1380#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="83" column="91" selection-start-line="83" selection-start-column="91" selection-end-line="83" selection-end-column="91" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="170">
+          <caret line="10" column="26" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
         </state>
       </provider>
     </entry>
@@ -459,10 +416,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="756">
+          <caret line="45" column="24" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/storage/OwnerStorage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="4" selection-start-line="21" selection-start-column="4" selection-end-line="21" selection-end-column="4" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="102" column="17" lean-forward="true" selection-start-line="102" selection-start-column="17" selection-end-line="102" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/storage/StorageManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="45" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1257#1258#0" expanded="true" />
+            <element signature="e#1292#1293#0" expanded="true" />
+            <element signature="e#1344#1345#0" expanded="true" />
+            <element signature="e#1379#1380#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/storage/FileManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="671">
-          <caret line="77" column="65" selection-start-line="77" selection-start-column="65" selection-end-line="77" selection-end-column="65" />
+        <state relative-caret-position="680">
+          <caret line="65" column="62" selection-start-line="65" selection-start-column="62" selection-end-line="65" selection-end-column="62" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

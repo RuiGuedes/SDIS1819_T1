@@ -2,6 +2,7 @@ package storage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 class OwnerStorage extends Storage<OwnerFile> {
 
@@ -16,5 +17,9 @@ class OwnerStorage extends Storage<OwnerFile> {
     @Override
     OwnerFile valueFromFile(Path file) throws IOException {
         return new OwnerFile(file);
+    }
+
+    void storeOwner(List<String> fileMetadata) {
+
     }
 }

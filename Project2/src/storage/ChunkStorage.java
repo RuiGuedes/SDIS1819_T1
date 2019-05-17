@@ -3,11 +3,9 @@ package storage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +29,7 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
         return AsynchronousFileChannel.open(file, Set.of(), chunkIOExecutor);
     }
 
-    int storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
+    void storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
         final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
@@ -44,14 +42,8 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
             this.fileMap.put(chunkId, afc);
 
             // When another peer is performing the store, it makes better sense to not block the write
-            final int result = afc.write(chunkData, 0).get();
+            afc.write(chunkData, 0).get();
             afc.close();
-
-            System.out.println(chunkData);
-
-            return result;
         }
-
-        return 0;
     }
 }
