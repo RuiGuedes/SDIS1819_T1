@@ -6,17 +6,17 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 
 abstract class Storage<T> {
-    private final ConcurrentHashMap<String, T> fileMap = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<String, T> fileMap = new ConcurrentHashMap<>();
 
-    Storage(String dirName) {
-        StorageManager.rootPath.resolve(dirName);
+    Storage(String dirName) throws IOException {
+        Files.createDirectory(StorageManager.rootPath.resolve(dirName));
     }
 
     Storage(Path directory) throws IOException {
         for (Path file : Files.newDirectoryStream(directory)) {
-            fileMap.put(file.getFileName().toString(), ValueFromFile(file));
+            fileMap.put(file.getFileName().toString(), valueFromFile(file));
         }
     }
 
-    abstract T ValueFromFile(Path file) throws IOException;
+    abstract T valueFromFile(Path file) throws IOException;
 }

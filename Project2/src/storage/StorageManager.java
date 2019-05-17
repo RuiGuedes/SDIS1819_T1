@@ -19,19 +19,27 @@ public class StorageManager {
                     case "owner":
                         ownerStorage = new OwnerStorage(directory);
                         break;
-                    case "chunks":
+                    case "chunk":
                         chunkStorage = new ChunkStorage(directory);
                         break;
                     default:
-                        throw new SecurityException();
+                        throw new SecurityException("Invalid folder: " + directory.getFileName());
                 }
             }
         }
         else {
             Files.createDirectory(rootPath);
-
-            ownerStorage = new OwnerStorage();
-            chunkStorage = new ChunkStorage();
         }
+
+        if (ownerStorage == null)   ownerStorage = new OwnerStorage();
+        if (chunkStorage == null)   chunkStorage = new ChunkStorage();
+    }
+
+    public static OwnerStorage getOwnerStorage() {
+        return ownerStorage;
+    }
+
+    public static ChunkStorage getChunkStorage() {
+        return chunkStorage;
     }
 }

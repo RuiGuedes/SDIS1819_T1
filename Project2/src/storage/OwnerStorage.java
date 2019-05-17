@@ -5,7 +5,7 @@ import java.nio.file.Path;
 
 class OwnerStorage extends Storage<OwnerFile> {
 
-    OwnerStorage() {
+    OwnerStorage() throws IOException {
         super("owner");
     }
 
@@ -14,7 +14,7 @@ class OwnerStorage extends Storage<OwnerFile> {
     }
 
     @Override
-    OwnerFile ValueFromFile(Path file) throws IOException {
+    OwnerFile valueFromFile(Path file) throws IOException {
         return new OwnerFile(file);
     }
 }

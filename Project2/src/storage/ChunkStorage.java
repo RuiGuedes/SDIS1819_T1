@@ -1,12 +1,25 @@
 package storage;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class ChunkStorage extends Storage<AsynchronousFileChannel> {
-    ChunkStorage() {
-        super("chunk");
+    private static final ExecutorService chunkIOExecutor = Executors.newCachedThreadPool();
+
+    private static final String dirName = "chunk";
+
+    ChunkStorage() throws IOException {
+        super(dirName);
     }
 
     ChunkStorage(Path chunkDirectory) throws IOException {
@@ -14,7 +27,31 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
     }
 
     @Override
-    AsynchronousFileChannel ValueFromFile(Path file) throws IOException {
-        return AsynchronousFileChannel.open(file);
+    AsynchronousFileChannel valueFromFile(Path file) throws IOException {
+        return AsynchronousFileChannel.open(file, Set.of(), chunkIOExecutor);
+    }
+
+    int storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
+        final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
+
+        if (!Files.isRegularFile(chunkFile)) {
+            final AsynchronousFileChannel afc = AsynchronousFileChannel.open(
+                    chunkFile,
+                    Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
+                    chunkIOExecutor
+            );
+
+            this.fileMap.put(chunkId, afc);
+
+            // When another peer is performing the store, it makes better sense to not block the write
+            final int result = afc.write(chunkData, 0).get();
+            afc.close();
+
+            System.out.println(chunkData);
+
+            return result;
+        }
+
+        return 0;
     }
 }
