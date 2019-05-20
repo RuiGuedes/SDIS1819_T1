@@ -6,30 +6,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 class OwnerFile {
     private final String name;
-    private final long length;
+    private final String length;
     private final String[] chunkIds;
 
     private final Path ownerFile;
 
-    OwnerFile(Path backupFile, String[] chunkIds) throws IOException {
-        this.name = backupFile.getFileName().toString();
-        this.length = Files.size(backupFile);
-        this.chunkIds = chunkIds;
+    OwnerFile(List<String> fileMetadata, String saltString, String hashString) throws IOException {
+        this.name = fileMetadata.get(0);
+        this.length = fileMetadata.get(1);
+        this.chunkIds = detachChunks(fileMetadata.get(2));
+
+        fileMetadata.add(saltString);
+        fileMetadata.add(hashString);
 
         this.ownerFile = Files.write(
-                backupFile,
+                StorageManager.rootPath.resolve(OwnerStorage.dirName)
+                        .resolve(hashString.replace('/', '_')),
+                fileMetadata,
 
-                Arrays.asList(
-                        name,
-                        String.valueOf(length),
-                        String.join("", chunkIds)
-                        // TODO Salt and Hash
-                ),
                 StandardCharsets.UTF_8,
 
                 StandardOpenOption.CREATE_NEW,
@@ -41,17 +39,19 @@ class OwnerFile {
         List<String> fileContents = Files.readAllLines(ownerFile, StandardCharsets.UTF_8);
 
         this.name = fileContents.remove(0);
-        this.length = Long.parseLong(fileContents.remove(0));
+        this.length = fileContents.remove(0);
+        this.chunkIds = detachChunks(fileContents.remove(0));
 
-        final String chunkHashes = fileContents.remove(0);
+        this.ownerFile = ownerFile;
+    }
 
+    private String[] detachChunks(String chunkHashes) {
         final List<String> chunkList = new ArrayList<>();
+
         for (int i = 0; i < chunkHashes.length(); i+= 64) {
             chunkList.add(chunkHashes.substring(i, i + 64));
         }
 
-        this.chunkIds = chunkList.toArray(String[]::new);
-
-        this.ownerFile = ownerFile;
+        return chunkList.toArray(String[]::new);
     }
 }
