@@ -1,5 +1,8 @@
 package storage;
 
+import peer.FileManager;
+import peer.Peer;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,30 +11,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class ChunkStorage extends Storage<AsynchronousFileChannel> {
+public class ChunkStorage {
     private static final ExecutorService chunkIOExecutor = Executors.newCachedThreadPool();
 
-    private static final String dirName = "chunk";
+    private static final Path chunkDir = Peer.rootPath.resolve("chunk");
 
-    ChunkStorage() throws IOException {
-        super(dirName);
+    private static final Set<String> chunkSet = ConcurrentHashMap.newKeySet();
+
+    public static void init() throws IOException {
+        if (Files.isDirectory(chunkDir)) {
+            for (Path file : Files.newDirectoryStream(chunkDir)) {
+                chunkSet.add(file.getFileName().toString());
+            }
+        }
+        else {
+            Files.createDirectories(chunkDir);
+        }
     }
 
-    ChunkStorage(Path chunkDirectory) throws IOException {
-        super(chunkDirectory);
-    }
-
-    @Override
-    AsynchronousFileChannel valueFromFile(Path file) throws IOException {
-        return AsynchronousFileChannel.open(file, Set.of(), chunkIOExecutor);
-    }
-
-    void storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
-        final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
+    public static void storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
+        final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
@@ -39,7 +43,7 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
                     Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
                     chunkIOExecutor
             )) {
-                this.fileMap.put(chunkId, afc);
+                chunkSet.add(chunkId);
 
                 // Unblock the chunk storage
                 afc.write(chunkData, 0).get();
@@ -47,8 +51,8 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
         }
     }
 
-    ByteBuffer getChunk(String chunkId) throws IOException, ExecutionException, InterruptedException {
-        final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
+    public static ByteBuffer getChunk(String chunkId) throws IOException, ExecutionException, InterruptedException {
+        final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile))
             throw new FileNotFoundException();

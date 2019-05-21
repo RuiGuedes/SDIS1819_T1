@@ -4,6 +4,7 @@ import peer.Peer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,26 +12,27 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
-class OwnerStorage extends Storage<OwnerFile> {
+public class OwnerStorage {
     private static Random secureRandom = new SecureRandom();
 
-    static final String dirName = "owner";
+    static final Path ownerDir = Peer.rootPath.resolve("owner");
 
-    OwnerStorage() throws IOException {
-        super(dirName);
+    private static final ConcurrentHashMap<String, OwnerFile> ownerMap = new ConcurrentHashMap<>();
+
+    public static void init() throws IOException {
+        if (Files.isDirectory(ownerDir)) {
+            for (Path file : Files.newDirectoryStream(ownerDir)) {
+                ownerMap.put(file.getFileName().toString(), new OwnerFile(file));
+            }
+        }
+        else {
+            Files.createDirectories(ownerDir);
+        }
     }
 
-    OwnerStorage(Path ownerDirectory) throws IOException {
-        super(ownerDirectory);
-    }
-
-    @Override
-    OwnerFile valueFromFile(Path file) throws IOException {
-        return new OwnerFile(file);
-    }
-
-    void storeOwner(List<String> fileMetadata) throws NoSuchAlgorithmException, IOException {
+    public static void storeOwner(List<String> fileMetadata) throws NoSuchAlgorithmException, IOException {
         byte[] salt = new byte[16];
         secureRandom.nextBytes(salt);
 
@@ -43,6 +45,6 @@ class OwnerStorage extends Storage<OwnerFile> {
         final String saltString = Base64.getEncoder().encodeToString(salt);
         final String hashString = Base64.getEncoder().encodeToString(sha256.digest(inputBytes));
 
-        this.fileMap.put(fileMetadata.get(0), new OwnerFile(fileMetadata, saltString, hashString));
+        ownerMap.put(fileMetadata.get(0), new OwnerFile(fileMetadata, saltString, hashString));
     }
 }

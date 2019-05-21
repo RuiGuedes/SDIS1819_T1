@@ -1,6 +1,6 @@
 package middleware;
 
-import storage.FileManager;
+import peer.FileManager;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;

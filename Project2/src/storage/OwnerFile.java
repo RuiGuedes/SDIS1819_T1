@@ -1,5 +1,7 @@
 package storage;
 
+import peer.Peer;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -8,7 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-class OwnerFile {
+public class OwnerFile {
     private final String name;
     private final String length;
     private final String[] chunkIds;
@@ -24,8 +26,7 @@ class OwnerFile {
         fileMetadata.add(hashString);
 
         this.ownerFile = Files.write(
-                StorageManager.rootPath.resolve(OwnerStorage.dirName)
-                        .resolve(hashString.replace('/', '_') + ".own"),
+                OwnerStorage.ownerDir.resolve(hashString.replace('/', '_') + ".own"),
                 fileMetadata,
 
                 StandardCharsets.UTF_8,
@@ -45,7 +46,7 @@ class OwnerFile {
         this.ownerFile = ownerFile;
     }
 
-    static String[] detachChunks(String chunkHashes) {
+    public static String[] detachChunks(String chunkHashes) {
         final List<String> chunkList = new ArrayList<>();
 
         for (int i = 0; i < chunkHashes.length(); i+= 64) {

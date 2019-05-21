@@ -1,4 +1,8 @@
-package storage;
+package peer;
+
+import storage.ChunkStorage;
+import storage.OwnerFile;
+import storage.OwnerStorage;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,7 +31,7 @@ public class FileManager {
         final Path file = Paths.get(filePath);
         if (!Files.isRegularFile(file)) throw new FileNotFoundException();
 
-        final ArrayList<String> chunkIds = UploadChunks(file, chunkConsumer);
+        final ArrayList<String> chunkIds = uploadChunks(file, chunkConsumer);
 
         final List<String> fileMetadata = new LinkedList<>();
         fileMetadata.add(file.getFileName().toString());
@@ -41,7 +45,7 @@ public class FileManager {
                     StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         }
 
-        StorageManager.getOwnerStorage().storeOwner(fileMetadata);
+        OwnerStorage.storeOwner(fileMetadata);
     }
 
     // TODO Make proper concurrent implementation
@@ -60,7 +64,7 @@ public class FileManager {
                     StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE
             )) {
                 for (int i = 0; i < chunkIds.length; i++) {
-                    final ByteBuffer chunkData = StorageManager.getChunkStorage().getChunk(chunkIds[i]);
+                    final ByteBuffer chunkData = ChunkStorage.getChunk(chunkIds[i]);
 
                     afc.write(chunkData, i * Chunk.CHUNK_SIZE).get();
                 }
@@ -73,7 +77,7 @@ public class FileManager {
         return true;
     }
 
-    private static ArrayList<String> UploadChunks(Path file, IntConsumer chunkConsumer) throws IOException {
+    private static ArrayList<String> uploadChunks(Path file, IntConsumer chunkConsumer) throws IOException {
         try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(file, StandardOpenOption.READ)) {
             // -floorDiv(-x, y) = ceil(x / y)
             final int chunkNum = Math.toIntExact(- Math.floorDiv(- Files.size(file), Chunk.CHUNK_SIZE));
@@ -96,7 +100,7 @@ public class FileManager {
                             // TODO Upload Chunk
 
                             // Chunks will be backed up locally for testing purposes
-                            StorageManager.getChunkStorage().storeChunk(chunkId, chunkData);
+                            ChunkStorage.storeChunk(chunkId, chunkData);
 
                             chunkConsumer.accept(chunkIndex);
                             attachment.complete(chunkId);
@@ -118,8 +122,8 @@ public class FileManager {
         }
     }
 
-    static class Chunk {
-        static int CHUNK_SIZE = 264144;
+    public static class Chunk {
+        public static final int CHUNK_SIZE = 264144;
 
         static String generateId(ByteBuffer dataBuffer) throws NoSuchAlgorithmException {
             final byte[] data = new byte[dataBuffer.remaining()];
