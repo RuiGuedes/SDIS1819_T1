@@ -1,5 +1,7 @@
 package storage;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -17,59 +19,74 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.IntConsumer;
 
 public class FileManager {
-    public static boolean createOwner(String filePath, ArrayList<String> chunkIds, boolean isShareble) {
-        final Path backupFile = Paths.get(filePath);
+    public static void backup(String filePath, IntConsumer chunkConsumer, boolean isShareble)
+            throws IOException, NoSuchAlgorithmException {
+        final Path file = Paths.get(filePath);
+        if (!Files.isRegularFile(file)) throw new FileNotFoundException();
 
-        if (!Files.isRegularFile(backupFile)) return false;
+        final ArrayList<String> chunkIds = UploadChunks(file, chunkConsumer);
 
-        try {
-            final List<String> fileMetadata = new LinkedList<>();
-            fileMetadata.add(backupFile.getFileName().toString());
-            fileMetadata.add(String.valueOf(Files.size(backupFile)));
-            fileMetadata.add(String.join("", chunkIds));
+        final List<String> fileMetadata = new LinkedList<>();
+        fileMetadata.add(file.getFileName().toString());
+        fileMetadata.add(String.valueOf(Files.size(file)));
+        fileMetadata.add(String.join("", chunkIds));
 
-            if (isShareble) {
-                Files.write(backupFile.resolveSibling(backupFile.getFileName() + ".meta"),
-                        fileMetadata,
-                        StandardCharsets.UTF_8,
-                        StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+        if (isShareble) {
+            Files.write(Paths.get(fileMetadata.get(0) + ".meta"),
+                    fileMetadata,
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        }
+
+        StorageManager.getOwnerStorage().storeOwner(fileMetadata);
+    }
+
+    // TODO Make proper concurrent implementation
+    public static boolean download(String filePath) {
+        final Path file = Paths.get(filePath);
+
+        if (!Files.isRegularFile(file)) return false;
+
+        try (BufferedReader bf = Files.newBufferedReader(file, StandardCharsets.UTF_8)){
+            final String fileName = bf.readLine();
+            final long fileSize = Long.parseLong(bf.readLine());
+            final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
+
+            try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
+                    Paths.get(fileName),
+                    StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE
+            )) {
+                for (int i = 0; i < chunkIds.length; i++) {
+                    final ByteBuffer chunkData = StorageManager.getChunkStorage().getChunk(chunkIds[i]);
+
+                    afc.write(chunkData, i * Chunk.CHUNK_SIZE).get();
+                }
             }
-
-            StorageManager.getOwnerStorage().storeOwner(fileMetadata);
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            return false;
         }
 
         return true;
     }
 
-    public static ArrayList<CompletableFuture<String>> backup(String filePath) {
-        final Path backupFile = Paths.get(filePath);
-
-        if (!Files.isRegularFile(backupFile)) return null;
-
-        try {
-            return UploadChunks(backupFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static ArrayList<CompletableFuture<String>> UploadChunks(Path backupFile) throws IOException {
-        try (AsynchronousFileChannel fc = AsynchronousFileChannel.open(backupFile, StandardOpenOption.READ)) {
+    private static ArrayList<String> UploadChunks(Path file, IntConsumer chunkConsumer) throws IOException {
+        try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(file, StandardOpenOption.READ)) {
             // -floorDiv(-x, y) = ceil(x / y)
-            final int chunkNum = Math.toIntExact(- Math.floorDiv(- Files.size(backupFile), Chunk.CHUNK_SIZE));
+            final int chunkNum = Math.toIntExact(- Math.floorDiv(- Files.size(file), Chunk.CHUNK_SIZE));
 
-            ArrayList<CompletableFuture<String>> chunkIds = new ArrayList<>(chunkNum);
+            final ArrayList<CompletableFuture<String>> chunkPromises = new ArrayList<>(chunkNum);
             for (int i = 0; i < chunkNum; i++) {
-                final CompletableFuture<String> chunkUpload = new CompletableFuture<>();
-                chunkIds.add(i, chunkUpload);
+                final int chunkIndex = i;
+
+                final CompletableFuture<String> chunkPromise = new CompletableFuture<>();
+                chunkPromises.add(chunkIndex, chunkPromise);
 
                 final ByteBuffer chunkData = ByteBuffer.allocate(Chunk.CHUNK_SIZE);
-                fc.read(chunkData, i * Chunk.CHUNK_SIZE, chunkUpload, new CompletionHandler<>() {
+                afc.read(chunkData, chunkIndex * Chunk.CHUNK_SIZE, chunkPromise, new CompletionHandler<>() {
                     @Override
                     public void completed(Integer result, CompletableFuture<String> attachment) {
                         try {
@@ -81,6 +98,7 @@ public class FileManager {
                             // Chunks will be backed up locally for testing purposes
                             StorageManager.getChunkStorage().storeChunk(chunkId, chunkData);
 
+                            chunkConsumer.accept(chunkIndex);
                             attachment.complete(chunkId);
                         } catch (NoSuchAlgorithmException | IOException | InterruptedException | ExecutionException e) {
                             attachment.completeExceptionally(e);
@@ -94,11 +112,13 @@ public class FileManager {
                 });
             }
 
+            final ArrayList<String> chunkIds = new ArrayList<>(chunkNum);
+            chunkPromises.forEach((p) -> chunkIds.add(p.join()));
             return chunkIds;
         }
     }
 
-    private static class Chunk {
+    static class Chunk {
         static int CHUNK_SIZE = 264144;
 
         static String generateId(ByteBuffer dataBuffer) throws NoSuchAlgorithmException {

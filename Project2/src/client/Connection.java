@@ -23,7 +23,7 @@ public class Connection {
             final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            out.println(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+            out.println(String.join("|", Arrays.copyOfRange(args, 1, args.length)));
 
             String inputLine = in.readLine();
             while (inputLine != null) {

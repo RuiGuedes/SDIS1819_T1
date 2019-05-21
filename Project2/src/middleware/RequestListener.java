@@ -9,9 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,13 +48,19 @@ public class RequestListener implements Runnable {
                 BufferedReader in = new BufferedReader(new InputStreamReader(this.requestSocket.getInputStream()));
                 PrintWriter out = new PrintWriter(this.requestSocket.getOutputStream(), true)
             ){
-                final String[] command = in.readLine().split(" ");
+                final String[] command = in.readLine().split("\\|");
                 final String[] commandArgs = Arrays.copyOfRange(command, 1, command.length);
 
                 switch(command[0]) {
                     case "BACKUP":
                         if (!backupCommand(commandArgs, out))
-                            out.println("Invalid command: " + String.join(" ", command));
+                            out.println("Invalid BACKUP command: " + String.join(" ", commandArgs));
+                        break;
+                    case "DOWNLOAD":
+                        if (downloadCommand(commandArgs, out))
+                            out.println("Download Successful");
+                        else
+                            out.println("Invalid DOWNLOAD command: " + String.join(" ", commandArgs));
                         break;
                     default:
                         out.println("Invalid command: " + String.join(" ", command));
@@ -81,31 +86,27 @@ public class RequestListener implements Runnable {
                     return false;
             }
 
-            final ArrayList<CompletableFuture<String>> chunkUploads = FileManager.backup(filePath);
-            if (chunkUploads == null)   return false;
-
-            final ArrayList<String> chunkIds = new ArrayList<>(chunkUploads.size());
-
-            out.println(chunkUploads.size() + " chunks");
-            for (int i = 0; i < chunkUploads.size(); i++) {
-                final int chunkIndex = i;
-                chunkUploads.get(i).whenComplete((chunkId, e) -> {
-                    chunkIds.add(chunkIndex, chunkId);
-                    out.println(chunkIndex);
-                });
+            try {
+                FileManager.backup(filePath, out::println, isShareble);
+                out.println("Backup successful");
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                out.println("Backup failed.");
             }
 
-            CompletableFuture.allOf(chunkUploads.toArray(new CompletableFuture[0])).whenComplete((r, e) -> {
-                if (e != null) {
-                    e.printStackTrace();
-                    out.println("Backup failed.");
-                    return;
-                }
+            return true;
+        }
 
-                out.println("Backup successful.");
-            }).join();
+        private boolean downloadCommand(String[] commandArgs, PrintWriter out) {
+            if (commandArgs.length != 1)    return false;
 
-            return FileManager.createOwner(filePath, chunkIds, isShareble);
+            final String filePath = commandArgs[0];
+            if (!filePath.endsWith(".meta") && !filePath.endsWith(".own"))  return false;
+
+            // TODO DOWNLOAD FILE
+
+            // For now, the chunks will be downloaded from local storage
+            return FileManager.download(filePath);
         }
     }
 }

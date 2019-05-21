@@ -25,7 +25,7 @@ class OwnerFile {
 
         this.ownerFile = Files.write(
                 StorageManager.rootPath.resolve(OwnerStorage.dirName)
-                        .resolve(hashString.replace('/', '_')),
+                        .resolve(hashString.replace('/', '_') + ".own"),
                 fileMetadata,
 
                 StandardCharsets.UTF_8,
@@ -45,7 +45,7 @@ class OwnerFile {
         this.ownerFile = ownerFile;
     }
 
-    private String[] detachChunks(String chunkHashes) {
+    static String[] detachChunks(String chunkHashes) {
         final List<String> chunkList = new ArrayList<>();
 
         for (int i = 0; i < chunkHashes.length(); i+= 64) {

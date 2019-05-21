@@ -1,5 +1,6 @@
 package storage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
@@ -33,17 +34,36 @@ class ChunkStorage extends Storage<AsynchronousFileChannel> {
         final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
-            final AsynchronousFileChannel afc = AsynchronousFileChannel.open(
+            try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     chunkFile,
                     Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
                     chunkIOExecutor
-            );
+            )) {
+                this.fileMap.put(chunkId, afc);
 
-            this.fileMap.put(chunkId, afc);
+                // Unblock the chunk storage
+                afc.write(chunkData, 0).get();
+            }
+        }
+    }
 
-            // When another peer is performing the store, it makes better sense to not block the write
-            afc.write(chunkData, 0).get();
-            afc.close();
+    ByteBuffer getChunk(String chunkId) throws IOException, ExecutionException, InterruptedException {
+        final Path chunkFile = StorageManager.rootPath.resolve(dirName).resolve(chunkId);
+
+        if (!Files.isRegularFile(chunkFile))
+            throw new FileNotFoundException();
+
+        try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
+                chunkFile,
+                Set.of(StandardOpenOption.READ),
+                chunkIOExecutor
+        )) {
+            final ByteBuffer chunkData = ByteBuffer.allocate(FileManager.Chunk.CHUNK_SIZE);
+
+            // Unblock the chunk retrieval
+            afc.read(chunkData, 0).get();
+
+            return chunkData.flip();
         }
     }
 }
