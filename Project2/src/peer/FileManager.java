@@ -48,33 +48,54 @@ public class FileManager {
         OwnerStorage.storeOwner(fileMetadata);
     }
 
-    // TODO Make proper concurrent implementation
-    public static boolean download(String filePath) {
+    public static boolean download(String filePath, IntConsumer chunkConsumer) {
         final Path file = Paths.get(filePath);
 
         if (!Files.isRegularFile(file)) return false;
 
         try (BufferedReader bf = Files.newBufferedReader(file, StandardCharsets.UTF_8)){
             final String fileName = bf.readLine();
-            final long fileSize = Long.parseLong(bf.readLine());
+            bf.readLine(); // file length
             final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
 
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     Paths.get(fileName),
                     StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE
             )) {
-                for (int i = 0; i < chunkIds.length; i++) {
-                    final ByteBuffer chunkData = ChunkStorage.getChunk(chunkIds[i]);
+                final int chunkNum = chunkIds.length;
 
-                    afc.write(chunkData, i * Chunk.CHUNK_SIZE).get();
+                final ArrayList<CompletableFuture<Void>> chunkPromises = new ArrayList<>(chunkNum);
+                for (int i = 0; i < chunkNum; i++) {
+                    final int chunkIndex = i;
+
+                    final CompletableFuture<Void> chunkPromise = new CompletableFuture<>();
+                    chunkPromises.add(chunkIndex, chunkPromise);
+
+                    // TODO Download Chunk
+
+                    // For now retrieve chunk locally
+                    final ByteBuffer chunkData = ChunkStorage.getChunk(chunkIds[i]);
+                    afc.write(chunkData, i * Chunk.CHUNK_SIZE, chunkPromise, new CompletionHandler<>() {
+                        @Override
+                        public void completed(Integer result, CompletableFuture<Void> attachment) {
+                            chunkConsumer.accept(chunkIndex);
+                            attachment.complete(null);
+                        }
+
+                        @Override
+                        public void failed(Throwable exc, CompletableFuture<Void> attachment) {
+                            attachment.completeExceptionally(exc);
+                        }
+                    });
                 }
+
+                chunkPromises.forEach(CompletableFuture::join);
+                return true;
             }
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return false;
         }
-
-        return true;
     }
 
     private static ArrayList<String> uploadChunks(Path file, IntConsumer chunkConsumer) throws IOException {

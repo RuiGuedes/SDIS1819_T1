@@ -70,4 +70,10 @@ public class ChunkStorage {
             return chunkData.flip();
         }
     }
+
+    public static String listFiles() {
+        final StringBuilder sb = new StringBuilder();
+        chunkSet.forEach((id) -> sb.append(id).append(System.lineSeparator()));
+        return sb.toString();
+    }
 }

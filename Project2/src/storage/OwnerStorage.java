@@ -47,4 +47,10 @@ public class OwnerStorage {
 
         ownerMap.put(fileMetadata.get(0), new OwnerFile(fileMetadata, saltString, hashString));
     }
+
+    public static String listFiles() {
+        final StringBuilder sb = new StringBuilder();
+        ownerMap.forEachValue(1, sb::append);
+        return sb.toString();
+    }
 }
