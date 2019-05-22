@@ -84,7 +84,7 @@ public class Chord {
      * @param address Address to be used
      * @return InetAddress
      */
-    private static InetAddress createInetAddress(String address) {
+    public static InetAddress createInetAddress(String address) {
         try {
             InetAddress inetAddress = InetAddress.getByName(address);
 
