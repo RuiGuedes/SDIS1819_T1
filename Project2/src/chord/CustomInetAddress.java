@@ -55,4 +55,8 @@ class CustomInetAddress {
         return port;
     }
 
+    @Override
+    public String toString() {
+        return this.getHostAddress() + ":" + this.port;
+    }
 }

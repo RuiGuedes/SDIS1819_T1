@@ -8,14 +8,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utilities {
 
-    public static void main(String[] args) throws UnknownHostException {
-        System.out.println(hashCode(InetAddress.getLocalHost().getHostAddress(),9000));
-        System.out.println(hashCode(InetAddress.getLocalHost().getHostAddress(),9001));
-        System.out.println(hashCode("192.193.29.89",9003));
-        System.out.println(hashCode("192.193.29.89",9034));
-        System.out.println(hashCode("172.23.269.89",9000));
-        System.out.println(hashCode("132.173.29.89",9000));
-        System.out.println(hashCode("42.197.239.89",9004));
+    public static void main(String[] args) {
+
+        sendRequest(new CustomInetAddress("224.0.0.2",9000), "TEST");
     }
 
     /**
@@ -80,16 +75,16 @@ public class Utilities {
         }
     }
 
-    static String sendRequest(CustomInetAddress inet, String req) {
+    static CustomInetAddress sendRequest(CustomInetAddress inet, String request) {
 
-        if (inet == null || req == null)
+        if (inet == null || request == null)
             return null;
 
         byte[] buf;
         DatagramSocket socket = null;
         DatagramPacket packet;
 
-        buf = req.getBytes();
+        buf = request.getBytes();
         packet = new DatagramPacket(buf, buf.length, inet.getAddress(), inet.getPort());
 
         try {
@@ -108,11 +103,11 @@ public class Utilities {
         return receiveResponse(socket);
     }
 
-    private static String receiveResponse(DatagramSocket socket) {
+    private static CustomInetAddress receiveResponse(DatagramSocket socket) {
         if (socket == null)
             return null;
 
-        byte[] buf = new byte[64000];
+        byte[] buf = new byte[1000];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         try {
@@ -121,6 +116,13 @@ public class Utilities {
             System.out.println("Receive packet exception: " + e.toString());
         }
 
-        return packet.getData().toString();
+        socket.close();
+
+        String[] response = new String(packet.getData(), StandardCharsets.UTF_8).split(":");
+
+        System.out.println(response[0]);
+
+//        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
+        return null;
     }
 }

@@ -30,7 +30,7 @@ public class Peer {
 
         // Validate arguments
         if(args.length < 1 || args.length > 2) {
-            System.out.println("Usage: java Peer [options] <PORT> <PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT");
+            System.out.println("Usage: java Peer [options] <PORT> <PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT>");
             System.exit(1);
         }
 

@@ -72,14 +72,14 @@ public class Node {
         this.contactAddress = address;
 
         if(this.contactAddress != null && !this.contactAddress.equals(this.peerAddress)) {
-//            CustomInetAddress successor = Utilities.sendRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerdID);
-//
-//            if(successor == null) {
-//                System.out.println("Join was not possible due to system being unable to find contact node");
-//                return false;
-//            }
-//
-//            this.setIthFinger(1, successor);
+            CustomInetAddress successor = Utilities.sendRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerdID);
+
+            if(successor == null) {
+                System.out.println("Join was not possible due to system being unable to find contact node");
+                return false;
+            }
+
+            this.setIthFinger(1, successor);
         }
 
         this.initializeAllThreads();
@@ -115,6 +115,16 @@ public class Node {
     public CustomInetAddress getPeerAddress() {
         return peerAddress;
     }
+
+    /**
+     * Get value of finger table
+     * @param key key of the value
+     * @return Custom InetAddress
+     */
+    public CustomInetAddress getFingerTable(Integer key) {
+        return fingerTable.get(key);
+    }
+
     /**
      * Updates finger on finger table. If it updates the first entry of the finger table (Successor)
      * it notifies it as it new predecessor is the current node
@@ -129,5 +139,4 @@ public class Node {
             // notify(value);
         }
     }
-
 }
