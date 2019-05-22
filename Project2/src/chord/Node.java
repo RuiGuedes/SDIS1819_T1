@@ -220,8 +220,4 @@ public class Node {
     public CustomInetAddress getPeerAddress() {
         return this.peerAddress;
     }
-
-    public CustomInetAddress getFingerTable(int key) {
-        return this.fingerTable.get(key);
-    }
 }

@@ -10,7 +10,6 @@ public class Utilities {
 
     public static void main(String[] args) {
 
-        sendRequest(new CustomInetAddress("224.0.0.2",9000), "TEST");
     }
 
     /**
@@ -88,7 +87,7 @@ public class Utilities {
         packet = new DatagramPacket(buf, buf.length, inet.getAddress(), inet.getPort());
 
         try {
-            socket = new DatagramSocket(inet.getPort(), inet.getAddress());
+            socket = new DatagramSocket();
             socket.send(packet);
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -120,9 +119,6 @@ public class Utilities {
 
         String[] response = new String(packet.getData(), StandardCharsets.UTF_8).split(":");
 
-        System.out.println(response[0]);
-
-//        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
-        return null;
+        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
     }
 }

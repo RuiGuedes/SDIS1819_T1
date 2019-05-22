@@ -61,8 +61,6 @@ class DecryptMessage extends Thread {
         this.address = packet.getAddress();
         this.port = packet.getPort();
         this.local = n;
-
-        System.out.println("1: " + message);
     }
 
     @Override
@@ -71,7 +69,7 @@ class DecryptMessage extends Thread {
         DatagramPacket response;
         switch(message[0]){
             case "FIND_SUCCESSOR":
-                String successor = this.local.getFingerTable(1).toString();
+                String successor = this.local.getSuccessor().toString();
                 buf = successor.getBytes();
                 response = new DatagramPacket(buf, buf.length, this.address, this.port);
                 try {
