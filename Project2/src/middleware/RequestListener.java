@@ -1,6 +1,8 @@
 package middleware;
 
 import peer.FileManager;
+import storage.ChunkStorage;
+import storage.OwnerStorage;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -50,17 +52,22 @@ public class RequestListener implements Runnable {
             ){
                 final String[] command = in.readLine().split("\\|");
                 final String[] commandArgs = Arrays.copyOfRange(command, 1, command.length);
+                final String commandArgsString = String.join(" ", commandArgs);
 
                 switch(command[0]) {
                     case "BACKUP":
                         if (!backupCommand(commandArgs, out))
-                            out.println("Invalid BACKUP command: " + String.join(" ", commandArgs));
+                            out.println("Invalid BACKUP command: " + commandArgsString);
                         break;
                     case "DOWNLOAD":
                         if (downloadCommand(commandArgs, out))
                             out.println("Download Successful");
                         else
-                            out.println("Invalid DOWNLOAD command: " + String.join(" ", commandArgs));
+                            out.println("Invalid DOWNLOAD command: " + commandArgsString);
+                        break;
+                    case "LIST":
+                        if (!listCommand(commandArgs, out))
+                            out.println("Invalid LIST command: " + commandArgsString);
                         break;
                     default:
                         out.println("Invalid command: " + String.join(" ", command));
@@ -103,10 +110,24 @@ public class RequestListener implements Runnable {
             final String filePath = commandArgs[0];
             if (!filePath.endsWith(".meta") && !filePath.endsWith(".own"))  return false;
 
-            // TODO DOWNLOAD FILE
+            return FileManager.download(filePath, out::println);
+        }
 
-            // For now, the chunks will be downloaded from local storage
-            return FileManager.download(filePath);
+        private boolean listCommand(String[] commandArgs, PrintWriter out) {
+            if (commandArgs.length > 1) return false;
+
+            switch(commandArgs[0]) {
+                case "--owner":
+                case "-o":
+                    out.print(OwnerStorage.listFiles());
+                    return true;
+                case "--chunks":
+                case "-c":
+                    out.print(ChunkStorage.listFiles());
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
