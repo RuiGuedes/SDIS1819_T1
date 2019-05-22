@@ -4,21 +4,38 @@ import java.net.InetAddress;
 
 public class Node {
 
-    public InetAddress peerAddress;
+    /**
+     * Peer InetAddress
+     */
+    private InetAddress peerAddress;
 
-    public Integer peerPort;
+    /**
+     * Peer associated Port
+     */
+    private Integer peerPort;
 
-    public InetAddress contactAddress;
+    /**
+     * Peer network ID
+     */
+    private Integer peerdID;
 
-    public Integer contactPort;
+    /**
+     * Address of the node used to introduce current peer to the network
+     */
+    private InetAddress contactAddress;
+
+    /**
+     * Port of the node used to introduce current peer to the network
+     */
+    private Integer contactPort;
 
 
-    public Node(InetAddress address, Integer port) {
+    Node(InetAddress address, Integer port) {
         this.peerAddress = address;
         this.peerPort = port;
     }
 
-    public boolean joinNetwork(InetAddress address, Integer port) {
+    boolean joinNetwork(InetAddress address, Integer port) {
         this.contactAddress = address;
         this.contactPort = port;
 

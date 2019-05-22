@@ -72,6 +72,14 @@ public class Chord {
     }
 
     /**
+     * Retrieves peer associated node
+     * @return Node
+     */
+    public static Node getNode() {
+        return node;
+    }
+
+    /**
      * Creates InetAddress given an address
      * @param address Address to be used
      * @return InetAddress

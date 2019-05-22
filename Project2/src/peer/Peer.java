@@ -16,6 +16,8 @@ public class Peer {
 
     public static final Path rootPath = Paths.get("./peer");
 
+    public static Chord chord = new Chord();
+
     public static void main(String[] args) {
 
         // Validate arguments
@@ -25,12 +27,17 @@ public class Peer {
         }
 
         try {
-            ChunkStorage.init();
-            OwnerStorage.init();
+            if(!chord.initialize(args)) {
+                System.out.println("FAILED");
+            }
 
-            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
-
-            System.out.println("Peer " + PEER_ID + " Online!");
+            System.in.read();
+//            ChunkStorage.init();
+//            OwnerStorage.init();
+//
+//            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
+//
+//            System.out.println("Peer " + PEER_ID + " Online!");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Peer " + PEER_ID + " failed to initialize!");
