@@ -19,16 +19,13 @@ public class Peer {
 
     public static final Path rootPath = Paths.get("./peer");
 
-<<<<<<< HEAD
+    public static Chord chord = new Chord();
+
     /**
      * Initializes a peer
      *
      * @param args arguments for initializing the peer
      */
-=======
-    public static Chord chord = new Chord();
-
->>>>>>> origin/master
     public static void main(String[] args) {
 
         // Validate arguments
