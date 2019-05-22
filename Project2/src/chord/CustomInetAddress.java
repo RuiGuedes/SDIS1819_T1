@@ -55,4 +55,11 @@ class CustomInetAddress {
         return port;
     }
 
+    /**
+     * Returns associated peer ID
+     */
+    long getNodeID() {
+        return Utilities.hashCode(this.getHostAddress(), this.port);
+    }
+
 }

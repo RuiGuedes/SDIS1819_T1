@@ -14,7 +14,7 @@ public class Node {
     /**
      * Peer network ID
      */
-    private long peerdID;
+    private long peerID;
 
     /**
      * Node finger table
@@ -52,8 +52,11 @@ public class Node {
      */
     Node(CustomInetAddress address) {
         // Variables Initialization
+        this.predecessor = null;
         this.peerAddress = address;
-        this.peerdID = Utilities.hashCode(this.peerAddress.getHostAddress(), this.peerAddress.getPort());
+        this.peerID = Utilities.hashCode(this.peerAddress.getHostAddress(), this.peerAddress.getPort());
+
+        // Init finger table
         this.initFingerTable();
 
         // Initialize all node associated threads
@@ -68,11 +71,10 @@ public class Node {
      * @return True if it has success, false otherwise
      */
     boolean joinNetwork(CustomInetAddress address) {
-        this.predecessor = null;
         this.contactAddress = address;
 
         if(this.contactAddress != null && !this.contactAddress.equals(this.peerAddress)) {
-//            CustomInetAddress successor = Utilities.sendRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerdID);
+//            CustomInetAddress successor = Utilities.sendRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerID);
 //
 //            if(successor == null) {
 //                System.out.println("Join was not possible due to system being unable to find contact node");
@@ -123,4 +125,97 @@ public class Node {
         }
     }
 
+
+    // TODO - Could miss something
+    public CustomInetAddress findSuccessor(long ID) {
+//
+//        CustomInetAddress predecessor = this.findPredecessor(ID);
+//
+//        return Utilities.sendRequest(predecessor, "YOUR_SUCCESSOR");
+
+        return null;
+    }
+
+    public CustomInetAddress findPredecessor(long ID) {
+
+        // Initialize node and successor variables
+        CustomInetAddress node = this.peerAddress;
+        CustomInetAddress nodeSuccessor = this.getSuccessor();
+        CustomInetAddress lastValidNode = this.peerAddress;
+
+        while(ID <= node.getNodeID() && ID > nodeSuccessor.getNodeID()) {
+
+            // Temporary node
+            CustomInetAddress lastNode = node;
+
+            if(node.equals(this.peerAddress))
+                node = this.closestPrecedingFinger(ID);
+            else {
+
+                CustomInetAddress node_clpf = Utilities.sendRequest(node, "CLP_FINGER:" + ID);
+
+                if(node_clpf == null) {
+                    // Update variables
+                    node = lastValidNode;
+                    nodeSuccessor = Utilities.sendRequest(node, "YOUR_SUCCESSOR");
+
+                    // Check if its not possible to retrieve predecessor
+                    if(nodeSuccessor == null)
+                        return this.peerAddress;
+
+                    continue;
+                }
+                else if(node_clpf.equals(node))
+                    return node;
+                else {
+                    // Update variables
+                    lastValidNode = node;
+                    nodeSuccessor = Utilities.sendRequest(node_clpf, "YOUR_SUCCESSOR");
+
+                    // If nodeSuccessor is valid, update node
+                    if (nodeSuccessor != null)
+                        node = node_clpf;
+                    else
+                        nodeSuccessor = Utilities.sendRequest(node, "YOUR_SUCCESSOR");
+                }
+
+            }
+
+            // Checks if last node is the same as the new one
+            if(lastNode.equals(node))
+                break;
+        }
+
+        return node;
+    }
+
+    // TODO - CustomInetAddress
+
+    /**
+     * Return the closest finger preceding ID
+     * @param ID Node ID
+     */
+    public CustomInetAddress closestPrecedingFinger(long ID) {
+        for(int index = Chord.M; index >= 1; index--) {
+            // Retrieves the value from the finger table
+            CustomInetAddress node = this.fingerTable.getOrDefault(index, null);
+
+            // If not null check if ID is in the respective interval
+            if(node != null) {
+                long node_id = node.getNodeID();
+
+                if(node_id > this.peerID && node_id < ID)
+                    return node;
+            }
+        }
+
+        return this.peerAddress;
+    }
+
+    /**
+     * Returns current node successor
+     */
+    public CustomInetAddress getSuccessor() {
+        return this.fingerTable.getOrDefault(1, null);
+    }
 }
