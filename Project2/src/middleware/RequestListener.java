@@ -16,15 +16,31 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Responsible for Listening to client request. A thread is meant to run this tasks.
+ *
+ * The connection is established using JSSE
+ *
+ * @see RequestHandler
+ */
 public class RequestListener implements Runnable {
     private final static ExecutorService requestPool = Executors.newCachedThreadPool();
     private final SSLServerSocket serverSocket;
 
+    /**
+     * Listens to clients on a specified port
+     * @param port Port to be listening on
+     *
+     * @throws IOException on error creating the socket
+     */
     public RequestListener(int port) throws IOException {
         final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
     }
 
+    /**
+     * Method to be executed by the thread. It'll listen for client requests and dispatch them.
+     */
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -37,13 +53,28 @@ public class RequestListener implements Runnable {
         }
     }
 
+    /**
+     * Responsible for handling a client request
+     *
+     * A EequestListener will dispatch client request to a RequestHandler
+     *
+     * @see RequestListener
+     */
     private class RequestHandler implements Runnable {
         private final SSLSocket requestSocket;
 
+        /**
+         * Creates a client request handler from a connection
+         *
+         * @param requestSocket Socket connected to the client
+         */
         RequestHandler(SSLSocket requestSocket) {
             this.requestSocket = requestSocket;
         }
 
+        /**
+         * Method to be executed by the dispatched thread. It'll handle a client request
+         */
         @Override
         public void run() {
             try (
@@ -78,6 +109,14 @@ public class RequestListener implements Runnable {
             }
         }
 
+        /**
+         * Processes a backup request
+         *
+         * @param commandArgs backup specific request
+         * @param out Connection OutputStream
+         *
+         * @return whether the request's syntax is valid or not.
+         */
         private boolean backupCommand(String[] commandArgs, PrintWriter out) {
             if (commandArgs.length > 2)     return false;
 
@@ -104,6 +143,14 @@ public class RequestListener implements Runnable {
             return true;
         }
 
+        /**
+         * Processes a download request
+         *
+         * @param commandArgs backup specific request
+         * @param out Connection OutputStream
+         *
+         * @return whether the request's syntax is valid or not.
+         */
         private boolean downloadCommand(String[] commandArgs, PrintWriter out) {
             if (commandArgs.length != 1)    return false;
 
@@ -113,6 +160,14 @@ public class RequestListener implements Runnable {
             return FileManager.download(filePath, out::println);
         }
 
+        /**
+         * Processes a list request
+         *
+         * @param commandArgs backup specific request
+         * @param out Connection OutputStream
+         *
+         * @return whether the request's syntax is valid or not.
+         */
         private boolean listCommand(String[] commandArgs, PrintWriter out) {
             if (commandArgs.length > 1) return false;
 

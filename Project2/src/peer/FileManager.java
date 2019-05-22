@@ -25,7 +25,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.IntConsumer;
 
+/**
+ * Responsible for managing various operations regarding files, such as file backup, download and delete
+ */
 public class FileManager {
+    /**
+     * Backs up a file
+     *
+     * @param filePath Path pointing to the file
+     * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is uploaded
+     * @param isShareble Whether a metadata file is to be created or not
+     *
+     * @throws IOException on error reading the file
+     * @throws NoSuchAlgorithmException on error retrieving the hashing algorithm
+     */
     public static void backup(String filePath, IntConsumer chunkConsumer, boolean isShareble)
             throws IOException, NoSuchAlgorithmException {
         final Path file = Paths.get(filePath);
@@ -48,6 +61,14 @@ public class FileManager {
         OwnerStorage.storeOwner(fileMetadata);
     }
 
+    /**
+     * Downloads a file
+     *
+     * @param filePath Path pointing to the file
+     * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is downloaded
+     *
+     * @return whether the download was successful or not
+     */
     public static boolean download(String filePath, IntConsumer chunkConsumer) {
         final Path file = Paths.get(filePath);
 
@@ -57,6 +78,8 @@ public class FileManager {
             final String fileName = bf.readLine();
             bf.readLine(); // file length
             final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
+
+            // TODO Validate owner file
 
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     Paths.get(fileName),
@@ -98,6 +121,16 @@ public class FileManager {
         }
     }
 
+    /**
+     * Seperates the file in chunks and uploads them
+     *
+     * @param file Path pointing to the file
+     * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is downloaded
+     *
+     * @return Ordered list of the uploaded chunk's identifiers
+     *
+     * @throws IOException on error reading the file
+     */
     private static ArrayList<String> uploadChunks(Path file, IntConsumer chunkConsumer) throws IOException {
         try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(file, StandardOpenOption.READ)) {
             // -floorDiv(-x, y) = ceil(x / y)
@@ -143,9 +176,23 @@ public class FileManager {
         }
     }
 
+    /**
+     * Responsible for handling chunk specific operations
+     */
     public static class Chunk {
         public static final int CHUNK_SIZE = 264144;
 
+        /**
+         * Generates a chunk identifier given a chunk's content.
+         *
+         * The identifier is a SHA-256 hash using the chunk's content as input
+         *
+         * @param dataBuffer Buffer containing a chunk's content
+         *
+         * @return The chunk's identifier
+         *
+         * @throws NoSuchAlgorithmException on error retrieving the hashing algorithm
+         */
         static String generateId(ByteBuffer dataBuffer) throws NoSuchAlgorithmException {
             final byte[] data = new byte[dataBuffer.remaining()];
             dataBuffer.get(data);
