@@ -1,10 +1,5 @@
 package chord;
 
-import jdk.jshell.execution.Util;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 /**
  * Chord class
  */
@@ -18,7 +13,7 @@ public class Chord {
     /**
      * Value used to truncate ID's
      */
-    public static final Integer M = 8;
+    static final Integer M = 8;
 
     /**
      * Created node
@@ -37,33 +32,27 @@ public class Chord {
      */
     public boolean initialize(String[] args) {
 
-        // Variables declaration
-        int peerPort, contactPort;
-        InetAddress peerAddress, contactAddress;
-
-        // Initialize variables
-        peerPort = contactPort = Integer.parseInt(args[0]);
-        peerAddress = contactAddress = Utilities.createInetAddress(Utilities.getHostAddress());
+        // Declare and initialize variables
+        CustomInetAddress peerAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
+        CustomInetAddress contactAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
 
         // Initializes contact peer address
         if(args.length > 1) {
             String[] contactPeerInfo = args[1].split(":");
-
-            contactPort = Integer.parseInt(contactPeerInfo[1]);
-            contactAddress = Utilities.createInetAddress(contactPeerInfo[0]);
+            contactAddress = new CustomInetAddress(contactPeerInfo[0], Integer.parseInt(contactPeerInfo[1]));
         }
 
         // Checks whether any of the created is not valid
-        if(peerAddress == null || contactAddress == null) {
-            System.out.println("Contact address not found !");
+        if(peerAddress.getAddress() == null || contactAddress.getAddress() == null) {
+            System.out.println("One the following address's could not be found: local_address or contact_address !");
             return false;
         }
 
         // Create local node
-        Chord.node = new Node(peerAddress, peerPort);
+        Chord.node = new Node(peerAddress);
 
         // Join network
-        boolean joinStatus = Chord.node.joinNetwork(contactAddress, contactPort);
+        boolean joinStatus = Chord.node.joinNetwork(contactAddress);
 
         if(!joinStatus)
             System.out.println("Node could not join successfully the network !");
