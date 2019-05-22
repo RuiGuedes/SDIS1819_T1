@@ -96,6 +96,12 @@ public class RequestListener implements Runnable {
                         else
                             out.println("Invalid DOWNLOAD command: " + commandArgsString);
                         break;
+                    case "DELETE":
+                        if (deleteCommand(commandArgs, out))
+                            out.println("Delete Successful");
+                        else
+                            out.println("Invalid DELETE command: " + commandArgsString);
+                        break;
                     case "LIST":
                         if (!listCommand(commandArgs, out))
                             out.println("Invalid LIST command: " + commandArgsString);
@@ -134,7 +140,7 @@ public class RequestListener implements Runnable {
 
             try {
                 FileManager.backup(filePath, out::println, isShareble);
-                out.println("Backup successful");
+                out.println("Backup successful.");
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
                 out.println("Backup failed.");
@@ -161,6 +167,23 @@ public class RequestListener implements Runnable {
         }
 
         /**
+         * Processes a delete request
+         *
+         * @param commandArgs backup specific request
+         * @param out Connection OutputStream
+         *
+         * @return whether the request's syntax is valid or not.
+         */
+        private boolean deleteCommand(String[] commandArgs, PrintWriter out) {
+            if (commandArgs.length != 1)    return false;
+
+            final String filePath = commandArgs[0];
+            if (!filePath.endsWith(".own")) return false;
+
+            return FileManager.delete(filePath, out::println);
+        }
+
+        /**
          * Processes a list request
          *
          * @param commandArgs backup specific request
@@ -178,7 +201,11 @@ public class RequestListener implements Runnable {
                     return true;
                 case "--chunks":
                 case "-c":
-                    out.print(ChunkStorage.listFiles());
+                    try {
+                        out.print(ChunkStorage.listFiles());
+                    } catch (IOException e) {
+                        System.out.println("List failed.");
+                    }
                     return true;
                 default:
                     return false;

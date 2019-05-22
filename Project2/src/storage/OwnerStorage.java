@@ -50,7 +50,7 @@ public class OwnerStorage {
      * @throws NoSuchAlgorithmException on error retrieving the hashing algorithm
      * @throws IOException on error creating the owner file
      */
-    public static void storeOwner(List<String> fileMetadata) throws NoSuchAlgorithmException, IOException {
+    public static void store(List<String> fileMetadata) throws NoSuchAlgorithmException, IOException {
         byte[] salt = new byte[16];
         secureRandom.nextBytes(salt);
 

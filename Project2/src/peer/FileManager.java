@@ -30,7 +30,7 @@ import java.util.function.IntConsumer;
  */
 public class FileManager {
     /**
-     * Backs up a file
+     * Backs up a file to the network
      *
      * @param filePath Path pointing to the file
      * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is uploaded
@@ -41,6 +41,9 @@ public class FileManager {
      */
     public static void backup(String filePath, IntConsumer chunkConsumer, boolean isShareble)
             throws IOException, NoSuchAlgorithmException {
+
+        // TODO Disallow multiple backups maybe? No problem in letting duplicate backups
+
         final Path file = Paths.get(filePath);
         if (!Files.isRegularFile(file)) throw new FileNotFoundException();
 
@@ -58,11 +61,11 @@ public class FileManager {
                     StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         }
 
-        OwnerStorage.storeOwner(fileMetadata);
+        OwnerStorage.store(fileMetadata);
     }
 
     /**
-     * Downloads a file
+     * Downloads a file from the network
      *
      * @param filePath Path pointing to the file
      * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is downloaded
@@ -72,14 +75,16 @@ public class FileManager {
     public static boolean download(String filePath, IntConsumer chunkConsumer) {
         final Path file = Paths.get(filePath);
 
-        if (!Files.isRegularFile(file)) return false;
+        if (!Files.isRegularFile(file))
+            return false;
 
-        try (BufferedReader bf = Files.newBufferedReader(file, StandardCharsets.UTF_8)){
+        try (BufferedReader bf = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             final String fileName = bf.readLine();
             bf.readLine(); // file length
             final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
 
-            // TODO Validate owner file
+            if (filePath.endsWith(".own") && OwnerFile.validate(bf.readLine(), bf.readLine()))
+                return false;
 
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     Paths.get(fileName),
@@ -97,7 +102,7 @@ public class FileManager {
                     // TODO Download Chunk
 
                     // For now retrieve chunk locally
-                    final ByteBuffer chunkData = ChunkStorage.getChunk(chunkIds[i]);
+                    final ByteBuffer chunkData = ChunkStorage.get(chunkIds[i]);
                     afc.write(chunkData, i * Chunk.CHUNK_SIZE, chunkPromise, new CompletionHandler<>() {
                         @Override
                         public void completed(Integer result, CompletableFuture<Void> attachment) {
@@ -115,7 +120,54 @@ public class FileManager {
                 chunkPromises.forEach(CompletableFuture::join);
                 return true;
             }
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException | InterruptedException | ExecutionException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Deletes a file from the network
+     *
+     * @param ownerPath Path pointing to its owner file
+     * @param chunkConsumer Consumer of a chunk index for each chunk, consumed after a chunk is downloaded
+     *
+     * @return whether the download was successful or not
+     */
+    public static boolean delete(String ownerPath, IntConsumer chunkConsumer) {
+        final Path ownerFile = Paths.get(ownerPath);
+
+        if (!Files.isRegularFile(ownerFile))
+            return false;
+
+        try (BufferedReader bf = Files.newBufferedReader(ownerFile, StandardCharsets.UTF_8)) {
+            bf.readLine();
+            bf.readLine(); // file length
+            final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
+
+            if (!OwnerFile.validate(bf.readLine(), bf.readLine()))
+                return false;
+
+            final ArrayList<CompletableFuture<Void>> chunkPromises = new ArrayList<>(chunkIds.length);
+            for (int i = 0; i < chunkIds.length; i++) {
+                final int chunkIndex = i;
+
+                final CompletableFuture<Void> chunkPromise = new CompletableFuture<>();
+                chunkPromises.add(chunkIndex, chunkPromise);
+
+                // TODO Delete Chunk
+
+                // For now delete locally then update the complete the promise
+                ChunkStorage.delete(chunkIds[i]);
+
+                chunkPromise.whenComplete((v, e) -> chunkConsumer.accept(chunkIndex));
+                chunkPromise.complete(null);
+            }
+            Files.delete(ownerFile);
+
+            chunkPromises.forEach(CompletableFuture::join);
+            return true;
+        } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             return false;
         }
@@ -154,7 +206,7 @@ public class FileManager {
                             // TODO Upload Chunk
 
                             // Chunks will be backed up locally for testing purposes
-                            ChunkStorage.storeChunk(chunkId, chunkData);
+                            ChunkStorage.store(chunkId, chunkData);
 
                             chunkConsumer.accept(chunkIndex);
                             attachment.complete(chunkId);

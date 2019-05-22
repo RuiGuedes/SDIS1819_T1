@@ -62,7 +62,7 @@ public class Node {
         // Initialize all node associated threads
         this.fixFingers = new FixFingers();
         this.stabilizer = new Stabilizer();
-        this.nodeListener = new NodeListener();
+        this.nodeListener = new NodeListener(this);
     }
 
     /**
@@ -110,6 +110,13 @@ public class Node {
         }
     }
 
+    /**
+     * Get Custom InetAddress
+     * @return Custom InetAddres
+     */
+    public CustomInetAddress getPeerAddress() {
+        return peerAddress;
+    }
     /**
      * Updates finger on finger table. If it updates the first entry of the finger table (Successor)
      * it notifies it as it new predecessor is the current node
