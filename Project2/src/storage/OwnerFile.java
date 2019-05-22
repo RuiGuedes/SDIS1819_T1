@@ -1,12 +1,18 @@
 package storage;
 
+import peer.Peer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -87,5 +93,25 @@ public class OwnerFile {
         }
 
         return chunkList.toArray(String[]::new);
+    }
+
+    /**
+     * Validates the Owner file
+     *
+     * @param saltString salt in the file
+     * @param hashString hash in the file
+     *
+     * @return Whether the file is valid or not
+     */
+    public static boolean validate(String saltString, String hashString) throws NoSuchAlgorithmException {
+        final byte[] peerId = Peer.PEER_ID.getBytes(), salt = Base64.getDecoder().decode(saltString);
+
+        final byte[] inputBytes = new byte[salt.length + peerId.length];
+        final ByteBuffer inputBuffer = ByteBuffer.allocate(salt.length + peerId.length).put(salt).put(peerId).flip();
+        inputBuffer.get(inputBytes);
+
+        final MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+
+        return (hashString.equals(Base64.getEncoder().encodeToString(sha256.digest(inputBytes))));
     }
 }
