@@ -1,5 +1,7 @@
 package peer;
 
+import chord.Chord;
+import chord.Node;
 import middleware.RequestListener;
 import storage.ChunkStorage;
 import storage.OwnerStorage;
@@ -17,22 +19,41 @@ public class Peer {
 
     public static final Path rootPath = Paths.get("./peer");
 
+<<<<<<< HEAD
     /**
      * Initializes a peer
      *
      * @param args arguments for initializing the peer
      */
+=======
+    public static Chord chord = new Chord();
+
+>>>>>>> origin/master
     public static void main(String[] args) {
+
+        // Validate arguments
+        if(args.length < 1 || args.length > 2) {
+            System.out.println("Usage: java Peer [options] <PORT> <PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT");
+            System.exit(1);
+        }
+
         try {
-            ChunkStorage.init();
-            OwnerStorage.init();
+            if(!chord.initialize(args)) {
+                System.out.println("FAILED");
+            }
 
-            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
-
-            System.out.println("Peer " + PEER_ID + " Online!");
+            System.in.read();
+//            ChunkStorage.init();
+//            OwnerStorage.init();
+//
+//            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
+//
+//            System.out.println("Peer " + PEER_ID + " Online!");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Peer " + PEER_ID + " failed to initialize!");
         }
     }
+
+
 }

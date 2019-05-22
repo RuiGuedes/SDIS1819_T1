@@ -1,8 +1,8 @@
 package chord;
 
-public class NodeListener extends Thread {
+public class FixFingers extends Thread {
 
-    public NodeListener() {
+    public FixFingers() {
 
     }
 
