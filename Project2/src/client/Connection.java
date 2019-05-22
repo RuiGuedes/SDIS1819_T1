@@ -28,8 +28,10 @@ import java.util.Arrays;
  * - LIST (-c | --chunk)
  *     The Peer lists the chunks it is storing for the network to the client.
  *
+ *  - DELETE `ownerPath`
+ *      The Peer deletes the file from the network, given its owner file.
+ *      
  *  TODO - STORAGE
- *  TODO - DELETE
  */
 public class Connection {
     /**

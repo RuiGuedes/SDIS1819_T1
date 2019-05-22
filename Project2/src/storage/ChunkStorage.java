@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// TODO Keep track of files dependent on chunk
+
 /**
  * Responsible for managing the storage of chunks
  */
@@ -49,11 +51,10 @@ public class ChunkStorage {
      * @param chunkData Contents of the chunk
      *
      * @throws IOException on error creating the chunk file
-     *
      * @throws ExecutionException on error executing the write operation
      * @throws InterruptedException on interruption of the write operation
      */
-    public static void storeChunk(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
+    public static void store(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
@@ -81,7 +82,7 @@ public class ChunkStorage {
      * @throws ExecutionException on error executing the read operation
      * @throws InterruptedException on interruption of the read operation
      */
-    public static ByteBuffer getChunk(String chunkId) throws IOException, ExecutionException, InterruptedException {
+    public static ByteBuffer get(String chunkId) throws IOException, ExecutionException, InterruptedException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile))
@@ -101,14 +102,30 @@ public class ChunkStorage {
         }
     }
 
+    public static void delete(String chunkId) throws IOException {
+        final Path chunkFile = chunkDir.resolve(chunkId);
+
+        chunkSet.remove(chunkId);
+        Files.delete(chunkFile);
+    }
+
     /**
      * Lists the chunks stored by the peer
      *
      * @return List of a peer's stored chunks, each line containing its identifer
      */
-    public static String listFiles() {
+    public static String listFiles() throws IOException {
         final StringBuilder sb = new StringBuilder();
-        chunkSet.forEach((id) -> sb.append(id).append(System.lineSeparator()));
-        return sb.toString();
+        long storageSize = 0L;
+
+
+        for (String id : chunkSet) {
+            final long chunkSize = Files.size(chunkDir.resolve(id));
+
+            sb.append(id).append('\t').append(chunkSize).append(System.lineSeparator());
+            storageSize += chunkSize;
+        }
+
+        return sb.append("Total Storage Size: ").append(storageSize).append(System.lineSeparator()).toString();
     }
 }

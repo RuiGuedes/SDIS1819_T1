@@ -14,7 +14,7 @@ public class Node {
     /**
      * Peer network ID
      */
-    private long peerdID;
+    private long peerID;
 
     /**
      * Node finger table
@@ -52,8 +52,11 @@ public class Node {
      */
     Node(CustomInetAddress address) {
         // Variables Initialization
+        this.predecessor = null;
         this.peerAddress = address;
-        this.peerdID = Utilities.hashCode(this.peerAddress.getHostAddress(), this.peerAddress.getPort());
+        this.peerID = Utilities.hashCode(this.peerAddress.getHostAddress(), this.peerAddress.getPort());
+
+        // Init finger table
         this.initFingerTable();
 
         // Initialize all node associated threads
@@ -68,7 +71,6 @@ public class Node {
      * @return True if it has success, false otherwise
      */
     boolean joinNetwork(CustomInetAddress address) {
-        this.predecessor = null;
         this.contactAddress = address;
 
         if(this.contactAddress != null && !this.contactAddress.equals(this.peerAddress)) {
@@ -139,4 +141,5 @@ public class Node {
             // notify(value);
         }
     }
+
 }

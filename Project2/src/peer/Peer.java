@@ -1,7 +1,6 @@
 package peer;
 
 import chord.Chord;
-import chord.Node;
 import middleware.RequestListener;
 import storage.ChunkStorage;
 import storage.OwnerStorage;
@@ -39,13 +38,13 @@ public class Peer {
                 System.out.println("FAILED");
             }
 
-            System.in.read();
-//            ChunkStorage.init();
-//            OwnerStorage.init();
-//
-//            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
-//
-//            System.out.println("Peer " + PEER_ID + " Online!");
+//            System.in.read();
+            ChunkStorage.init();
+            OwnerStorage.init();
+
+            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
+
+            System.out.println("Peer " + PEER_ID + " Online!");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Peer " + PEER_ID + " failed to initialize!");

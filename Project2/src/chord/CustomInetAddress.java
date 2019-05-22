@@ -55,8 +55,18 @@ class CustomInetAddress {
         return port;
     }
 
+<<<<<<< HEAD
     @Override
     public String toString() {
         return this.getHostAddress() + ":" + this.port;
     }
+=======
+    /**
+     * Returns associated peer ID
+     */
+    long getNodeID() {
+        return Utilities.hashCode(this.getHostAddress(), this.port);
+    }
+
+>>>>>>> master
 }
