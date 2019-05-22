@@ -1,5 +1,7 @@
 package chord;
 
+import jdk.jshell.execution.Util;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -41,14 +43,14 @@ public class Chord {
 
         // Initialize variables
         peerPort = contactPort = Integer.parseInt(args[0]);
-        peerAddress = contactAddress = Chord.createInetAddress(this.getHostAddress());
+        peerAddress = contactAddress = Utilities.createInetAddress(Utilities.getHostAddress());
 
         // Initializes contact peer address
         if(args.length > 1) {
             String[] contactPeerInfo = args[1].split(":");
 
             contactPort = Integer.parseInt(contactPeerInfo[1]);
-            contactAddress = Chord.createInetAddress(contactPeerInfo[0]);
+            contactAddress = Utilities.createInetAddress(contactPeerInfo[0]);
         }
 
         // Checks whether any of the created is not valid
@@ -77,38 +79,6 @@ public class Chord {
      */
     public static Node getNode() {
         return node;
-    }
-
-    /**
-     * Creates InetAddress given an address
-     * @param address Address to be used
-     * @return InetAddress
-     */
-    public static InetAddress createInetAddress(String address) {
-        try {
-            InetAddress inetAddress = InetAddress.getByName(address);
-
-            if(inetAddress == null)
-                throw new UnknownHostException();
-            else
-                return inetAddress;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Retrieves local host IP address
-     * @return IP address
-     */
-    private String getHostAddress() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
 }

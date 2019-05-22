@@ -2,16 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="434b019c-3893-433b-a100-599d76cef2e6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/SDIS1819_T1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Project2/src/chord/Utilities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Project2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Chord.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Chord.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Node.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Node.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Utilities.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/chord/Utilities.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/peer/FileManager$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/peer/FileManager$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/peer/FileManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/out/production/P2P Backup Service on Internet/peer/FileManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Project2/src/chord/Chord.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/src/chord/Chord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Project2/src/chord/Utilities.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Project2/src/chord/Utilities.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -395,7 +393,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14978679" />
