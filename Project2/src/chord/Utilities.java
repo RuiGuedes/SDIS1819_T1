@@ -105,10 +105,10 @@ public class Utilities {
             e.printStackTrace();
         }
 
-        return recieveResponse(socket);
+        return receiveResponse(socket);
     }
 
-    private static String recieveResponse(DatagramSocket socket) {
+    private static String receiveResponse(DatagramSocket socket) {
         if (socket == null)
             return null;
 

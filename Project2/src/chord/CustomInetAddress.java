@@ -24,6 +24,16 @@ class CustomInetAddress {
         this.port = port;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof CustomInetAddress))
+            return false;
+
+        CustomInetAddress object = (CustomInetAddress) obj;
+
+        return this.address.getHostAddress().equals(object.getHostAddress()) && this.port.equals(object.getPort());
+    }
+
     /**
      * Returns InetAddress
      */
