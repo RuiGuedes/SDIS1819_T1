@@ -46,7 +46,7 @@ public class Node {
 
     /**
      * Node constructor. Initializes all node class needed variables
-     * @param address
+     * @param address Node address
      */
     Node(CustomInetAddress address) {
         // Variables Initialization
@@ -123,15 +123,39 @@ public class Node {
         }
     }
 
+    /**
+     * Removes an element from the finger table
+     * @param value Element to be removed
+     */
+    private void clearIthFinger(CustomInetAddress value) {
+        for(int index = Chord.M; index >= 1; index--) {
+            // Retrieve element from the finger table
+            CustomInetAddress fingerTableEntry = this.fingerTable.get(index);
 
-    // TODO - Could miss something
+            if(fingerTableEntry != null && fingerTableEntry.equals(value))
+                this.fingerTable.put(index, null);
+        }
+    }
+
+
+    /**
+     * Finds the successor of node with the ID passed by parameter
+     * @param ID Node ID
+     * @return Successor of the node
+     */
     public CustomInetAddress findSuccessor(long ID) {
-//
-//        CustomInetAddress predecessor = this.findPredecessor(ID);
-//
-//        return Utilities.sendRequest(predecessor, "YOUR_SUCCESSOR");
 
-        return null;
+        // Assuming the node predecessor is the current node
+        CustomInetAddress successor = this.getSuccessor();
+
+        CustomInetAddress predecessor = this.findPredecessor(ID);
+
+        // Checks whether node predecessor is equals to the current node
+        if(predecessor.equals(this.peerAddress))
+            successor = Utilities.sendRequest(predecessor, "YOUR_SUCCESSOR");
+
+        // If successor is null, return the current node as the successor
+        return successor == null ? this.peerAddress : successor;
     }
 
     public CustomInetAddress findPredecessor(long ID) {
@@ -187,13 +211,12 @@ public class Node {
         return node;
     }
 
-    // TODO - CustomInetAddress
 
     /**
      * Return the closest finger preceding ID
      * @param ID Node ID
      */
-    public CustomInetAddress closestPrecedingFinger(long ID) {
+    private CustomInetAddress closestPrecedingFinger(long ID) {
         for(int index = Chord.M; index >= 1; index--) {
             // Retrieves the value from the finger table
             CustomInetAddress node = this.fingerTable.getOrDefault(index, null);
@@ -202,22 +225,28 @@ public class Node {
             if(node != null) {
                 long node_id = node.getNodeID();
 
-                if(node_id > this.peerID && node_id < ID)
-                    return node;
+                if(node_id > this.peerID && node_id < ID) {
+                    // Determine if node is online
+                    if(Utilities.sendRequest(node, "ONLINE"))
+                        return node;
+                    else
+                        this.clearIthFinger(node);
+                }
             }
         }
 
+        // If any value on the finger table does not meet the needed constraints return current node
         return this.peerAddress;
     }
 
     /**
      * Returns current node successor
      */
-    public CustomInetAddress getSuccessor() {
+    CustomInetAddress getSuccessor() {
         return this.fingerTable.getOrDefault(1, null);
     }
 
-    public CustomInetAddress getPeerAddress() {
+    CustomInetAddress getPeerAddress() {
         return this.peerAddress;
     }
 }
