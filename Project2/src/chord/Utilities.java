@@ -1,7 +1,7 @@
 package chord;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -78,5 +78,49 @@ public class Utilities {
             e.printStackTrace();
             return null;
         }
+    }
+
+    static String sendRequest(CustomInetAddress inet, String req) {
+
+        if (inet == null || req == null)
+            return null;
+
+        byte[] buf;
+        DatagramSocket socket = null;
+        DatagramPacket packet;
+
+        buf = req.getBytes();
+        packet = new DatagramPacket(buf, buf.length, inet.getAddress(), inet.getPort());
+
+        try {
+            socket = new DatagramSocket(inet.getPort(), inet.getAddress());
+            socket.send(packet);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Thread.sleep(60);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return recieveResponse(socket);
+    }
+
+    private static String recieveResponse(DatagramSocket socket) {
+        if (socket == null)
+            return null;
+
+        byte[] buf = new byte[64000];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
+        try {
+            socket.receive(packet);
+        } catch (IOException e) {
+            System.out.println("Receive packet exception: " + e.toString());
+        }
+
+        return packet.getData().toString();
     }
 }
