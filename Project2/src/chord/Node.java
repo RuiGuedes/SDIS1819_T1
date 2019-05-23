@@ -59,7 +59,7 @@ public class Node {
 
         // Initialize all node associated threads
         this.fixFingers = new FixFingers();
-        this.stabilizer = new Stabilizer();
+        this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
     }
 
@@ -261,6 +261,17 @@ public class Node {
         return this.fingerTable.getOrDefault(1, null);
     }
 
+    /**
+     * Returns current node predecessor
+     */
+    CustomInetAddress getPredecessor() {
+        return this.predecessor;
+    }
+
+    /**
+     *
+     * @return
+     */
     CustomInetAddress getPeerAddress() {
         return this.peerAddress;
     }
