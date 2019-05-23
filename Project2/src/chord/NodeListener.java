@@ -16,7 +16,7 @@ public class NodeListener extends Thread {
 
     NodeListener(Node n) {
         this.node = n;
-        CustomInetAddress address = n.getPeerAddress();
+        CustomInetAddress address = n.getAddress();
 
         try {
             this.socket = new DatagramSocket(address.getPort());

@@ -19,6 +19,7 @@ public class Status extends Thread {
                 System.out.println(i + " -> " + this.node.getIthFinger(i));
             }
 
+            System.out.println("9 -> " + this.node.getPredecessor());
             System.out.println("------------------------------------------------------------");
 
             try {

@@ -113,7 +113,8 @@ public class Node {
     }
 
     void notifyNode(CustomInetAddress nodeToNotify) {
-        Utilities.sendRequest(nodeToNotify, "SET_PREDECESSOR:" + this.peerAddress.toString());
+        if(nodeToNotify != null && !nodeToNotify.equals(this.peerAddress))
+            Utilities.sendRequest(nodeToNotify, "SET_PREDECESSOR:" + this.peerAddress.toString());
     }
 
     void handleNodeNotification(CustomInetAddress newPredecessor) {
@@ -139,15 +140,83 @@ public class Node {
         this.fingerTable.put(key, value);
 
         // If successor: notify the new successor
-        if (key == 1 && value != null && !value.equals(this.peerAddress)) {
-            // notify(value);
-        }
+        if (key == 1 && value != null && !value.equals(this.peerAddress))
+            this.notifyNode(value);
     }
 
-    public CustomInetAddress getIthFinger(Integer key) {
+    /**
+     * Retrieves a certain finger identified by key
+     * @param key Finger identifier
+     */
+    CustomInetAddress getIthFinger(Integer key) {
         return this.fingerTable.getOrDefault(key, null);
     }
 
+    /**
+     *
+     */
+    void updateCandidateSuccessors() {
+
+        // Retrieve successor
+        CustomInetAddress successor = this.getSuccessor();
+
+        // Check if in the meanwhile successor got updated
+        if(successor != null && !successor.equals(this.peerAddress))
+            return;
+
+        for (int index = 2; index <= Chord.M; index++) {
+            // Retrieve finger table specific element
+            CustomInetAddress fingerTableEntry = this.fingerTable.getOrDefault(index, null);
+
+            if (fingerTableEntry != null && !fingerTableEntry.equals(this.peerAddress)) {
+                // Updates previous finger table entry with the new successor candidate
+                for (int j = index - 1; j >= 1; j--)
+                    this.setIthFinger(j, fingerTableEntry);
+
+                break;
+            }
+        }
+
+        // If a valid finger table entry was not found consider the successor the same as the predecessor
+        if ((this.getSuccessor() == null || this.getSuccessor().equals(this.peerAddress)) &&
+                this.predecessor != null && !this.predecessor.equals(this.peerAddress)) {
+            this.setIthFinger(1, this.predecessor);
+        }
+    }
+
+    void resetCandidateSuccessors() {
+        // If successor is null, its removal is not necessary
+        if (this.getSuccessor() == null)
+            return;
+
+        // Delete all finger table entry that contains successor as its value
+        this.clearSpecificFinger(this.getSuccessor());
+
+        // Check successor and predecessor equality
+        if (predecessor!= null && predecessor.equals(this.getSuccessor()))
+            this.predecessor = null;
+
+//        // Fill successor with candidate values
+//        this.updateCandidateSuccessors();
+//
+//        // If predecessor is a remote node, finds it predecessor to avoid entering a loop
+//        if ((this.getSuccessor() == null || this.getSuccessor().equals(this.peerAddress)) &&
+//                this.predecessor != null && !this.predecessor.equals(this.peerAddress)) {
+//
+//            while (true) {
+//                CustomInetAddress newPredecessor = Utilities.addressRequest(this.predecessor, "YOUR_PREDECESSOR");
+//
+//                if (newPredecessor == null || newPredecessor.equals(this.predecessor) ||
+//                        newPredecessor.equals(this.peerAddress) || newPredecessor.equals(this.getSuccessor()))
+//                    break;
+//                else
+//                    this.predecessor = newPredecessor;
+//            }
+//
+//            // Set new node successor
+//            this.setIthFinger(1, this.predecessor);
+//        }
+    }
 
     /**
      * Removes an element from the finger table
@@ -299,9 +368,9 @@ public class Node {
     }
 
     /**
-     * Returns peer custom InetAddress
+     * Returns current node custom InetAddress
      */
-    CustomInetAddress getPeerAddress() {
+    CustomInetAddress getAddress() {
         return this.peerAddress;
     }
 

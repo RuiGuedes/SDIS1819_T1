@@ -17,19 +17,25 @@ public class Stabilizer extends Thread {
     public void run() {
         while(online) {
 
-            CustomInetAddress successorPredecessor = this.node.getSuccessor() == null ?
-                    null :
-                    Utilities.addressRequest(this.node.getSuccessor(), "YOUR_PREDECESSOR");
+            // Determines whether node successor is null or is its own node
+            if(this.node.getSuccessor() == null || this.node.getSuccessor().equals(this.node.getAddress()))
+                this.node.updateCandidateSuccessors();
 
-            if(this.node.getSuccessor() != null && !this.node.getPeerAddress().equals(successorPredecessor)) {
+            if(this.node.getSuccessor() != null && !this.node.getSuccessor().equals(this.node.getAddress())) {
 
-                long successorID = Utilities.hashCode(this.node.getSuccessor().getHostAddress(), this.node.getSuccessor().getPort());
-                long successorPredecessorID = Utilities.hashCode(Objects.requireNonNull(successorPredecessor).getHostAddress(), successorPredecessor.getPort());
+                CustomInetAddress successorPredecessor = Utilities.addressRequest(this.node.getSuccessor(), "YOUR_PREDECESSOR");
 
-                if(successorPredecessorID > this.node.getID() && successorPredecessorID < successorID)
-                    this.node.setIthFinger(1, successorPredecessor);
+                if(successorPredecessor != null) {
+                    long successorID = Utilities.hashCode(this.node.getSuccessor().getHostAddress(), this.node.getSuccessor().getPort());
+                    long successorPredecessorID = Utilities.hashCode(Objects.requireNonNull(successorPredecessor).getHostAddress(), successorPredecessor.getPort());
 
-                this.node.notifyNode(this.node.getSuccessor());
+                    if(successorPredecessorID > this.node.getID() && successorPredecessorID < successorID)
+                        this.node.setIthFinger(1, successorPredecessor);
+
+                    this.node.notifyNode(this.node.getSuccessor());
+                }
+                else
+                    this.node.resetCandidateSuccessors();
             }
 
         }
