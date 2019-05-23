@@ -9,12 +9,12 @@ import java.nio.charset.StandardCharsets;
 
 public class NodeListener extends Thread {
 
-    private Node local;
+    private Node node;
     private DatagramSocket socket = null;
     private boolean terminate = false;
 
     NodeListener(Node n) {
-        this.local = n;
+        this.node = n;
         CustomInetAddress address = n.getPeerAddress();
 
         try {
@@ -32,7 +32,7 @@ public class NodeListener extends Thread {
 
             try {
                 this.socket.receive(receive);
-                new Thread( new DecryptMessage(this.socket, receive, this.local)).start();
+                new Thread( new DecryptMessage(this.socket, receive, this.node)).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -53,14 +53,14 @@ class DecryptMessage extends Thread {
     private InetAddress address;
     private Integer port;
     private DatagramSocket socket;
-    private Node local;
+    private Node node;
 
     DecryptMessage(DatagramSocket socket, DatagramPacket packet, Node n) {
         this.socket = socket;
         this.message = new String(packet.getData(), StandardCharsets.UTF_8).split(":");
         this.address = packet.getAddress();
         this.port = packet.getPort();
-        this.local = n;
+        this.node = n;
     }
 
     @Override
@@ -69,18 +69,21 @@ class DecryptMessage extends Thread {
 
         switch(message[0]){
             case "FIND_SUCCESSOR":
-                response = this.local.findSuccessor(Integer.parseInt(message[1])).toString();
+                response = this.node.findSuccessor(Integer.parseInt(message[1])).toString();
                 break;
             case "CLP_FINGER":
-                response = this.local.closestPrecedingFinger(Integer.parseInt(message[1])).toString();
+                response = this.node.closestPrecedingFinger(Integer.parseInt(message[1])).toString();
                 break;
             case "YOUR_SUCCESSOR":
-                response = this.local.getSuccessor().toString();
+                response = this.node.getSuccessor().toString();
                 break;
             case "ONLINE":
                 response = "TRUE";
                 break;
         }
+
+        if (response == null)
+            response = "EMPTY";
 
         byte[] buf = response.getBytes();
         DatagramPacket packet = new DatagramPacket(buf, buf.length, this.address, this.port);

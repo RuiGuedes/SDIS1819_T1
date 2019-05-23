@@ -80,6 +80,9 @@ public class Utilities {
         if(response == null)
             return null;
 
+        if(response.equals("EMPTY"))
+            return inet;
+
         String[] info = response.split(":");
 
         return new CustomInetAddress(info[0], Integer.parseInt(info[1]));
