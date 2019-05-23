@@ -137,7 +137,6 @@ public class Node {
         }
     }
 
-
     /**
      * Finds the successor of node with the ID passed by parameter
      * @param ID Node ID
@@ -190,7 +189,7 @@ public class Node {
                 }
             }
             else {
-
+                // Retrieve remote node closest preceding finger
                 CustomInetAddress node_clpf = Utilities.addressRequest(node, "CLP_FINGER:" + ID);
 
                 if(node_clpf == null) {
