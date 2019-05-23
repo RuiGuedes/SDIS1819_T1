@@ -76,9 +76,11 @@ class DecryptMessage extends Thread {
                 response = this.node.getSuccessor().toString();
                 break;
             case "YOUR_PREDECESSOR":
-                response = this.node.getPredecessor().toString();
+                response = this.node.getPredecessor() == null ? null : this.node.getPredecessor().toString();
                 break;
-            case "":
+            case "SET_PREDECESSOR":
+                this.node.handleNodeNotification(new CustomInetAddress(message[1], Integer.parseInt(message[2])));
+                response = "SUCCESS";
                 break;
             case "CLP_FINGER":
                 response = this.node.closestPrecedingFinger(Integer.parseInt(message[1])).toString();

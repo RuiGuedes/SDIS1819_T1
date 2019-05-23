@@ -44,6 +44,8 @@ public class Node {
      */
     private FixFingers fixFingers;
 
+    private Status status;
+
     /**
      * Node constructor. Initializes all node class needed variables
      * @param address Node address
@@ -58,9 +60,10 @@ public class Node {
         this.initFingerTable();
 
         // Initialize all node associated threads
-        this.fixFingers = new FixFingers();
+        this.fixFingers = new FixFingers(this);
         this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
+        this.status = new Status(this);
     }
 
     /**
@@ -94,6 +97,7 @@ public class Node {
         this.nodeListener.start();
         this.stabilizer.start();
         this.fixFingers.start();
+        this.status.start();
     }
 
     /**
@@ -108,20 +112,42 @@ public class Node {
         }
     }
 
+    void notifyNode(CustomInetAddress nodeToNotify) {
+        Utilities.sendRequest(nodeToNotify, "SET_PREDECESSOR:" + this.peerAddress.toString());
+    }
+
+    void handleNodeNotification(CustomInetAddress newPredecessor) {
+        if(this.predecessor == null)
+            this.predecessor = newPredecessor;
+        else {
+            long predecessorID = Utilities.hashCode(this.predecessor.getHostAddress(), this.predecessor.getPort());
+            long newPredecessorID = Utilities.hashCode(newPredecessor.getHostAddress(), newPredecessor.getPort());
+
+            if(newPredecessorID > predecessorID && newPredecessorID < this.getID())
+                this.predecessor = newPredecessor;
+
+        }
+    }
+
     /**
      * Updates finger on finger table. If it updates the first entry of the finger table (Successor)
      * it notifies it as it new predecessor is the current node
      * @param key Finger key
      * @param value Finger value
      */
-    private void setIthFinger(Integer key, CustomInetAddress value) {
+    void setIthFinger(Integer key, CustomInetAddress value) {
         this.fingerTable.put(key, value);
 
-        // If successor: updates successor if the updated one is successor, notify the new successor
+        // If successor: notify the new successor
         if (key == 1 && value != null && !value.equals(this.peerAddress)) {
             // notify(value);
         }
     }
+
+    public CustomInetAddress getIthFinger(Integer key) {
+        return this.fingerTable.getOrDefault(key, null);
+    }
+
 
     /**
      * Removes an element from the finger table
@@ -168,6 +194,10 @@ public class Node {
         CustomInetAddress node = this.peerAddress;
         CustomInetAddress nodeSuccessor = this.getSuccessor();
         CustomInetAddress lastValidNode = this.peerAddress;
+
+        // If current peer does not have an already valid successor
+        if(nodeSuccessor == null)
+            return this.peerAddress;
 
         while(ID <= node.getNodeID() || ID > nodeSuccessor.getNodeID()) {
 
@@ -269,10 +299,16 @@ public class Node {
     }
 
     /**
-     *
-     * @return
+     * Returns peer custom InetAddress
      */
     CustomInetAddress getPeerAddress() {
         return this.peerAddress;
+    }
+
+    /**
+     * Returns node ID
+     */
+    long getID() {
+        return peerID;
     }
 }

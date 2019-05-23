@@ -38,6 +38,10 @@ public class Utilities {
         return 0;
     }
 
+    static long fingerTableIthEntry(long nodeID, int key) {
+        return (long)((nodeID + Math.pow(2,(key - 1))) % Math.pow(2, Chord.M));
+    }
+
     /**
      * Creates InetAddress given an address
      * @param address Address to be used

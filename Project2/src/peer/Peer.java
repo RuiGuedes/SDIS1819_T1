@@ -38,7 +38,8 @@ public class Peer {
                 System.out.println("FAILED");
             }
 
-//            System.in.read();
+            System.in.read();
+
             ChunkStorage.init();
             OwnerStorage.init();
 
