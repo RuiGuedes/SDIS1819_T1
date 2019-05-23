@@ -142,7 +142,7 @@ public class Node {
      * @param ID Node ID
      * @return Successor of the node
      */
-    public CustomInetAddress findSuccessor(long ID) {
+    CustomInetAddress findSuccessor(long ID) {
 
         // Assuming the node predecessor is the current node
         CustomInetAddress successor = this.getSuccessor();

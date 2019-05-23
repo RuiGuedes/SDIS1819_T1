@@ -75,10 +75,14 @@ public class Utilities {
     }
 
     static CustomInetAddress addressRequest(CustomInetAddress inet, String request) {
+        String response = sendRequest(inet, request);
 
-        String[] response = sendRequest(inet, request).split(":");
+        if(response == null)
+            return null;
 
-        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
+        String[] info = response.split(":");
+
+        return new CustomInetAddress(info[0], Integer.parseInt(info[1]));
     }
 
     static String sendRequest(CustomInetAddress inet, String request) {

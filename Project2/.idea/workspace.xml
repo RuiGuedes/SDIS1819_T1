@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2b045b97-7341-4eb8-8628-0167f2dd8fe6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/src/chord/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/Node.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/chord/Utilities.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/Utilities.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,39 +33,29 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/chord/Node.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="137" column="5" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
+            <state relative-caret-position="739">
+              <caret line="67" column="5" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
               <folding>
-                <element signature="e#8308#8309#0" expanded="true" />
-                <element signature="e#8389#8390#0" expanded="true" />
+                <element signature="e#603#604#0" expanded="true" />
+                <element signature="e#633#634#0" expanded="true" />
+                <element signature="e#738#739#0" expanded="true" />
+                <element signature="e#785#786#0" expanded="true" />
+                <element signature="e#874#875#0" expanded="true" />
+                <element signature="e#901#902#0" expanded="true" />
+                <element signature="e#1273#1274#0" expanded="true" />
+                <element signature="e#1335#1336#0" expanded="true" />
+                <element signature="e#1416#1417#0" expanded="true" />
+                <element signature="e#1491#1492#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/chord/Stabilizer.java">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/chord/Node.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="40" lean-forward="true" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="40" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/chord/NodeListener.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="40" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/chord/CustomInetAddress.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="450">
-              <caret line="63" column="33" selection-start-line="63" selection-start-column="33" selection-end-line="63" selection-end-column="33" />
+            <state relative-caret-position="4454">
+              <caret line="262" column="5" lean-forward="true" selection-start-line="262" selection-start-column="5" selection-end-line="262" selection-end-column="5" />
               <folding>
                 <element signature="e#613#614#0" expanded="true" />
                 <element signature="e#643#644#0" expanded="true" />
@@ -89,8 +80,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="76" column="29" selection-start-line="76" selection-start-column="29" selection-end-line="76" selection-end-column="29" />
+            <state relative-caret-position="357">
+              <caret line="83" lean-forward="true" selection-start-line="83" selection-end-line="83" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -108,10 +102,15 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/peer.bat">
+        <entry file="file://$PROJECT_DIR$/src/chord/NodeListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
+            <state relative-caret-position="1156">
+              <caret line="74" column="102" lean-forward="true" selection-start-line="74" selection-start-column="102" selection-end-line="74" selection-end-column="102" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1130#1131#0" expanded="true" />
+                <element signature="e#1168#1169#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -124,6 +123,14 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>sendRequest</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>addressRequest</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -158,6 +165,7 @@
         <option value="$PROJECT_DIR$/src/chord/Chord.java" />
         <option value="$PROJECT_DIR$/src/peer/Peer.java" />
         <option value="$PROJECT_DIR$/src/chord/CustomInetAddress.java" />
+        <option value="$PROJECT_DIR$/src/chord/NodeListener.java" />
         <option value="$PROJECT_DIR$/src/chord/Utilities.java" />
         <option value="$PROJECT_DIR$/src/chord/NodeListener.java" />
         <option value="$PROJECT_DIR$/src/chord/Node.java" />
@@ -336,7 +344,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="100995000" />
+    <option name="totallyTimeSpent" value="100891000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -348,7 +356,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="848" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23825504" />
@@ -519,6 +527,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/chord/NodeListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1156">
+          <caret line="74" column="102" lean-forward="true" selection-start-line="74" selection-start-column="102" selection-end-line="74" selection-end-column="102" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1130#1131#0" expanded="true" />
+            <element signature="e#1168#1169#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="175">
@@ -531,25 +551,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/chord/NodeListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="40" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
+        <state relative-caret-position="357">
+          <caret line="83" lean-forward="true" selection-start-line="83" selection-end-line="83" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="76" column="29" selection-start-line="76" selection-start-column="29" selection-end-line="76" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/chord/Node.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="137" column="5" selection-start-line="137" selection-start-column="5" selection-end-line="137" selection-end-column="5" />
+        <state relative-caret-position="4454">
+          <caret line="262" column="5" lean-forward="true" selection-start-line="262" selection-start-column="5" selection-end-line="262" selection-end-column="5" />
           <folding>
-            <element signature="e#8308#8309#0" expanded="true" />
-            <element signature="e#8389#8390#0" expanded="true" />
+            <element signature="e#7512#7513#0" expanded="true" />
+            <element signature="e#7573#7574#0" expanded="true" />
+            <element signature="e#6380#6381#0" expanded="true" />
+            <element signature="e#6418#6419#0" expanded="true" />
           </folding>
         </state>
       </provider>
