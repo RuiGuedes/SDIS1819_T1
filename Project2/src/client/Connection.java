@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -34,6 +35,8 @@ import java.util.Arrays;
  *  TODO - STORAGE
  */
 public class Connection {
+    private static String storageSize;
+
     /**
      * Connects to the local peer and outputs the result of a single command
      *
@@ -46,13 +49,7 @@ public class Connection {
         }
 
         try {
-            final SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            final SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", Integer.parseInt(args[0]));
-
-            final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-            out.println(String.join("|", Arrays.copyOfRange(args, 1, args.length)));
+            final BufferedReader in = connectAndSend(args);
 
             String inputLine = in.readLine();
             while (inputLine != null) {
@@ -62,5 +59,72 @@ public class Connection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Connects to the peer and sends a command
+     *
+     * @param args Space split values to be used (Port then the command)
+     *
+     * @return OutputStream for processing the peer response
+     *
+     * @throws IOException on error connecting to the peer
+     */
+    private static BufferedReader connectAndSend(String[] args) throws IOException {
+        final SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        final SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", Integer.parseInt(args[0]));
+
+        final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        out.println(String.join("|", Arrays.copyOfRange(args, 1, args.length)));
+        return in;
+    }
+
+    static String[][] getFiles(String port) {
+        ArrayList<String[]> files = new ArrayList<>();
+
+        try {
+            final BufferedReader in = connectAndSend(new String[]{port, "LIST", "-o"});
+
+            String inputLine = in.readLine();
+            while (inputLine != null) {
+                final String[] ownerSplit = inputLine.split("\\t");
+                files.add(new String[]{ownerSplit[1], ownerSplit[2]});
+
+                inputLine = in.readLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new String[0][2];
+        }
+
+        return files.toArray(new String[0][2]);
+    }
+
+    static String[][] getChunks(String port) {
+        ArrayList<String[]> chunks = new ArrayList<>();
+
+        try {
+            final BufferedReader in = connectAndSend(new String[]{port, "LIST", "-c"});
+
+            String inputLine = in.readLine();
+            while (inputLine != null) {
+                chunks.add(inputLine.split("\\t"));
+                inputLine = in.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new String[0][2];
+        }
+
+        storageSize = chunks.remove(chunks.size() - 1)[0].split(": ")[1];
+
+        return chunks.toArray(new String[0][2]);
+    }
+
+    static String getStorageSize() {
+        return storageSize;
     }
 }
