@@ -6,12 +6,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class NodeListener extends Thread {
 
     private Node node;
     private DatagramSocket socket = null;
-    private boolean terminate = false;
+    private boolean online = true;
 
     NodeListener(Node n) {
         this.node = n;
@@ -26,8 +27,8 @@ public class NodeListener extends Thread {
 
     @Override
     public void run() {
-        while(!terminate) {
-            byte[] buf = new byte[1000];
+        while(online) {
+            byte[] buf = new byte[100];
             DatagramPacket receive = new DatagramPacket(buf, buf.length);
 
             try {
@@ -43,7 +44,7 @@ public class NodeListener extends Thread {
      * Terminate the thread
      */
     public void terminate() {
-        this.terminate = false;
+        this.online = false;
     }
 }
 
@@ -57,7 +58,7 @@ class DecryptMessage extends Thread {
 
     DecryptMessage(DatagramSocket socket, DatagramPacket packet, Node n) {
         this.socket = socket;
-        this.message = new String(packet.getData(), StandardCharsets.UTF_8).split(":");
+        this.message = cleanString(packet.getData()).split("-");
         this.address = packet.getAddress();
         this.port = packet.getPort();
         this.node = n;
@@ -71,11 +72,16 @@ class DecryptMessage extends Thread {
             case "FIND_SUCCESSOR":
                 response = this.node.findSuccessor(Integer.parseInt(message[1])).toString();
                 break;
-            case "CLP_FINGER":
-                response = this.node.closestPrecedingFinger(Integer.parseInt(message[1])).toString();
-                break;
             case "YOUR_SUCCESSOR":
                 response = this.node.getSuccessor().toString();
+                break;
+            case "YOUR_PREDECESSOR":
+                response = this.node.getPredecessor().toString();
+                break;
+            case "":
+                break;
+            case "CLP_FINGER":
+                response = this.node.closestPrecedingFinger(Integer.parseInt(message[1])).toString();
                 break;
             case "ONLINE":
                 response = "TRUE";
@@ -92,5 +98,18 @@ class DecryptMessage extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String cleanString(byte[] info) {
+        String message = null;
+        char[] aux = new String(info, StandardCharsets.UTF_8).toCharArray();
+
+        for (int i = 0; i < aux.length; i++){
+            if(aux[i] == 0) {
+                message = String.valueOf(Arrays.copyOf(aux, i));
+                break;
+            }
+        }
+        return  message;
     }
 }

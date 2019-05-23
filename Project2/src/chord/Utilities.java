@@ -8,10 +8,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utilities {
 
-    public static void main(String[] args) {
-
-    }
-
     /**
      * Create Hash code with IP and Port number
      * @param ip IP address
@@ -134,6 +130,6 @@ public class Utilities {
 
         socket.close();
 
-        return new String(packet.getData(), StandardCharsets.UTF_8);
+        return DecryptMessage.cleanString(packet.getData());
     }
 }
