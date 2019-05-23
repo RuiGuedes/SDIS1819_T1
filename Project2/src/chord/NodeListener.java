@@ -102,7 +102,7 @@ class DecryptMessage extends Thread {
         }
     }
 
-    public static String cleanString(byte[] info) {
+    static String cleanString(byte[] info) {
         String message = null;
         char[] aux = new String(info, StandardCharsets.UTF_8).toCharArray();
 

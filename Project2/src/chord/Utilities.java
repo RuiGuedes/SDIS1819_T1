@@ -74,6 +74,12 @@ public class Utilities {
         }
     }
 
+    /**
+     * Send a request and decode the answer returning address
+     * @param inet Address to send request
+     * @param request Request
+     * @return Custom InetAddress
+     */
     static CustomInetAddress addressRequest(CustomInetAddress inet, String request) {
         String response = sendRequest(inet, request);
 
@@ -88,6 +94,12 @@ public class Utilities {
         return new CustomInetAddress(info[0], Integer.parseInt(info[1]));
     }
 
+    /**
+     * Send a request and receive the answer returning them
+     * @param inet Address to send the request
+     * @param request Request
+     * @return Received answer
+     */
     static String sendRequest(CustomInetAddress inet, String request) {
 
         if (inet == null || request == null)
@@ -116,11 +128,16 @@ public class Utilities {
         return receiveResponse(socket);
     }
 
+    /**
+     * Receive an answer of a request sent
+     * @param socket Socket where the request has sent
+     * @return Answer of the request
+     */
     private static String receiveResponse(DatagramSocket socket) {
         if (socket == null)
             return null;
 
-        byte[] buf = new byte[1000];
+        byte[] buf = new byte[500];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         try {
