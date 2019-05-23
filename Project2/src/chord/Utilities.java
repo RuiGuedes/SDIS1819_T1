@@ -74,7 +74,14 @@ public class Utilities {
         }
     }
 
-    static CustomInetAddress sendRequest(CustomInetAddress inet, String request) {
+    static CustomInetAddress addressRequest(CustomInetAddress inet, String request) {
+
+        String[] response = sendRequest(inet, request).split(":");
+
+        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
+    }
+
+    static String sendRequest(CustomInetAddress inet, String request) {
 
         if (inet == null || request == null)
             return null;
@@ -102,7 +109,7 @@ public class Utilities {
         return receiveResponse(socket);
     }
 
-    private static CustomInetAddress receiveResponse(DatagramSocket socket) {
+    private static String receiveResponse(DatagramSocket socket) {
         if (socket == null)
             return null;
 
@@ -110,15 +117,16 @@ public class Utilities {
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         try {
+            socket.setSoTimeout(100);
             socket.receive(packet);
+        } catch (SocketTimeoutException e) {
+            return null;
         } catch (IOException e) {
             System.out.println("Receive packet exception: " + e.toString());
         }
 
         socket.close();
 
-        String[] response = new String(packet.getData(), StandardCharsets.UTF_8).split(":");
-
-        return new CustomInetAddress(response[0], Integer.parseInt(response[1]));
+        return new String(packet.getData(), StandardCharsets.UTF_8);
     }
 }

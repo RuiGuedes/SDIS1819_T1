@@ -65,25 +65,29 @@ class DecryptMessage extends Thread {
 
     @Override
     public void run() {
-        byte[] buf;
-        DatagramPacket response;
+        String response = null;
+
         switch(message[0]){
             case "FIND_SUCCESSOR":
-                String successor = this.local.getSuccessor().toString();
-                buf = successor.getBytes();
-                response = new DatagramPacket(buf, buf.length, this.address, this.port);
-                try {
-                    this.socket.send(response);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                response = this.local.findSuccessor(Integer.parseInt(message[1])).toString();
                 break;
-            case "":
-
+            case "CLP_FINGER":
+                response = this.local.closestPrecedingFinger(Integer.parseInt(message[1])).toString();
                 break;
-            default:
-
+            case "YOUR_SUCCESSOR":
+                response = this.local.getSuccessor().toString();
+                break;
+            case "ONLINE":
+                response = "TRUE";
+                break;
         }
 
+        byte[] buf = response.getBytes();
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, this.address, this.port);
+        try {
+            this.socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

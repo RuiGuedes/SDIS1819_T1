@@ -72,7 +72,7 @@ public class Node {
         this.contactAddress = address;
 
         if(this.contactAddress != null && !this.contactAddress.equals(this.peerAddress)) {
-            CustomInetAddress successor = Utilities.sendRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerID);
+            CustomInetAddress successor = Utilities.addressRequest(this.contactAddress, "FIND_SUCCESSOR:" + this.peerID);
 
             if(successor == null) {
                 System.out.println("Join was not possible due to system being unable to find contact node");
@@ -152,7 +152,7 @@ public class Node {
 
         // Checks whether node predecessor is equals to the current node
         if(!predecessor.equals(this.peerAddress))
-            successor = Utilities.sendRequest(predecessor, "YOUR_SUCCESSOR");
+            successor = Utilities.addressRequest(predecessor, "YOUR_SUCCESSOR");
 
         // If successor is null, return the current node as the successor
         return successor == null ? this.peerAddress : successor;
@@ -180,7 +180,7 @@ public class Node {
 
                 if(!node_clpf.equals(this.peerAddress)) {
                     // Update variables
-                    nodeSuccessor = Utilities.sendRequest(node_clpf, "YOUR_SUCCESSOR");
+                    nodeSuccessor = Utilities.addressRequest(node_clpf, "YOUR_SUCCESSOR");
 
                     // If nodeSuccessor is valid, update node
                     if (nodeSuccessor != null)
@@ -191,12 +191,12 @@ public class Node {
             }
             else {
 
-                CustomInetAddress node_clpf = Utilities.sendRequest(node, "CLP_FINGER:" + ID);
+                CustomInetAddress node_clpf = Utilities.addressRequest(node, "CLP_FINGER:" + ID);
 
                 if(node_clpf == null) {
                     // Update variables
                     node = lastValidNode;
-                    nodeSuccessor = Utilities.sendRequest(node, "YOUR_SUCCESSOR");
+                    nodeSuccessor = Utilities.addressRequest(node, "YOUR_SUCCESSOR");
 
                     // Check if its not possible to retrieve predecessor
                     if(nodeSuccessor == null)
@@ -209,13 +209,13 @@ public class Node {
                 else {
                     // Update variables
                     lastValidNode = node;
-                    nodeSuccessor = Utilities.sendRequest(node_clpf, "YOUR_SUCCESSOR");
+                    nodeSuccessor = Utilities.addressRequest(node_clpf, "YOUR_SUCCESSOR");
 
                     // If nodeSuccessor is valid, update node
                     if (nodeSuccessor != null)
                         node = node_clpf;
                     else
-                        nodeSuccessor = Utilities.sendRequest(node, "YOUR_SUCCESSOR");
+                        nodeSuccessor = Utilities.addressRequest(node, "YOUR_SUCCESSOR");
                 }
             }
 
