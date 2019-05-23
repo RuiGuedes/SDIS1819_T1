@@ -58,7 +58,7 @@ class DecryptMessage extends Thread {
 
     DecryptMessage(DatagramSocket socket, DatagramPacket packet, Node n) {
         this.socket = socket;
-        this.message = cleanString(packet.getData()).split("-");
+        this.message = cleanString(packet.getData()).split(":");
         this.address = packet.getAddress();
         this.port = packet.getPort();
         this.node = n;
