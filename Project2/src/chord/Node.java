@@ -257,7 +257,7 @@ public class Node {
      * @param ID Node ID
      * @return Predecessor of the node
      */
-    private CustomInetAddress findPredecessor(long ID) {
+    CustomInetAddress findPredecessor(long ID) {
 
         // Initialize node and successor variables
         CustomInetAddress node = this.peerAddress;
