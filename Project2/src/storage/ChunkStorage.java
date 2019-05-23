@@ -10,13 +10,12 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-// TODO Keep track of files dependent on chunk
 
 /**
  * Responsible for managing the storage of chunks
@@ -26,7 +25,7 @@ public class ChunkStorage {
 
     private static final Path chunkDir = Peer.rootPath.resolve("chunk");
 
-    private static final Set<String> chunkSet = ConcurrentHashMap.newKeySet();
+    private static final ConcurrentHashMap<String, Integer> chunkMap = new ConcurrentHashMap<>();
 
     /**
      * Initializes the chunk storage, restoring from a previous state if it exists
@@ -36,7 +35,11 @@ public class ChunkStorage {
     public static void init() throws IOException {
         if (Files.isDirectory(chunkDir)) {
             for (Path file : Files.newDirectoryStream(chunkDir)) {
-                chunkSet.add(file.getFileName().toString());
+                final byte[] intBytes = new byte[4];
+                final byte[] inputBytes = (byte[]) Files.getAttribute(file, "user:dependency");
+                System.arraycopy(inputBytes, 0, intBytes, 4 - inputBytes.length, inputBytes.length);
+
+                chunkMap.put(file.getFileName().toString(), ByteBuffer.wrap(intBytes).rewind().getInt());
             }
         }
         else {
@@ -54,7 +57,8 @@ public class ChunkStorage {
      * @throws ExecutionException on error executing the write operation
      * @throws InterruptedException on interruption of the write operation
      */
-    public static void store(String chunkId, ByteBuffer chunkData) throws IOException, ExecutionException, InterruptedException {
+    public static void store(String chunkId, ByteBuffer chunkData)
+            throws IOException, ExecutionException, InterruptedException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
@@ -63,12 +67,13 @@ public class ChunkStorage {
                     Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
                     chunkIOExecutor
             )) {
-                chunkSet.add(chunkId);
-
-                // Unblock the chunk storage
+                // TODO Unblock the chunk storage
                 afc.write(chunkData, 0).get();
             }
         }
+
+        final int dependencyNum = chunkMap.compute(chunkId, (id, value) -> value == null ? 1 : value + 1);
+        Files.setAttribute(chunkFile, "user:dependency", ByteBuffer.allocate(4).putInt(dependencyNum).flip());
     }
 
     /**
@@ -95,7 +100,7 @@ public class ChunkStorage {
         )) {
             final ByteBuffer chunkData = ByteBuffer.allocate(FileManager.Chunk.CHUNK_SIZE);
 
-            // Unblock the chunk retrieval
+            // TODO Unblock the chunk retrieval
             afc.read(chunkData, 0).get();
 
             return chunkData.flip();
@@ -105,8 +110,12 @@ public class ChunkStorage {
     public static void delete(String chunkId) throws IOException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
-        chunkSet.remove(chunkId);
-        Files.delete(chunkFile);
+        final Integer dependencyNum = chunkMap.compute(chunkId, (id, value) -> value == 1 ? null : value - 1);
+
+        if (dependencyNum == null)
+            Files.delete(chunkFile);
+        else
+            Files.setAttribute(chunkFile, "user:dependency", ByteBuffer.allocate(4).putInt(dependencyNum).flip());
     }
 
     /**
@@ -119,7 +128,7 @@ public class ChunkStorage {
         long storageSize = 0L;
 
 
-        for (String id : chunkSet) {
+        for (String id : chunkMap.keySet()) {
             final long chunkSize = Files.size(chunkDir.resolve(id));
 
             sb.append(id).append('\t').append(chunkSize).append(System.lineSeparator());

@@ -144,8 +144,10 @@ public class FileManager {
             bf.readLine();
             bf.readLine(); // file length
             final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
+            final String saltString = bf.readLine();
+            final String hashString = bf.readLine();
 
-            if (!OwnerFile.validate(bf.readLine(), bf.readLine()))
+            if (!OwnerFile.validate(saltString, hashString))
                 return false;
 
             final ArrayList<CompletableFuture<Void>> chunkPromises = new ArrayList<>(chunkIds.length);
@@ -163,7 +165,8 @@ public class FileManager {
                 chunkPromise.whenComplete((v, e) -> chunkConsumer.accept(chunkIndex));
                 chunkPromise.complete(null);
             }
-            Files.delete(ownerFile);
+
+            OwnerStorage.delete(hashString, ownerFile);
 
             chunkPromises.forEach(CompletableFuture::join);
             return true;

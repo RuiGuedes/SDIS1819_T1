@@ -63,7 +63,21 @@ public class OwnerStorage {
         final String saltString = Base64.getEncoder().encodeToString(salt);
         final String hashString = Base64.getEncoder().encodeToString(sha256.digest(inputBytes));
 
-        ownerMap.put(fileMetadata.get(0), new OwnerFile(fileMetadata, saltString, hashString));
+        final String ownerName = hashString.replace('/', '_') + ".own";
+        ownerMap.put(ownerName, new OwnerFile(ownerName, fileMetadata, saltString, hashString));
+    }
+
+    /**
+     * Deletes a owner file on the peer's filesystem
+     *
+     * @param ownerHash Hash of the file to be deleted
+     * @param ownerFile File to be removed
+     *
+     * @throws IOException on error deleting the owner file
+     */
+    public static void delete(String ownerHash, Path ownerFile) throws IOException {
+        ownerMap.remove(ownerHash.replace('/', '_') + ".own");
+        Files.delete(ownerFile);
     }
 
     /**
@@ -73,7 +87,7 @@ public class OwnerStorage {
      */
     public static String listFiles() {
         final StringBuilder sb = new StringBuilder();
-        ownerMap.forEachValue(1, sb::append);
+        ownerMap.forEach((id, file) -> sb.append(id).append('\t').append(file));
         return sb.toString();
     }
 }
