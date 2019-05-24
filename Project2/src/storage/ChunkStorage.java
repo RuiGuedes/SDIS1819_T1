@@ -1,6 +1,6 @@
 package storage;
 
-import peer.FileManager;
+import peer.Chunk;
 import peer.Peer;
 
 import java.io.FileNotFoundException;
@@ -114,7 +114,7 @@ public class ChunkStorage {
                 Set.of(StandardOpenOption.READ),
                 chunkIOExecutor
         )) {
-            final ByteBuffer chunkData = ByteBuffer.allocate(FileManager.Chunk.CHUNK_SIZE);
+            final ByteBuffer chunkData = ByteBuffer.allocate(Chunk.CHUNK_SIZE);
 
             // TODO Unblock the chunk retrieval
             afc.read(chunkData, 0).get();

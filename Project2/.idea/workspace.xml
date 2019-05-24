@@ -2,20 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b045b97-7341-4eb8-8628-0167f2dd8fe6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/peer/Chunk.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/chord/CustomInetAddress.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/chord/CustomInetAddress.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/client/Connection.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/client/Connection.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener$RequestHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener$RequestHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/middleware/RequestListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager$Chunk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager$Chunk.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/peer/FileManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/ChunkStorage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/P2P Backup Service on Internet/storage/ChunkStorage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chord/CustomInetAddress.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/CustomInetAddress.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/Connection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/GUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/GUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/RequestListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/RequestListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/peer.bat" beforeDir="false" afterPath="$PROJECT_DIR$/peer.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/peer/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/peer/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/storage/ChunkStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/ChunkStorage.java" afterDir="false" />
     </list>
@@ -45,23 +35,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="569">
-              <caret line="128" column="48" selection-start-line="128" selection-start-column="48" selection-end-line="128" selection-end-column="48" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/client/GUI.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1054">
-              <caret line="68" column="37" selection-start-line="68" selection-start-column="37" selection-end-line="68" selection-end-column="37" />
+            <state relative-caret-position="814">
+              <caret line="121" column="32" selection-start-line="121" selection-start-column="32" selection-end-line="121" selection-end-column="32" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -72,8 +50,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2006">
-              <caret line="126" column="9" selection-start-line="126" selection-start-column="9" selection-end-line="126" selection-end-column="9" />
+            <state relative-caret-position="-9">
+              <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -84,7 +62,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3519">
+            <state relative-caret-position="561">
               <caret line="223" selection-start-line="223" selection-end-line="223" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -96,11 +74,50 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/middleware/ChunkTransfer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="35" selection-start-line="35" selection-end-line="35" />
+            <state relative-caret-position="280">
+              <caret line="30" column="47" lean-forward="true" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/chord/Chord.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="35" column="113" selection-start-line="35" selection-start-column="112" selection-end-line="35" selection-end-column="113" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/peer.bat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="756">
+              <caret line="233" selection-start-line="233" selection-end-line="233" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/peer/Chunk.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="24" column="11" selection-start-line="24" selection-start-column="11" selection-end-line="24" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -113,36 +130,6 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3043">
-              <caret line="202" column="47" selection-start-line="202" selection-start-column="47" selection-end-line="202" selection-end-column="47" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/peer.bat">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="144" selection-start-line="10" selection-start-column="144" selection-end-line="10" selection-end-column="144" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client.bat">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -194,18 +181,19 @@
         <option value="$PROJECT_DIR$/src/storage/Storage.java" />
         <option value="$PROJECT_DIR$/src/chord/Chord.java" />
         <option value="$PROJECT_DIR$/src/peer/Peer.java" />
-        <option value="$PROJECT_DIR$/peer.bat" />
         <option value="$PROJECT_DIR$/src/storage/OwnerFile.java" />
         <option value="$PROJECT_DIR$/src/storage/OwnerStorage.java" />
         <option value="$PROJECT_DIR$/client.bat" />
         <option value="$PROJECT_DIR$/gui.bat" />
         <option value="$PROJECT_DIR$/src/chord/CustomInetAddress.java" />
-        <option value="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" />
         <option value="$PROJECT_DIR$/src/peer/FileManager.java" />
         <option value="$PROJECT_DIR$/src/client/Connection.java" />
         <option value="$PROJECT_DIR$/src/middleware/RequestListener.java" />
         <option value="$PROJECT_DIR$/src/client/GUI.java" />
         <option value="$PROJECT_DIR$/src/storage/ChunkStorage.java" />
+        <option value="$PROJECT_DIR$/src/peer/Chunk.java" />
+        <option value="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" />
+        <option value="$PROJECT_DIR$/peer.bat" />
       </list>
     </option>
   </component>
@@ -319,12 +307,15 @@
     <key name="MoveMembersDialog.RECENTS_KEY">
       <recent name="peer.Peer" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Joao\Desktop\Uni\3ano\2-S\SDIS\rui_repo\SDIS1819_T1\Project2\" />
-    </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="storage" />
       <recent name="Storage" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="peer" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Joao\Desktop\Uni\3ano\2-S\SDIS\rui_repo\SDIS1819_T1\Project2\" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -384,12 +375,12 @@
       <workItem from="1558534855016" duration="6615000" />
       <workItem from="1558617471878" duration="17870000" />
       <workItem from="1558682969904" duration="6381000" />
-      <workItem from="1558707673813" duration="2070000" />
+      <workItem from="1558707673813" duration="4353000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="113492000" />
+    <option name="totallyTimeSpent" value="115775000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -453,13 +444,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/chord/Chord.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="524">
-          <caret line="54" column="47" selection-start-line="54" selection-start-column="47" selection-end-line="54" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/chord/Stabilizer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -498,13 +482,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/43abcbf898544826a67c1bacfcf1868e.mp4.meta" />
     <entry file="file://$PROJECT_DIR$/src/storage/OwnerStorage.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -540,19 +517,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
+    <entry file="file://$PROJECT_DIR$/client.bat">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="569">
-          <caret line="128" column="48" selection-start-line="128" selection-start-column="48" selection-end-line="128" selection-end-column="48" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="136">
+          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/client/GUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1054">
+        <state relative-caret-position="311">
           <caret line="68" column="37" selection-start-line="68" selection-start-column="37" selection-end-line="68" selection-end-column="37" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -560,33 +534,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
+    <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2006">
-          <caret line="126" column="9" selection-start-line="126" selection-start-column="9" selection-end-line="126" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3519">
-          <caret line="223" selection-start-line="223" selection-end-line="223" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/middleware/ChunkTransfer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="35" selection-start-line="35" selection-end-line="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="-3">
+          <caret line="58" selection-start-line="58" selection-end-line="58" />
         </state>
       </provider>
     </entry>
@@ -600,27 +551,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
+    <entry file="file://$PROJECT_DIR$/src/middleware/RequestListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3043">
-          <caret line="202" column="47" selection-start-line="202" selection-start-column="47" selection-end-line="202" selection-end-column="47" />
+        <state relative-caret-position="561">
+          <caret line="223" selection-start-line="223" selection-end-line="223" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/peer.bat">
+    <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="144" selection-start-line="10" selection-start-column="144" selection-end-line="10" selection-end-column="144" />
+        <state relative-caret-position="-9">
+          <caret line="92" lean-forward="true" selection-start-line="92" selection-end-line="92" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client.bat">
+    <entry file="file://$PROJECT_DIR$/src/peer/Chunk.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+        <state relative-caret-position="357">
+          <caret line="24" column="11" selection-start-line="24" selection-start-column="11" selection-end-line="24" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="756">
+          <caret line="233" selection-start-line="233" selection-end-line="233" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/storage/ChunkStorage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="814">
+          <caret line="121" column="32" selection-start-line="121" selection-start-column="32" selection-end-line="121" selection-end-column="32" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/middleware/ChunkTransfer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="30" column="47" lean-forward="true" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/chord/Chord.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="35" column="113" selection-start-line="35" selection-start-column="112" selection-end-line="35" selection-end-column="113" />
         </state>
       </provider>
     </entry>
@@ -628,6 +619,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="10" column="97" selection-start-line="10" selection-start-column="97" selection-end-line="10" selection-end-column="97" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/peer.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
         </state>
       </provider>
     </entry>

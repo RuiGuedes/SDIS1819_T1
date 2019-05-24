@@ -1,12 +1,17 @@
 package middleware;
 
 import chord.CustomInetAddress;
+import peer.Chunk;
+import storage.ChunkStorage;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,7 +43,16 @@ public class ChunkTransfer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                SSLSocket transferSocket = (SSLSocket) listenerSocket.accept();
+                final SSLSocket transferSocket = (SSLSocket) listenerSocket.accept();
+                requestPool.execute(() -> {
+                    try {
+                        ByteBuffer chunkBuffer = ByteBuffer.wrap(transferSocket.getInputStream().readAllBytes());
+                        ChunkStorage.store(Chunk.generateId(chunkBuffer.flip()), chunkBuffer);
+                    } catch (IOException | NoSuchAlgorithmException | ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+
             } catch (IOException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
@@ -46,7 +60,15 @@ public class ChunkTransfer implements Runnable {
         }
     }
 
-    public static void requestChunk(CustomInetAddress targetPeer, String chunkId) throws IOException {
-        final SSLSocket requestSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+    public static void transmitChunk(CustomInetAddress targetPeer, String chunkId)
+            throws IOException, ExecutionException, InterruptedException {
+        final SSLSocket transmitSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+
+        final ByteBuffer chunkBuffer = ChunkStorage.get(chunkId);
+
+        byte[] chunkBytes = new byte[chunkBuffer.remaining()];
+        chunkBuffer.get(chunkBytes);
+
+        transmitSocket.getOutputStream().write(chunkBytes);
     }
 }
