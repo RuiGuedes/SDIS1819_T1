@@ -45,6 +45,11 @@ class Node {
     private FixFingers fixFingers;
 
     /**
+     * Class responsible to ensure predecessor validity
+     */
+    private PredecessorPolling predecessorPolling;
+
+    /**
      * Node constructor. Initializes all node class needed variables
      * @param address Node address
      */
@@ -61,6 +66,7 @@ class Node {
         this.fixFingers = new FixFingers(this);
         this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
+        this.predecessorPolling = new PredecessorPolling(this);
     }
 
     /**
@@ -94,6 +100,7 @@ class Node {
         this.nodeListener.start();
         this.stabilizer.start();
         this.fixFingers.start();
+        this.predecessorPolling.start();
     }
 
     /**
@@ -367,6 +374,7 @@ class Node {
         if(this.nodeListener != null) this.nodeListener.terminate();
         if(this.stabilizer != null) this.stabilizer.terminate();
         if(this.fixFingers != null) this.fixFingers.terminate();
+        if(this.predecessorPolling != null) this.predecessorPolling.terminate();
     }
 
     /**
@@ -381,6 +389,13 @@ class Node {
      */
     CustomInetAddress getPredecessor() {
         return this.predecessor;
+    }
+
+    /**
+     * Resets predecessor value to its default state: null
+     */
+    void clearPredecessor() {
+        this.predecessor = null;
     }
 
     /**

@@ -8,9 +8,9 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TransferringKeys class
+ * TransferKeys class
  */
-public class TransferringKeys extends Thread {
+public class TransferKeys extends Thread {
 
     /**
      * Associated node
@@ -33,10 +33,10 @@ public class TransferringKeys extends Thread {
     private boolean online;
 
     /**
-     * TransferringKeys class constructor
+     * TransferKeys class constructor
      * @param node Associated node
      */
-    public TransferringKeys(Node node) {
+    public TransferKeys(Node node) {
         this.node = node;
         this.oldPredecessor = this.node.getPredecessor();
         this.keysToTransfer = null;
