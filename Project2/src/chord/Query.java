@@ -1,5 +1,8 @@
 package chord;
 
+/**
+ * Query class
+ */
 public class Query {
 
     /**
