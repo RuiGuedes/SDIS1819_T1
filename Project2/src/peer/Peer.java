@@ -14,7 +14,6 @@ import java.nio.file.Paths;
  * Responsible for initializing a peer
  */
 public class Peer {
-    // TODO Identify each peer by their certificate?
     private static String PEER_ID;
 
     public static final Path rootPath = Paths.get("./peer");

@@ -1,5 +1,7 @@
 package peer;
 
+import chord.Utilities;
+import middleware.ChunkTransfer;
 import storage.ChunkStorage;
 import storage.OwnerFile;
 import storage.OwnerStorage;
@@ -39,9 +41,6 @@ public class FileManager {
      */
     public static void backup(String filePath, IntConsumer chunkConsumer, boolean isShareble)
             throws IOException, NoSuchAlgorithmException {
-
-        // TODO Disallow multiple backups maybe? No problem in letting duplicate backups
-
         final Path file = Paths.get(filePath);
         if (!Files.isRegularFile(file)) throw new FileNotFoundException();
 
@@ -155,10 +154,7 @@ public class FileManager {
                 final CompletableFuture<Void> chunkPromise = new CompletableFuture<>();
                 chunkPromises.add(chunkIndex, chunkPromise);
 
-                // TODO Delete Chunk
-
-                // For now delete locally then update the complete the promise
-                ChunkStorage.delete(chunkIds[i]);
+                ChunkTransfer.deleteChunk(chunkIds[i]);
 
                 chunkPromise.whenComplete((v, e) -> chunkConsumer.accept(chunkIndex));
                 chunkPromise.complete(null);
@@ -206,14 +202,11 @@ public class FileManager {
                             chunkData.flip();
                             final String chunkId = Chunk.generateId(chunkData);
 
-                            // TODO Upload Chunk
-
-                            // Chunks will be backed up locally for testing purposes
-                            ChunkStorage.store(chunkId, chunkData);
+                            ChunkTransfer.uploadChunk(chunkId);
 
                             chunkConsumer.accept(chunkIndex);
                             attachment.complete(chunkId);
-                        } catch (NoSuchAlgorithmException | IOException | InterruptedException | ExecutionException e) {
+                        } catch (NoSuchAlgorithmException | IOException e) {
                             attachment.completeExceptionally(e);
                         }
                     }

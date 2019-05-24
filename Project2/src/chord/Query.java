@@ -1,5 +1,7 @@
 package chord;
 
+import java.util.List;
+
 /**
  * Query class
  */
@@ -7,11 +9,12 @@ public class Query {
 
     /**
      * Return the neighbor nodes of an id
-     * @param current Current node
      * @param fileId Id to search
      * @return Array with predecessor, target and successor addresses
      */
-    public static CustomInetAddress[] findTargetAddress(Node current, long fileId) {
+    public static List<CustomInetAddress> findTargetAddress(long fileId) {
+        final Node current = Chord.getNode();
+
         CustomInetAddress target = current.getAddress();
         CustomInetAddress predecessor = current.getPredecessor();
         CustomInetAddress successor = current.getSuccessor();
@@ -19,7 +22,7 @@ public class Query {
         if (Utilities.belongsToInterval(fileId,
                 Utilities.hashCode(predecessor.getHostAddress(),predecessor.getPort()),
                 Utilities.hashCode(target.getHostAddress(),target.getPort())))
-            return new CustomInetAddress[] {predecessor, target, successor};
+            return List.of(target, predecessor, successor);
 
         predecessor = current.findPredecessor(fileId);
 
@@ -29,6 +32,14 @@ public class Query {
         if(target != null && Utilities.sendRequest(target,"ONLINE").equals("TRUE"))
             successor = Utilities.addressRequest(target, "YOUR_SUCCESSOR");
 
-        return new CustomInetAddress[] {predecessor, target, successor};
+        if (target != null && successor != null) {
+            return List.of(target, predecessor, successor);
+        }
+        else if (target != null) {
+            return List.of(target, predecessor);
+        }
+        else {
+            return List.of(predecessor, successor);
+        }
     }
 }

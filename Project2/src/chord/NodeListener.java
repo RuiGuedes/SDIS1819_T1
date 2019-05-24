@@ -1,5 +1,7 @@
 package chord;
 
+import storage.ChunkStorage;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -130,6 +132,15 @@ class DecryptMessage extends Thread {
                 break;
             case "ONLINE":
                 response = "TRUE";
+                break;
+            case "DELETE_CHUNK":
+                try {
+                    ChunkStorage.delete(message[1]);
+                    response = "SUCCESS";
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    response = "FAIL";
+                }
                 break;
         }
 

@@ -4,7 +4,6 @@ package chord;
  * Chord class
  */
 public class Chord {
-
     /**
      * Value used to replicate information on both successors and predecessors
      */
@@ -31,7 +30,6 @@ public class Chord {
      * @return True on success, false otherwise
      */
     public boolean initialize(String[] args) {
-
         // Declare and initialize variables
         CustomInetAddress peerAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
         CustomInetAddress contactAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
@@ -54,20 +52,18 @@ public class Chord {
         // Join network
         boolean joinStatus = Chord.node.joinNetwork(contactAddress);
 
+        // Start Key Transfer thread
+        new Thread(new TransferKeys(Chord.node));
+
         if(!joinStatus)
-            System.out.println("Node could not join successfully the network !");
+            System.out.println("Node could not join successfully the network!");
         else
-            System.out.println("Node has joined successfully the network !");
+            System.out.println("Node has joined successfully the network!");
 
         return joinStatus;
     }
 
-    /**
-     * Retrieves peer associated node
-     * @return Node
-     */
-    public static Node getNode() {
+    static Node getNode() {
         return node;
     }
-
 }

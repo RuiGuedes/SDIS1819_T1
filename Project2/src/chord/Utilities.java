@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Utilities class
  */
-class Utilities {
+public class Utilities {
 
     /**
      * Create Hash code with IP and Port number
@@ -126,8 +126,7 @@ class Utilities {
      * @param request Request
      * @return Received answer
      */
-    static String sendRequest(CustomInetAddress inet, String request) {
-
+    public static String sendRequest(CustomInetAddress inet, String request) {
         if (inet == null || request == null)
             return null;
 

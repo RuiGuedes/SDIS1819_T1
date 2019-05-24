@@ -1,9 +1,9 @@
 package chord;
 
+import middleware.ChunkTransfer;
 import storage.ChunkStorage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -23,11 +23,6 @@ public class TransferKeys extends Thread {
     private CustomInetAddress oldPredecessor;
 
     /**
-     * List of Keys to transfer for the new predecessor
-     */
-    private ArrayList<Long> keysToTransfer;
-
-    /**
      * Online status: True if online, false if offline
      */
     private boolean online;
@@ -39,13 +34,12 @@ public class TransferKeys extends Thread {
     public TransferKeys(Node node) {
         this.node = node;
         this.oldPredecessor = this.node.getPredecessor();
-        this.keysToTransfer = null;
         this.online = true;
     }
 
     @Override
     public void run() {
-        while(this.online) {
+        while (this.online) {
             if (this.node.getPredecessor() != this.oldPredecessor) {
                 this.findKeysToTransfer(this.node.getPredecessor());
                 this.oldPredecessor = this.node.getPredecessor();
@@ -76,18 +70,12 @@ public class TransferKeys extends Thread {
         }
 
         for (int i = 0 ; i < chunkIds.length - 1 ; i++) {
-            long numId = Long.parseLong(chunkIds[i].split("\t")[0]);
+            String chunkId = chunkIds[i].split("\t")[0];
 
-            if(Utilities.belongsToInterval(numId,oldPredecessorId, newPredecessorId))
-                this.keysToTransfer.add(numId);
+            if (Utilities.belongsToInterval(Long.parseLong(chunkId), oldPredecessorId, newPredecessorId))
+                ChunkTransfer.transmitChunk(newPredecessor, chunkIds[i]);
         }
     }
-
-    /**
-     * Get the keys to be transferred to the new predecessor
-     * @return Keys array
-     */
-    public ArrayList<Long> getKeysToTransfer() { return keysToTransfer; }
 
     /**
      * Set online status to false
