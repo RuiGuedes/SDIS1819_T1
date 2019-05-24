@@ -44,8 +44,6 @@ class Node {
      */
     private FixFingers fixFingers;
 
-    private Status status;
-
     /**
      * Node constructor. Initializes all node class needed variables
      * @param address Node address
@@ -63,7 +61,6 @@ class Node {
         this.fixFingers = new FixFingers(this);
         this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
-        this.status = new Status(this);
     }
 
     /**
@@ -97,7 +94,6 @@ class Node {
         this.nodeListener.start();
         this.stabilizer.start();
         this.fixFingers.start();
-        this.status.start();
     }
 
     /**
@@ -118,7 +114,6 @@ class Node {
      */
     void notifyNode(CustomInetAddress nodeToNotify) {
         if(nodeToNotify != null && !nodeToNotify.equals(this.peerAddress)) {
-            //System.out.println("UPDATE " + nodeToNotify + " WITH " + this.peerAddress.toString());
             Utilities.sendRequest(nodeToNotify, "SET_PREDECESSOR:" + this.peerAddress.toString());
         }
     }
@@ -338,7 +333,6 @@ class Node {
         return node;
     }
 
-
     /**
      * Return the closest finger preceding ID
      * @param ID Node ID
@@ -364,6 +358,15 @@ class Node {
 
         // If any value on the finger table does not meet the needed constraints return current node
         return this.peerAddress;
+    }
+
+    /**
+     * Terminates all initialized threads
+     */
+    void terminateAllThreads() {
+        if(this.nodeListener != null) this.nodeListener.terminate();
+        if(this.stabilizer != null) this.stabilizer.terminate();
+        if(this.fixFingers != null) this.fixFingers.terminate();
     }
 
     /**

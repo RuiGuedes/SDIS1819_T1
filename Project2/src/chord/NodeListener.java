@@ -8,15 +8,33 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * NodeListener class
+ */
 public class NodeListener extends Thread {
 
+    /**
+     * Associated node
+     */
     private Node node;
+
+    /**
+     * Datagram socket used for communication
+     */
     private DatagramSocket socket = null;
+
+    /**
+     * Online status: True if online, false if offline
+     */
     private boolean online = true;
 
-    NodeListener(Node n) {
-        this.node = n;
-        CustomInetAddress address = n.getAddress();
+    /**
+     * NodeListener class constructor
+     * @param node Associated node
+     */
+    NodeListener(Node node) {
+        this.node = node;
+        CustomInetAddress address = this.node.getAddress();
 
         try {
             this.socket = new DatagramSocket(address.getPort());
@@ -41,27 +59,52 @@ public class NodeListener extends Thread {
     }
 
     /**
-     * Terminate the thread
+     * Set online status to false
      */
-    public void terminate() {
+    void terminate() {
         this.online = false;
     }
 }
 
+/**
+ * DecryptMessage class
+ */
 class DecryptMessage extends Thread {
 
+    /**
+     * Received message
+     */
     private String[] message;
+
+    /**
+     * Node associated InetAddress
+     */
     private InetAddress address;
+
+    /**
+     * Node associated port
+     */
     private Integer port;
+
+    /**
+     * Datagram socket used for communication
+     */
     private DatagramSocket socket;
+
+    /**
+     * Associated node
+     */
     private Node node;
 
-    DecryptMessage(DatagramSocket socket, DatagramPacket packet, Node n) {
+    /**
+     * DecryptMessage class constructor
+     */
+    DecryptMessage(DatagramSocket socket, DatagramPacket packet, Node node) {
         this.socket = socket;
         this.message = cleanString(packet.getData()).split(":");
         this.address = packet.getAddress();
         this.port = packet.getPort();
-        this.node = n;
+        this.node = node;
     }
 
     @Override
@@ -90,8 +133,8 @@ class DecryptMessage extends Thread {
                 break;
         }
 
-        if (response == null)
-            response = "EMPTY";
+        // Check if response if valid
+        if (response == null) response = "EMPTY";
 
         byte[] buf = response.getBytes();
         DatagramPacket packet = new DatagramPacket(buf, buf.length, this.address, this.port);
@@ -102,6 +145,11 @@ class DecryptMessage extends Thread {
         }
     }
 
+    /**
+     * Cleans byte array to contain only needed information
+     * @param info Array received
+     * @return Array content as a string
+     */
     static String cleanString(byte[] info) {
         String message = null;
         char[] aux = new String(info, StandardCharsets.UTF_8).toCharArray();

@@ -6,6 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Utilities class
+ */
 class Utilities {
 
     /**
@@ -64,7 +67,7 @@ class Utilities {
         else
             return (value > lowerLimit && value < upperLimit);
     }
-// TRUE == TRUE
+
     /**
      * Creates InetAddress given an address
      * @param address Address to be used

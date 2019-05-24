@@ -4,12 +4,25 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Stabilizer class
+ */
 public class Stabilizer extends Thread {
 
+    /**
+     * Associated node
+     */
     private Node node;
 
+    /**
+     * Online status: True if online, false if offline
+     */
     private boolean online;
 
+    /**
+     * Stabilizer class constructor
+     * @param node Associated node
+     */
     Stabilizer(Node node) {
         this.node = node;
         this.online = true;
@@ -48,7 +61,10 @@ public class Stabilizer extends Thread {
         }
     }
 
-    public void terminate() {
+    /**
+     * Set online status to false
+     */
+    void terminate() {
         this.online = false;
     }
 }

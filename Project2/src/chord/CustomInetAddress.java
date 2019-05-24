@@ -2,6 +2,9 @@ package chord;
 
 import java.net.InetAddress;
 
+/**
+ * CustomInetAddress class
+ */
 class CustomInetAddress {
 
     /**

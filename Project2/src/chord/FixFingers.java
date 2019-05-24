@@ -49,9 +49,9 @@ public class FixFingers extends Thread {
     }
 
     /**
-     * Terminates thread
+     * Set online status to false
      */
-    public void terminate() {
+    void terminate() {
         this.online = false;
     }
 
