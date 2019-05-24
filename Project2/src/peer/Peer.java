@@ -6,6 +6,7 @@ import storage.ChunkStorage;
 import storage.OwnerStorage;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,7 +15,7 @@ import java.nio.file.Paths;
  */
 public class Peer {
     // TODO Identify each peer by their certificate?
-    public static final String PEER_ID = "tempID";
+    private static String PEER_ID;
 
     public static final Path rootPath = Paths.get("./peer");
 
@@ -26,24 +27,25 @@ public class Peer {
      * @param args arguments for initializing the peer
      */
     public static void main(String[] args) {
-
         // Validate arguments
-        if(args.length < 1 || args.length > 2) {
-            System.out.println("Usage: java Peer [options] <PORT> <PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT>");
+        if(args.length < 2 || args.length > 3) {
+            System.out.println(
+                    "Usage: java Peer [options] <PORT> (<PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT>)? <CLIENT-PORT>"
+            );
             System.exit(1);
         }
 
         try {
+            PEER_ID = InetAddress.getLocalHost().toString();
+
             if(!chord.initialize(args)) {
                 System.out.println("FAILED");
             }
 
-            System.in.read();
-
             ChunkStorage.init();
             OwnerStorage.init();
 
-            new Thread(new RequestListener(Integer.parseInt(args[0]))).start();
+            new Thread(new RequestListener(Integer.parseInt(args[args.length - 1]))).start();
 
             System.out.println("Peer " + PEER_ID + " Online!");
         } catch (IOException e) {
@@ -53,4 +55,7 @@ public class Peer {
     }
 
 
+    public static String getPeerId() {
+        return PEER_ID;
+    }
 }

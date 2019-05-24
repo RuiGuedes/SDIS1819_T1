@@ -23,6 +23,9 @@ import java.util.concurrent.Executors;
  *
  * @see RequestHandler
  */
+
+// TODO Setup Protocols and Cyphers
+
 public class RequestListener implements Runnable {
     private final static ExecutorService requestPool = Executors.newCachedThreadPool();
     private final SSLServerSocket serverSocket;
@@ -105,6 +108,10 @@ public class RequestListener implements Runnable {
                     case "LIST":
                         if (!listCommand(commandArgs, out))
                             out.println("Invalid LIST command: " + commandArgsString);
+                        break;
+                    case "STORAGE":
+                        if (!storageCommand(commandArgs, out))
+                            out.println("Invalid STORAGE command: " + commandArgsString);
                         break;
                     default:
                         out.println("Invalid command: " + String.join(" ", command));
@@ -210,6 +217,20 @@ public class RequestListener implements Runnable {
                 default:
                     return false;
             }
+        }
+
+        private boolean storageCommand(String[] commandArgs, PrintWriter out) {
+            if (commandArgs.length > 1) return false;
+
+            try {
+                ChunkStorage.setMaxStorage(Long.parseLong(commandArgs[0]));
+                out.println("Storage successful");
+            } catch (IOException e) {
+                e.printStackTrace();
+                out.println("Storage failed");
+            }
+
+            return true;
         }
     }
 }

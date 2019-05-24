@@ -37,7 +37,7 @@ public class Chord {
         CustomInetAddress contactAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
 
         // Initializes contact peer address
-        if(args.length > 1) {
+        if(args.length > 2) {
             String[] contactPeerInfo = args[1].split(":");
             contactAddress = new CustomInetAddress(contactPeerInfo[0], Integer.parseInt(contactPeerInfo[1]));
         }

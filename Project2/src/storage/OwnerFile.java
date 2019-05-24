@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+// TODO Use some file info for generating the hash
+
 /**
  * Represents a Owner File
  *
@@ -39,7 +41,7 @@ public class OwnerFile {
      *
      * @throws IOException on error creating the owner file
      */
-    OwnerFile(List<String> fileMetadata, String saltString, String hashString) throws IOException {
+    OwnerFile(String ownerName, List<String> fileMetadata, String saltString, String hashString) throws IOException {
         this.name = fileMetadata.get(0);
         this.length = fileMetadata.get(1);
 
@@ -47,7 +49,7 @@ public class OwnerFile {
         fileMetadata.add(hashString);
 
         Files.write(
-                OwnerStorage.ownerDir.resolve(hashString.replace('/', '_') + ".own"),
+                OwnerStorage.ownerDir.resolve(ownerName),
                 fileMetadata,
 
                 StandardCharsets.UTF_8,
@@ -104,7 +106,7 @@ public class OwnerFile {
      * @return Whether the file is valid or not
      */
     public static boolean validate(String saltString, String hashString) throws NoSuchAlgorithmException {
-        final byte[] peerId = Peer.PEER_ID.getBytes(), salt = Base64.getDecoder().decode(saltString);
+        final byte[] peerId = Peer.getPeerId().getBytes(), salt = Base64.getDecoder().decode(saltString);
 
         final byte[] inputBytes = new byte[salt.length + peerId.length];
         final ByteBuffer inputBuffer = ByteBuffer.allocate(salt.length + peerId.length).put(salt).put(peerId).flip();
