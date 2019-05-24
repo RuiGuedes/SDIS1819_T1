@@ -1,6 +1,8 @@
 package chord;
 
 import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Stabilizer extends Thread {
 
@@ -29,7 +31,7 @@ public class Stabilizer extends Thread {
                     long successorID = Utilities.hashCode(this.node.getSuccessor().getHostAddress(), this.node.getSuccessor().getPort());
                     long successorPredecessorID = Utilities.hashCode(Objects.requireNonNull(successorPredecessor).getHostAddress(), successorPredecessor.getPort());
 
-                    if(successorPredecessorID > this.node.getID() && successorPredecessorID < successorID)
+                    if(Utilities.belongsToInterval(successorPredecessorID, this.node.getID(), successorID))
                         this.node.setIthFinger(1, successorPredecessor);
 
                     this.node.notifyNode(this.node.getSuccessor());
@@ -38,6 +40,11 @@ public class Stabilizer extends Thread {
                     this.node.resetCandidateSuccessors();
             }
 
+            try {
+                TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

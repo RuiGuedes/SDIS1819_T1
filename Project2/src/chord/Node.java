@@ -2,7 +2,7 @@ package chord;
 
 import java.util.HashMap;
 
-public class Node {
+class Node {
 
     /**
      * Peer CustomInetAddress
@@ -112,11 +112,21 @@ public class Node {
         }
     }
 
+    /**
+     * Notifies a certain node to update its successor
+     * @param nodeToNotify Node to be notified
+     */
     void notifyNode(CustomInetAddress nodeToNotify) {
-        if(nodeToNotify != null && !nodeToNotify.equals(this.peerAddress))
+        if(nodeToNotify != null && !nodeToNotify.equals(this.peerAddress)) {
+            //System.out.println("UPDATE " + nodeToNotify + " WITH " + this.peerAddress.toString());
             Utilities.sendRequest(nodeToNotify, "SET_PREDECESSOR:" + this.peerAddress.toString());
+        }
     }
 
+    /**
+     * Upon a given notification, check if predecessor should be updated
+     * @param newPredecessor New predecessor
+     */
     void handleNodeNotification(CustomInetAddress newPredecessor) {
         if(this.predecessor == null)
             this.predecessor = newPredecessor;
@@ -124,9 +134,8 @@ public class Node {
             long predecessorID = Utilities.hashCode(this.predecessor.getHostAddress(), this.predecessor.getPort());
             long newPredecessorID = Utilities.hashCode(newPredecessor.getHostAddress(), newPredecessor.getPort());
 
-            if(newPredecessorID > predecessorID && newPredecessorID < this.getID())
+            if(Utilities.belongsToInterval(newPredecessorID, predecessorID, this.getID()))
                 this.predecessor = newPredecessor;
-
         }
     }
 
@@ -153,7 +162,8 @@ public class Node {
     }
 
     /**
-     *
+     * Updates finger table successors based up on the its valid referenced nodes or its predecessor
+     * if no entry in the finger table is valid
      */
     void updateCandidateSuccessors() {
 
@@ -184,6 +194,9 @@ public class Node {
         }
     }
 
+    /**
+     * Resets previously retrieved candidate successors
+     */
     void resetCandidateSuccessors() {
         // If successor is null, its removal is not necessary
         if (this.getSuccessor() == null)
@@ -196,26 +209,26 @@ public class Node {
         if (predecessor!= null && predecessor.equals(this.getSuccessor()))
             this.predecessor = null;
 
-//        // Fill successor with candidate values
-//        this.updateCandidateSuccessors();
-//
-//        // If predecessor is a remote node, finds it predecessor to avoid entering a loop
-//        if ((this.getSuccessor() == null || this.getSuccessor().equals(this.peerAddress)) &&
-//                this.predecessor != null && !this.predecessor.equals(this.peerAddress)) {
-//
-//            while (true) {
-//                CustomInetAddress newPredecessor = Utilities.addressRequest(this.predecessor, "YOUR_PREDECESSOR");
-//
-//                if (newPredecessor == null || newPredecessor.equals(this.predecessor) ||
-//                        newPredecessor.equals(this.peerAddress) || newPredecessor.equals(this.getSuccessor()))
-//                    break;
-//                else
-//                    this.predecessor = newPredecessor;
-//            }
-//
-//            // Set new node successor
-//            this.setIthFinger(1, this.predecessor);
-//        }
+        // Fill successor with candidate values
+        this.updateCandidateSuccessors();
+
+        // If predecessor is a remote node, finds it predecessor to avoid entering a loop
+        if ((this.getSuccessor() == null || this.getSuccessor().equals(this.peerAddress)) &&
+                this.predecessor != null && !this.predecessor.equals(this.peerAddress)) {
+
+            while (true) {
+                CustomInetAddress newPredecessor = Utilities.addressRequest(this.predecessor, "YOUR_PREDECESSOR");
+
+                if (newPredecessor == null || newPredecessor.equals(this.predecessor) ||
+                        newPredecessor.equals(this.peerAddress) || newPredecessor.equals(this.getSuccessor()))
+                    break;
+                else
+                    this.predecessor = newPredecessor;
+            }
+
+            // Set new node successor
+            this.setIthFinger(1, this.predecessor);
+        }
     }
 
     /**
@@ -268,7 +281,7 @@ public class Node {
         if(nodeSuccessor == null)
             return this.peerAddress;
 
-        while(ID <= node.getNodeID() || ID > nodeSuccessor.getNodeID()) {
+        while(!(Utilities.belongsToInterval(ID, node.getNodeID(), nodeSuccessor.getNodeID()) || ID == nodeSuccessor.getNodeID())) {
 
             // Temporary node
             CustomInetAddress lastNode = node;
@@ -339,7 +352,7 @@ public class Node {
             if(node != null) {
                 long node_id = node.getNodeID();
 
-                if(node_id > this.peerID && node_id < ID) {
+                if(Utilities.belongsToInterval(node_id, this.peerID, ID)) {
                     // Determine if node is online
                     if(Utilities.sendRequest(node, "ONLINE").equals("TRUE"))
                         return node;

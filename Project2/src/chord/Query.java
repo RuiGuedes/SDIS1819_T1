@@ -9,12 +9,13 @@ public class Query {
      * @return Array with predecessor, target and successor addresses
      */
     public static CustomInetAddress[] findTargetAddress(Node current, long fileId) {
-        CustomInetAddress target = current.getPeerAddress();
+        CustomInetAddress target = current.getAddress();
         CustomInetAddress predecessor = current.getPredecessor();
         CustomInetAddress successor = current.getSuccessor();
 
-        if (Utilities.hashCode(predecessor.getHostAddress(),predecessor.getPort()) < fileId &&
-        Utilities.hashCode(target.getHostAddress(),target.getPort()) >= fileId)
+        if (Utilities.belongsToInterval(fileId,
+                Utilities.hashCode(predecessor.getHostAddress(),predecessor.getPort()),
+                Utilities.hashCode(target.getHostAddress(),target.getPort())))
             return new CustomInetAddress[] {predecessor, target, successor};
 
         predecessor = current.findPredecessor(fileId);

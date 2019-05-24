@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Utilities {
+class Utilities {
 
     /**
      * Create Hash code with IP and Port number
@@ -38,10 +38,33 @@ public class Utilities {
         return 0;
     }
 
+    /**
+     * Calculate value associated to a finger table entry
+     * @param nodeID Node ID
+     * @param key Associated key
+     * @return Computed value
+     */
     static long fingerTableIthEntry(long nodeID, int key) {
         return (long)((nodeID + Math.pow(2,(key - 1))) % Math.pow(2, Chord.M));
     }
 
+    /**
+     * Check whether a value belongs to a certain interval
+     * @return True if it belongs false otherwise
+     */
+    static boolean belongsToInterval(long value, long lowerLimit, long upperLimit) {
+        if(lowerLimit == upperLimit)
+            return false;
+        else if(lowerLimit > upperLimit) {
+            if(value > lowerLimit && value < (Math.pow(2, Chord.M) - 1))
+                return true;
+            else
+                return value > 0 && value < upperLimit;
+        }
+        else
+            return (value > lowerLimit && value < upperLimit);
+    }
+// TRUE == TRUE
     /**
      * Creates InetAddress given an address
      * @param address Address to be used
