@@ -26,23 +26,36 @@ public class ChunkStorage {
 
     private static final ConcurrentHashMap<String, Integer> chunkMap = new ConcurrentHashMap<>();
 
+    private static final Object storageLock = new Object();
+    private static long maxStorage = Long.MAX_VALUE;
+    private static long usedStorage = 0L;
+
     /**
      * Initializes the chunk storage, restoring from a previous state if it exists
      *
      * @throws IOException on error reading chunk files
      */
     public static void init() throws IOException {
-        if (Files.isDirectory(chunkDir)) {
-            for (Path file : Files.newDirectoryStream(chunkDir)) {
-                final byte[] intBytes = new byte[4];
-                final byte[] inputBytes = (byte[]) Files.getAttribute(file, "user:dependency");
-                System.arraycopy(inputBytes, 0, intBytes, 4 - inputBytes.length, inputBytes.length);
+        synchronized (storageLock) {
+            if (Files.isDirectory(chunkDir)) {
+                final byte[] longBytes = new byte[8];
+                final byte[] storageBytes = (byte[]) Files.getAttribute(chunkDir, "user:maxstorage");
+                System.arraycopy(storageBytes, 0, longBytes, 8 - storageBytes.length, storageBytes.length);
+                maxStorage = ByteBuffer.wrap(longBytes).rewind().getLong();
 
-                chunkMap.put(file.getFileName().toString(), ByteBuffer.wrap(intBytes).rewind().getInt());
+                for (Path file : Files.newDirectoryStream(chunkDir)) {
+                    final byte[] intBytes = new byte[4];
+                    final byte[] inputBytes = (byte[]) Files.getAttribute(file, "user:dependency");
+                    System.arraycopy(inputBytes, 0, intBytes, 4 - inputBytes.length, inputBytes.length);
+
+                    chunkMap.put(file.getFileName().toString(), ByteBuffer.wrap(intBytes).rewind().getInt());
+                    usedStorage += Files.size(file);
+                }
             }
-        }
-        else {
-            Files.createDirectories(chunkDir);
+            else {
+                Files.createDirectories(chunkDir);
+                Files.setAttribute(chunkDir, "user:maxstorage", ByteBuffer.allocate(8).putLong(maxStorage).flip());
+            }
         }
     }
 
@@ -68,6 +81,10 @@ public class ChunkStorage {
             )) {
                 // TODO Unblock the chunk storage
                 afc.write(chunkData, 0).get();
+            }
+
+            synchronized (storageLock) {
+                usedStorage += Files.size(chunkFile);
             }
         }
 
@@ -109,12 +126,21 @@ public class ChunkStorage {
     public static void delete(String chunkId) throws IOException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
-        final Integer dependencyNum = chunkMap.compute(chunkId, (id, value) -> value == 1 ? null : value - 1);
+        if (!Files.isRegularFile(chunkFile))    return;
 
-        if (dependencyNum == null)
+        final Integer dependencyNum = chunkMap.computeIfPresent(chunkId, (id, value) -> value == 1 ? null : value - 1);
+
+        if (dependencyNum == null) {
+            synchronized (storageLock) {
+                usedStorage -= Files.size(chunkFile);
+            }
+
             Files.delete(chunkFile);
-        else
-            Files.setAttribute(chunkFile, "user:dependency", ByteBuffer.allocate(4).putInt(dependencyNum).flip());
+        }
+        else {
+            Files.setAttribute(chunkFile, "user:dependency",
+                    ByteBuffer.allocate(4).putInt(dependencyNum).flip());
+        }
     }
 
     /**
@@ -124,16 +150,32 @@ public class ChunkStorage {
      */
     public static String listFiles() throws IOException {
         final StringBuilder sb = new StringBuilder();
-        long storageSize = 0L;
-
 
         for (String id : chunkMap.keySet()) {
             final long chunkSize = Files.size(chunkDir.resolve(id));
 
             sb.append(id).append('\t').append(chunkSize).append(System.lineSeparator());
-            storageSize += chunkSize;
         }
 
-        return sb.append("Total Storage Size: ").append(storageSize).append(System.lineSeparator()).toString();
+        synchronized (storageLock) {
+            return sb.append("Max Storage Size: ")
+                    .append(maxStorage == Long.MAX_VALUE ? "unlimited" : maxStorage)
+                    .append(System.lineSeparator())
+                    .append("Total Storage Size: ")
+                    .append(usedStorage)
+                    .append(System.lineSeparator()).toString();
+        }
+    }
+
+    public static void setMaxStorage(long newMaxStorage) throws IOException {
+        synchronized (storageLock) {
+            maxStorage = newMaxStorage;
+            Files.setAttribute(chunkDir, "user:maxstorage",
+                    ByteBuffer.allocate(8).putLong(newMaxStorage).flip());
+
+            while (usedStorage > maxStorage) {
+                delete(chunkMap.keys().nextElement());
+            }
+        }
     }
 }

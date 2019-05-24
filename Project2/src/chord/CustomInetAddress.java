@@ -2,7 +2,7 @@ package chord;
 
 import java.net.InetAddress;
 
-class CustomInetAddress {
+public class CustomInetAddress {
 
     /**
      * Peer InetAddress
@@ -37,7 +37,7 @@ class CustomInetAddress {
     /**
      * Returns InetAddress
      */
-    InetAddress getAddress() {
+    public InetAddress getAddress() {
         return address;
     }
 
@@ -51,7 +51,7 @@ class CustomInetAddress {
     /**
      * Returns the port associated to peer/node
      */
-    Integer getPort() {
+    public Integer getPort() {
         return port;
     }
 

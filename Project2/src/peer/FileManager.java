@@ -191,6 +191,8 @@ public class FileManager {
             // -floorDiv(-x, y) = ceil(x / y)
             final int chunkNum = Math.toIntExact(- Math.floorDiv(- Files.size(file), Chunk.CHUNK_SIZE));
 
+            chunkConsumer.accept(chunkNum);
+
             final ArrayList<CompletableFuture<String>> chunkPromises = new ArrayList<>(chunkNum);
             for (int i = 0; i < chunkNum; i++) {
                 final int chunkIndex = i;

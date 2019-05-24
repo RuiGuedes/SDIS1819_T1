@@ -2,6 +2,7 @@ package client;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,6 +36,7 @@ import java.util.Arrays;
  *  TODO - STORAGE
  */
 public class Connection {
+    private static String maxStorage;
     private static String storageSize;
 
     /**
@@ -81,6 +83,11 @@ public class Connection {
         return in;
     }
 
+    static void uploadFile(String port, JProgressBar progress, String filePath) {
+        // TODO Upload File
+        //final BufferedReader in connectAndSend(new String[]{port, "BACKUP", filePath});
+    }
+
     static String[][] getFiles(String port) {
         ArrayList<String[]> files = new ArrayList<>();
 
@@ -120,8 +127,13 @@ public class Connection {
         }
 
         storageSize = chunks.remove(chunks.size() - 1)[0].split(": ")[1];
+        maxStorage = chunks.remove(chunks.size() - 1)[0].split(": ")[1];
 
         return chunks.toArray(new String[0][2]);
+    }
+
+    static String getMaxStorage() {
+        return maxStorage;
     }
 
     static String getStorageSize() {
