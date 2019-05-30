@@ -10,15 +10,17 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -58,17 +60,14 @@ public class ChunkTransfer implements Runnable {
                 final SSLSocket transferSocket = (SSLSocket) listenerSocket.accept();
                 requestPool.execute(() -> {
                     try {
-                        final BufferedInputStream in = new BufferedInputStream(transferSocket.getInputStream());
+                        final DataInputStream in = new DataInputStream(transferSocket.getInputStream());
                         final OutputStream out = transferSocket.getOutputStream();
                         if (in.read() == TRANSMIT) {
-                            final byte[] chunkData = new byte[Chunk.CHUNK_SIZE];
+                            final byte[] chunkData = new byte[in.readInt()];
+                            in.readFully(chunkData, 0, chunkData.length);
 
-                            int chunkLength = in.read(chunkData, 0, Chunk.CHUNK_SIZE);
-
-                            final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunkData, 0, chunkLength);
-                            out.write(1);
-
-                            ChunkStorage.store(Chunk.generateId(chunkBuffer.flip()), chunkBuffer);
+                            final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunkData);
+                            ChunkStorage.store(Chunk.generateId(chunkBuffer), chunkBuffer);
                         }
                         else {
                             final String chunkId = new BufferedReader(
@@ -156,9 +155,11 @@ public class ChunkTransfer implements Runnable {
 
             byte[] chunkBytes = new byte[chunkData.remaining()];
             chunkData.get(chunkBytes);
+            chunkData.rewind();
 
-            final BufferedOutputStream out = new BufferedOutputStream(transmitSocket.getOutputStream());
+            final DataOutputStream out = new DataOutputStream(transmitSocket.getOutputStream());
             out.write(TRANSMIT);
+            out.writeInt(chunkBytes.length);
             out.write(chunkBytes, 0, chunkBytes.length);
 
             return transmitSocket.getInputStream().read() != 0;

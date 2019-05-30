@@ -81,6 +81,7 @@ public class ChunkStorage {
             )) {
                 // TODO Unblock the chunk storage
                 afc.write(chunkData, 0).get();
+                chunkData.rewind();
             }
 
             synchronized (storageLock) {
