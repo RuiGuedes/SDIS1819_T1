@@ -50,6 +50,11 @@ class Node {
     private PredecessorPolling predecessorPolling;
 
     /**
+     * Chord status
+     */
+    private Status status;
+
+    /**
      * Node constructor. Initializes all node class needed variables
      * @param address Node address
      */
@@ -67,6 +72,7 @@ class Node {
         this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
         this.predecessorPolling = new PredecessorPolling(this);
+        this.status = new Status(this);
     }
 
     /**
@@ -88,7 +94,7 @@ class Node {
             this.setIthFinger(1, successor);
         }
 
-        this.initializeAllThreads();
+        this.initializeAllThreads(false);
 
         return true;
     }
@@ -96,11 +102,12 @@ class Node {
     /**
      * Initializes all threads
      */
-    private void initializeAllThreads() {
+    private void initializeAllThreads(boolean initStatus) {
         this.nodeListener.start();
         this.stabilizer.start();
         this.fixFingers.start();
         this.predecessorPolling.start();
+        if(initStatus) this.status.start();
     }
 
     /**
@@ -375,6 +382,7 @@ class Node {
         if(this.stabilizer != null) this.stabilizer.terminate();
         if(this.fixFingers != null) this.fixFingers.terminate();
         if(this.predecessorPolling != null) this.predecessorPolling.terminate();
+        if(this.status != null) this.status.terminate();
     }
 
     /**
