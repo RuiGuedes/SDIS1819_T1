@@ -172,7 +172,7 @@ public class Utilities {
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
 
         try {
-            socket.setSoTimeout(100);
+            socket.setSoTimeout(5000);
             socket.receive(packet);
         } catch (SocketTimeoutException e) {
             return null;

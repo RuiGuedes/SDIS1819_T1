@@ -148,6 +148,7 @@ class DecryptMessage extends Thread {
         if (response == null) response = "EMPTY";
 
         byte[] buf = response.getBytes();
+
         DatagramPacket packet = new DatagramPacket(buf, buf.length, this.address, this.port);
         try {
             this.socket.send(packet);
