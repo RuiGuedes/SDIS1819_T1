@@ -19,10 +19,12 @@ public class Query {
         CustomInetAddress predecessor = current.getPredecessor();
         CustomInetAddress successor = current.getSuccessor();
 
+        if (predecessor == null && successor == null)   return List.of(target);
+
         if (Utilities.belongsToInterval(fileId,
                 Utilities.hashCode(predecessor.getHostAddress(),predecessor.getPort()),
                 Utilities.hashCode(target.getHostAddress(),target.getPort())))
-            return List.of(target, predecessor, successor);
+            return nonNullsList(target, predecessor, successor);
 
         predecessor = current.findPredecessor(fileId);
 
@@ -32,6 +34,11 @@ public class Query {
         if(target != null && Utilities.sendRequest(target,"ONLINE").equals("TRUE"))
             successor = Utilities.addressRequest(target, "YOUR_SUCCESSOR");
 
+        return nonNullsList(target, predecessor, successor);
+    }
+
+    private static List<CustomInetAddress> nonNullsList(CustomInetAddress target, CustomInetAddress predecessor,
+                                                        CustomInetAddress successor) {
         if (target != null && successor != null) {
             return List.of(target, predecessor, successor);
         }

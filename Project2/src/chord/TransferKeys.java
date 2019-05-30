@@ -5,6 +5,7 @@ import storage.ChunkStorage;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,14 +41,15 @@ public class TransferKeys extends Thread {
     @Override
     public void run() {
         while (this.online) {
-            if (this.node.getPredecessor() != this.oldPredecessor) {
-                this.findKeysToTransfer(this.node.getPredecessor());
-                this.oldPredecessor = this.node.getPredecessor();
-            }
 
             try {
+                if (this.node.getPredecessor() != this.oldPredecessor) {
+                    this.findKeysToTransfer(this.node.getPredecessor());
+                    this.oldPredecessor = this.node.getPredecessor();
+                }
+
                 TimeUnit.MILLISECONDS.sleep(new Random().nextInt(400));
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -57,23 +59,18 @@ public class TransferKeys extends Thread {
      * Find the keys needed transfer for the new predecessor
      * @param newPredecessor New predecessor address
      */
-    private void findKeysToTransfer(CustomInetAddress newPredecessor) {
+    private void findKeysToTransfer(CustomInetAddress newPredecessor) throws InterruptedException, ExecutionException,
+            IOException {
         long newPredecessorId = newPredecessor.getNodeID();
         long oldPredecessorId = this.oldPredecessor.getNodeID();
         String[] chunkIds;
 
-        try {
-            chunkIds = ChunkStorage.listFiles().split(System.lineSeparator());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
+        chunkIds = ChunkStorage.listFiles().split(System.lineSeparator());
         for (int i = 0 ; i < chunkIds.length - 1 ; i++) {
             String chunkId = chunkIds[i].split("\t")[0];
 
             if (Utilities.belongsToInterval(Long.parseLong(chunkId), oldPredecessorId, newPredecessorId))
-                ChunkTransfer.transmitChunk(newPredecessor, chunkIds[i]);
+                ChunkTransfer.transmitChunk(newPredecessor, ChunkStorage.get(chunkIds[i]));
         }
     }
 

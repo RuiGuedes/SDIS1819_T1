@@ -69,4 +69,8 @@ public class CustomInetAddress {
     long getNodeID() {
         return Utilities.hashCode(this.getHostAddress(), this.port);
     }
+
+    public boolean isSelf() {
+        return this.equals(Chord.getNode().getAddress());
+    }
 }

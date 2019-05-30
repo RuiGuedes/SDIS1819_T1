@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OwnerStorage {
     private static Random secureRandom = new SecureRandom();
 
-    static final Path ownerDir = Peer.rootPath.resolve("owner");
+    static final Path ownerDir = Peer.getRootPath().resolve("owner");
 
     private static final ConcurrentHashMap<String, OwnerFile> ownerMap = new ConcurrentHashMap<>();
 

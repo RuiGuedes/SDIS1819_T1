@@ -1,6 +1,7 @@
 package peer;
 
 import chord.Chord;
+import middleware.ChunkTransfer;
 import middleware.RequestListener;
 import storage.ChunkStorage;
 import storage.OwnerStorage;
@@ -16,7 +17,7 @@ import java.nio.file.Paths;
 public class Peer {
     private static String PEER_ID;
 
-    public static final Path rootPath = Paths.get("./peer");
+    private static Path rootPath;
 
     public static Chord chord = new Chord();
 
@@ -35,16 +36,19 @@ public class Peer {
         }
 
         try {
-            PEER_ID = InetAddress.getLocalHost().toString();
+            PEER_ID = InetAddress.getLocalHost().toString() + ":" + args[0];
+            rootPath = Paths.get("./" + PEER_ID.split("/")[0] + args[0]);
 
             if(!chord.initialize(args)) {
                 System.out.println("FAILED");
+                System.exit(2);
             }
 
             ChunkStorage.init();
             OwnerStorage.init();
 
             new Thread(new RequestListener(Integer.parseInt(args[args.length - 1]))).start();
+            new Thread(new ChunkTransfer(Integer.parseInt(args[0]))).start();
 
             System.out.println("Peer " + PEER_ID + " Online!");
         } catch (IOException e) {
@@ -56,5 +60,9 @@ public class Peer {
 
     public static String getPeerId() {
         return PEER_ID;
+    }
+
+    public static Path getRootPath() {
+        return rootPath;
     }
 }

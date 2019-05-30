@@ -10,6 +10,8 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -56,25 +58,34 @@ public class ChunkTransfer implements Runnable {
                 final SSLSocket transferSocket = (SSLSocket) listenerSocket.accept();
                 requestPool.execute(() -> {
                     try {
-                        if (transferSocket.getInputStream().read() == TRANSMIT) {
-                            ByteBuffer chunkBuffer = ByteBuffer.wrap(transferSocket.getInputStream().readAllBytes());
+                        final BufferedInputStream in = new BufferedInputStream(transferSocket.getInputStream());
+                        final OutputStream out = transferSocket.getOutputStream();
+                        if (in.read() == TRANSMIT) {
+                            final byte[] chunkData = new byte[Chunk.CHUNK_SIZE];
+
+                            int chunkLength = in.read(chunkData, 0, Chunk.CHUNK_SIZE);
+
+                            final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunkData, 0, chunkLength);
+                            out.write(1);
+
                             ChunkStorage.store(Chunk.generateId(chunkBuffer.flip()), chunkBuffer);
                         }
                         else {
                             final String chunkId = new BufferedReader(
-                                    new InputStreamReader(transferSocket.getInputStream())).readLine();
+                                    new InputStreamReader(in)).readLine();
 
                             final ByteBuffer chunkBuffer = ChunkStorage.get(chunkId);
                             final byte[] data = new byte[chunkBuffer.remaining()];
                             chunkBuffer.get(data);
 
-                            transferSocket.getOutputStream().write(data);
+                            out.write(data);
                         }
+
+                        transferSocket.close();
                     } catch (IOException | NoSuchAlgorithmException | ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }
                 });
-
             } catch (IOException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
@@ -82,23 +93,43 @@ public class ChunkTransfer implements Runnable {
         }
     }
 
-    public static void uploadChunk(String chunkId) throws IOException {
+    public static void uploadChunk(String chunkId, ByteBuffer chunkData) throws IOException {
+        boolean uploaded = false;
         final List<CustomInetAddress> candidateNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
 
         for (CustomInetAddress target : candidateNodes) {
-            if (transmitChunk(target, chunkId)) return;
+            if (target.isSelf()) {
+                try {
+                    ChunkStorage.store(chunkId, chunkData);
+                    uploaded = true;
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                if (transmitChunk(target, chunkData)) uploaded = true;
+            }
         }
 
-        throw new IOException();
+        if (!uploaded) throw new IOException();
     }
 
     public static ByteBuffer downloadChunk(String chunkId) throws IOException {
         final List<CustomInetAddress> candidateNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
 
         for (CustomInetAddress target : candidateNodes) {
-            final ByteBuffer data = receiveChunk(target, chunkId);
+            if (target.isSelf()) {
+                try {
+                    return ChunkStorage.get(chunkId);
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                final ByteBuffer data = receiveChunk(target, chunkId);
 
-            if (data != null)   return data;
+                if (data != null)   return data;
+            }
         }
 
         throw new IOException();
@@ -108,26 +139,30 @@ public class ChunkTransfer implements Runnable {
         final List<CustomInetAddress> targetNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
 
         for (CustomInetAddress target : targetNodes) {
-            if (!Utilities.sendRequest(target, "DELETE_CHUNK:" + chunkId).equals("SUCCESS"))
-                throw new IOException();
+            if (target.isSelf()) {
+                ChunkStorage.delete(chunkId);
+            }
+            else {
+                if (!Utilities.sendRequest(target, "DELETE_CHUNK:" + chunkId).equals("SUCCESS"))
+                    throw new IOException();
+            }
         }
     }
 
-    public static boolean transmitChunk(CustomInetAddress targetPeer, String chunkId) {
+    public static boolean transmitChunk(CustomInetAddress targetPeer, ByteBuffer chunkData) {
         final SSLSocket transmitSocket;
         try {
             transmitSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
-            final ByteBuffer chunkBuffer = ChunkStorage.get(chunkId);
 
-            byte[] chunkBytes = new byte[chunkBuffer.remaining()];
-            chunkBuffer.get(chunkBytes);
+            byte[] chunkBytes = new byte[chunkData.remaining()];
+            chunkData.get(chunkBytes);
 
-            final OutputStream out = transmitSocket.getOutputStream();
+            final BufferedOutputStream out = new BufferedOutputStream(transmitSocket.getOutputStream());
             out.write(TRANSMIT);
-            out.write(chunkBytes);
+            out.write(chunkBytes, 0, chunkBytes.length);
 
-            return transmitSocket.getInputStream().read() != -1;
-        } catch (IOException | InterruptedException | ExecutionException e) {
+            return transmitSocket.getInputStream().read() != 0;
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -140,7 +175,7 @@ public class ChunkTransfer implements Runnable {
 
             final PrintWriter out = new PrintWriter(receiveSocket.getOutputStream());
             out.write(RECEIVE);
-            out.write(chunkId);
+            out.println(chunkId);
 
             return ByteBuffer.wrap(receiveSocket.getInputStream().readAllBytes());
         } catch (IOException e) {

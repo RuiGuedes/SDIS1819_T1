@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.IntConsumer;
 
 /**
@@ -200,7 +199,7 @@ public class FileManager {
                             chunkData.flip();
                             final String chunkId = Chunk.generateId(chunkData);
 
-                            ChunkTransfer.uploadChunk(chunkId);
+                            ChunkTransfer.uploadChunk(chunkId, chunkData);
 
                             chunkConsumer.accept(chunkIndex);
                             attachment.complete(chunkId);
@@ -218,6 +217,7 @@ public class FileManager {
 
             final ArrayList<String> chunkIds = new ArrayList<>(chunkNum);
             chunkPromises.forEach((p) -> chunkIds.add(p.join()));
+
             return chunkIds;
         }
     }

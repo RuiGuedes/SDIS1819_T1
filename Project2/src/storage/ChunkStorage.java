@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 public class ChunkStorage {
     private static final ExecutorService chunkIOExecutor = Executors.newCachedThreadPool();
 
-    private static final Path chunkDir = Peer.rootPath.resolve("chunk");
+    private static final Path chunkDir = Peer.getRootPath().resolve("chunk");
 
     private static final ConcurrentHashMap<String, Integer> chunkMap = new ConcurrentHashMap<>();
 
