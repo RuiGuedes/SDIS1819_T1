@@ -61,7 +61,7 @@ public class ChunkTransfer implements Runnable {
                 requestPool.execute(() -> {
                     try {
                         final DataInputStream in = new DataInputStream(transferSocket.getInputStream());
-                        final OutputStream out = transferSocket.getOutputStream();
+                        final DataOutputStream out = new DataOutputStream(transferSocket.getOutputStream());
                         if (in.read() == TRANSMIT) {
                             final byte[] chunkData = new byte[in.readInt()];
                             in.readFully(chunkData, 0, chunkData.length);
@@ -70,14 +70,14 @@ public class ChunkTransfer implements Runnable {
                             ChunkStorage.store(Chunk.generateId(chunkBuffer), chunkBuffer);
                         }
                         else {
-                            final String chunkId = new BufferedReader(
-                                    new InputStreamReader(in)).readLine();
+                            final String chunkId = in.readUTF();
 
                             final ByteBuffer chunkBuffer = ChunkStorage.get(chunkId);
                             final byte[] data = new byte[chunkBuffer.remaining()];
                             chunkBuffer.get(data);
 
-                            out.write(data);
+                            out.writeInt(data.length);
+                            out.write(data, 0, data.length);
                         }
 
                         transferSocket.close();
@@ -174,11 +174,15 @@ public class ChunkTransfer implements Runnable {
         try {
             receiveSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
 
-            final PrintWriter out = new PrintWriter(receiveSocket.getOutputStream());
+            final DataOutputStream out = new DataOutputStream(receiveSocket.getOutputStream());
             out.write(RECEIVE);
-            out.println(chunkId);
+            out.writeUTF(chunkId);
 
-            return ByteBuffer.wrap(receiveSocket.getInputStream().readAllBytes());
+            final DataInputStream in = new DataInputStream(receiveSocket.getInputStream());
+            final byte[] chunkData = new byte[in.readInt()];
+            in.readFully(chunkData, 0, chunkData.length);
+
+            return ByteBuffer.wrap(chunkData);
         } catch (IOException e) {
             e.printStackTrace();
         }
