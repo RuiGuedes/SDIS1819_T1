@@ -96,10 +96,8 @@ public class FileManager {
                     final CompletableFuture<Void> chunkPromise = new CompletableFuture<>();
                     chunkPromises.add(chunkIndex, chunkPromise);
 
-                    // TODO Download Chunk
 
-                    // For now retrieve chunk locally
-                    final ByteBuffer chunkData = ChunkStorage.get(chunkIds[i]);
+                    final ByteBuffer chunkData = ChunkTransfer.downloadChunk(chunkIds[i]);
                     afc.write(chunkData, i * Chunk.CHUNK_SIZE, chunkPromise, new CompletionHandler<>() {
                         @Override
                         public void completed(Integer result, CompletableFuture<Void> attachment) {
@@ -117,7 +115,7 @@ public class FileManager {
                 chunkPromises.forEach(CompletableFuture::join);
                 return true;
             }
-        } catch (IOException | InterruptedException | ExecutionException | NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
             return false;
         }

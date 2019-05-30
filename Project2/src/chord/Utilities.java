@@ -10,16 +10,22 @@ import java.security.NoSuchAlgorithmException;
  * Utilities class
  */
 public class Utilities {
-
     /**
      * Create Hash code with IP and Port number
      * @param ip IP address
      * @param port Port number
      * @return Hash Code
      */
-    static long hashCode (String ip, int port) {
-        String s = ip + port;
+    static long hashCode(String ip, int port) {
+        return hashCode(ip + port);
+    }
 
+    /**
+     * Create Hash code from a String
+     * @param s String to be hashed
+     * @return Hash Code
+     */
+    public static long hashCode(String s) {
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-256");

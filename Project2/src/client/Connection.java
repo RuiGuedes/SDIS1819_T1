@@ -21,7 +21,7 @@ import java.util.Arrays;
  *     When the -s / --share option is given, a metadata file is generated, which can be shared to other users so
  *     they can download the file
  *
- * - DONWLOAD (`metaPath`|`ownerPath`)
+ * - DOWNLOAD (`metaPath`|`ownerPath`)
  *     The Peer downloads the file from the network, given its metadata file or owner file.
  *
  * - LIST (-o | --owner)
@@ -33,7 +33,8 @@ import java.util.Arrays;
  *  - DELETE `ownerPath`
  *      The Peer deletes the file from the network, given its owner file.
  *      
- *  TODO - STORAGE
+ *  - STORAGE `maxStorage`
+ *      Sets the Maximum Storage used by the peer to store chunks. Any overflowing storage will be reclaimed.
  */
 public class Connection {
     private static String maxStorage;
