@@ -1,7 +1,7 @@
 # P2P Backup Service on the Internet
 
 The Project was developed using InteliJ IDEA. The project can be viewed and compiled using this IDE, 
-however the project is already precompiled in **Java 11**
+however the project is already precompiled in **Java 11**.
 
 ## Requirements
 ### Java 
@@ -9,7 +9,7 @@ however the project is already precompiled in **Java 11**
     Version 10 or above (Compiling the Source Code)
 
 ### Microsoft Windows 
-    The networking was only tested on this OS. Also required for using the provided scripts
+    The networking was only tested on this OS. Also required for using the provided scripts.
 
 ## Initializing Peers
 Each peer can be initialized using the `peer.bat` script in the following manner:
