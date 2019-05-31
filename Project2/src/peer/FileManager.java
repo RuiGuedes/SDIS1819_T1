@@ -1,8 +1,6 @@
 package peer;
 
-import chord.Utilities;
 import middleware.ChunkTransfer;
-import storage.ChunkStorage;
 import storage.OwnerFile;
 import storage.OwnerStorage;
 
@@ -22,12 +20,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.IntConsumer;
 
 /**
  * Responsible for managing various operations regarding files, such as file backup, download and delete
  */
 public class FileManager {
+    private static ExecutorService deletePool = Executors.newFixedThreadPool(50);
+
     /**
      * Backs up a file to the network
      *
@@ -149,18 +152,21 @@ public class FileManager {
             for (int i = 0; i < chunkIds.length; i++) {
                 final int chunkIndex = i;
 
-                final CompletableFuture<Void> chunkPromise = new CompletableFuture<>();
+                final CompletableFuture<Void> chunkPromise = CompletableFuture.runAsync(() -> {
+                    try {
+                        ChunkTransfer.deleteChunk(chunkIds[chunkIndex]);
+                        chunkConsumer.accept(chunkIndex);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        throw new CompletionException(e);
+                    }
+                }, deletePool);
+
                 chunkPromises.add(chunkIndex, chunkPromise);
-
-                ChunkTransfer.deleteChunk(chunkIds[i]);
-
-                chunkPromise.whenComplete((v, e) -> chunkConsumer.accept(chunkIndex));
-                chunkPromise.complete(null);
             }
+            chunkPromises.forEach(CompletableFuture::join);
 
             OwnerStorage.delete(hashString, ownerFile);
-
-            chunkPromises.forEach(CompletableFuture::join);
             return true;
         } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
