@@ -43,7 +43,7 @@ public class ChunkTransfer implements Runnable {
      */
     public ChunkTransfer(int port) throws IOException {
         final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-        listenerSocket = (SSLServerSocket) ssf.createServerSocket(port, 200);
+        listenerSocket = (SSLServerSocket) ssf.createServerSocket(port, 50);
         listenerSocket.setNeedClientAuth(true);
     }
 
@@ -61,7 +61,13 @@ public class ChunkTransfer implements Runnable {
                             in.readFully(chunkData, 0, chunkData.length);
 
                             final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunkData);
-                            ChunkStorage.store(Chunk.generateId(chunkBuffer), chunkBuffer);
+                            try {
+                                ChunkStorage.store(Chunk.generateId(chunkBuffer), chunkBuffer);
+                                out.write(1);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                out.write(0);
+                            }
                         }
                         else {
                             final String chunkId = in.readUTF();
@@ -97,6 +103,8 @@ public class ChunkTransfer implements Runnable {
                     uploaded = true;
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    System.out.println("Couldn't store chunk id " + chunkId);
                 }
             }
             else {

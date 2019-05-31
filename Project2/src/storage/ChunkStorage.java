@@ -74,18 +74,22 @@ public class ChunkStorage {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
         if (!Files.isRegularFile(chunkFile)) {
+            synchronized (storageLock) {
+                final long chunkSize = chunkData.remaining();
+
+                if (usedStorage + chunkSize > maxStorage)
+                    throw new IOException();
+
+                usedStorage += chunkSize;
+            }
+
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     chunkFile,
                     Set.of(StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW),
                     chunkIOExecutor
             )) {
-                // TODO Unblock the chunk storage
                 afc.write(chunkData, 0).get();
                 chunkData.rewind();
-            }
-
-            synchronized (storageLock) {
-                usedStorage += Files.size(chunkFile);
             }
         }
 
@@ -117,7 +121,6 @@ public class ChunkStorage {
         )) {
             final ByteBuffer chunkData = ByteBuffer.allocate(Chunk.CHUNK_SIZE);
 
-            // TODO Unblock the chunk retrieval
             afc.read(chunkData, 0).get();
 
             return chunkData.flip();
