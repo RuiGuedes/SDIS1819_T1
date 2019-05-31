@@ -75,7 +75,24 @@ public class Connection {
      */
     private static BufferedReader connectAndSend(String[] args) throws IOException {
         final SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+
+        /*for (String s : socketFactory.getSupportedCipherSuites()) {
+            System.out.println(s);
+        }
+
+        System.out.println();
+
+        for (String s : socketFactory.getDefaultCipherSuites()) {
+            System.out.println(s);
+        }*/
+
         final SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", Integer.parseInt(args[0]));
+        socket.setEnabledCipherSuites(new String[] {
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        });
 
         final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);

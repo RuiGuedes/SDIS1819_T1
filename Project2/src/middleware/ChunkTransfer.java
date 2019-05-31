@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * Responsible for listening to Chunk Transfer request by other Peers and requesting chunks to other peers
  */
 
-// TODO Setup Protocols and Cyphers
+// TODO Setup Cyphers
 
 public class ChunkTransfer implements Runnable {
     private static int TRANSMIT = 0;
@@ -45,6 +45,12 @@ public class ChunkTransfer implements Runnable {
         final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         listenerSocket = (SSLServerSocket) ssf.createServerSocket(port, 50);
         listenerSocket.setNeedClientAuth(true);
+        listenerSocket.setEnabledCipherSuites(new String[] {
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        });
     }
 
     @Override
@@ -151,20 +157,26 @@ public class ChunkTransfer implements Runnable {
     }
 
     public static boolean transmitChunk(CustomInetAddress targetPeer, ByteBuffer chunkData) {
-        final SSLSocket transmitSocket;
+        final SSLSocket socket;
         try {
-            transmitSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+            socket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+            socket.setEnabledCipherSuites(new String[] {
+                    "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+            });
 
             byte[] chunkBytes = new byte[chunkData.remaining()];
             chunkData.get(chunkBytes);
             chunkData.rewind();
 
-            final DataOutputStream out = new DataOutputStream(transmitSocket.getOutputStream());
+            final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.write(TRANSMIT);
             out.writeInt(chunkBytes.length);
             out.write(chunkBytes, 0, chunkBytes.length);
 
-            return transmitSocket.getInputStream().read() != 0;
+            return socket.getInputStream().read() != 0;
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -172,15 +184,21 @@ public class ChunkTransfer implements Runnable {
     }
 
     private static ByteBuffer receiveChunk(CustomInetAddress targetPeer, String chunkId) {
-        final SSLSocket receiveSocket;
+        final SSLSocket socket;
         try {
-            receiveSocket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+            socket = (SSLSocket) sf.createSocket(targetPeer.getAddress(), targetPeer.getPort());
+            socket.setEnabledCipherSuites(new String[] {
+                    "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                    "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                    "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+            });
 
-            final DataOutputStream out = new DataOutputStream(receiveSocket.getOutputStream());
+            final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.write(RECEIVE);
             out.writeUTF(chunkId);
 
-            final DataInputStream in = new DataInputStream(receiveSocket.getInputStream());
+            final DataInputStream in = new DataInputStream(socket.getInputStream());
             final byte[] chunkData = new byte[in.readInt()];
             in.readFully(chunkData, 0, chunkData.length);
 

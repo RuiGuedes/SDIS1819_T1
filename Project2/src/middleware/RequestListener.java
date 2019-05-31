@@ -39,6 +39,12 @@ public class RequestListener implements Runnable {
     public RequestListener(int port) throws IOException {
         final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
+        serverSocket.setEnabledCipherSuites(new String[] {
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        });
     }
 
     /**
