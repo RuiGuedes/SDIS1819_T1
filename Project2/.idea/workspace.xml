@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd1e01fa-c5f4-4f09-ab2c-7d05fc24d3ed" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/gui.bat" beforeDir="false" afterPath="$PROJECT_DIR$/gui.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/peer.bat" beforeDir="false" afterPath="$PROJECT_DIR$/peer.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chord/Chord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/Chord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/peer/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/peer/Peer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/peer.bat">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="9" selection-start-column="9" selection-end-column="9" />
+            <state relative-caret-position="153">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
         </entry>
@@ -40,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="599">
-              <caret line="50" column="78" selection-start-line="50" selection-start-column="78" selection-end-line="50" selection-end-column="78" />
+            <state relative-caret-position="429">
+              <caret line="41" column="12" selection-start-line="41" selection-start-column="12" selection-end-line="41" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1692#1693#0" expanded="true" />
@@ -52,6 +50,15 @@
                 <element signature="e#1762#1763#0" expanded="true" />
                 <element signature="e#1793#1794#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gui.bat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="133" selection-start-line="8" selection-start-column="133" selection-end-line="8" selection-end-column="133" />
             </state>
           </provider>
         </entry>
@@ -74,18 +81,6 @@
                 <element signature="imports" expanded="true" />
                 <element signature="e#2266#2267#0" expanded="true" />
                 <element signature="e#2324#2325#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="89" column="39" selection-start-line="89" selection-start-column="39" selection-end-line="89" selection-end-column="39" />
-              <folding>
-                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -202,8 +197,9 @@
         <option value="$PROJECT_DIR$/src/peer/FileManager.java" />
         <option value="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" />
         <option value="$PROJECT_DIR$/src/chord/Chord.java" />
-        <option value="$PROJECT_DIR$/peer.bat" />
         <option value="$PROJECT_DIR$/src/peer/Peer.java" />
+        <option value="$PROJECT_DIR$/gui.bat" />
+        <option value="$PROJECT_DIR$/peer.bat" />
       </list>
     </option>
   </component>
@@ -397,12 +393,12 @@
       <workItem from="1559204966928" duration="840000" />
       <workItem from="1559209253656" duration="2833000" />
       <workItem from="1559222391286" duration="15543000" />
-      <workItem from="1559289648222" duration="4766000" />
+      <workItem from="1559289648222" duration="5443000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="165648000" />
+    <option name="totallyTimeSpent" value="166325000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -638,13 +634,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/peer.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="9" selection-start-column="9" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/middleware/ChunkTransfer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="372">
@@ -664,8 +653,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="599">
-          <caret line="50" column="78" selection-start-line="50" selection-start-column="78" selection-end-line="50" selection-end-column="78" />
+        <state relative-caret-position="429">
+          <caret line="41" column="12" selection-start-line="41" selection-start-column="12" selection-end-line="41" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1692#1693#0" expanded="true" />
@@ -673,6 +662,20 @@
             <element signature="e#1762#1763#0" expanded="true" />
             <element signature="e#1793#1794#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="133" selection-start-line="8" selection-start-column="133" selection-end-line="8" selection-end-column="133" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/peer.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
         </state>
       </provider>
     </entry>
