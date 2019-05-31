@@ -94,7 +94,7 @@ class Node {
             this.setIthFinger(1, successor);
         }
 
-        this.initializeAllThreads(false);
+        this.initializeAllThreads(true);
 
         return true;
     }
