@@ -114,7 +114,7 @@ public class ChunkTransfer implements Runnable {
             if (target.isSelf()) {
                 try {
                     return ChunkStorage.get(chunkId);
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (IOException | ExecutionException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
