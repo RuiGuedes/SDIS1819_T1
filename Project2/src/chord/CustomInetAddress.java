@@ -70,6 +70,9 @@ public class CustomInetAddress {
         return Utilities.hashCode(this.getHostAddress(), this.port);
     }
 
+    /**
+     * @return Whether this address corresponds to this own node
+     */
     public boolean isSelf() {
         return this.equals(Chord.getNode().getAddress());
     }

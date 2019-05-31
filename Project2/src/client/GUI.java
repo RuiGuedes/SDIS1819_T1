@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * Class responsible for presenting a GUI-based Client
+ */
 public class GUI {
     private static String PORT;
 
@@ -15,6 +18,9 @@ public class GUI {
     private static JTable chunkTable;
     private static JFrame gui;
 
+    /**
+     * @return A panel showing the list of owner files
+     */
     private static JPanel FilePanel() {
         JPanel files = new JPanel();
 
@@ -35,6 +41,9 @@ public class GUI {
         return files;
     }
 
+    /**
+     * @return A panel showing the list of chunk files
+     */
     private static JPanel ChunkPanel() {
         JPanel chunks = new JPanel();
 
@@ -66,6 +75,11 @@ public class GUI {
         return chunks;
     }
 
+    /**
+     * Starts the GUI-based Client
+     *
+     * @param args Port where the peer is listening on
+     */
     public static void main(String[] args) {
         GUI.PORT = args[0];
 
@@ -97,17 +111,11 @@ public class GUI {
         });
     }
 
-    private static void uploadFile(ActionEvent e) {
-        final JFileChooser chooser = new JFileChooser();
-
-        if (chooser.showDialog(gui, "Upload") == JFileChooser.APPROVE_OPTION) {
-            JProgressBar progress = new JProgressBar();
-            gui.add(progress);
-
-            Connection.uploadFile(PORT, progress, chooser.getSelectedFile().getPath());
-        }
-    }
-
+    /**
+     * Reloads the state of the peer
+     *
+     * @param e ActionEvent related with the action triggering the reload (Button press)
+     */
     private static void reloadTables(ActionEvent e) {
         ((DefaultTableModel) (fileTable.getModel()))
                 .setDataVector(Connection.getFiles(PORT), new String[]{"Name", "Size"});
@@ -115,5 +123,21 @@ public class GUI {
                 .setDataVector(Connection.getChunks(PORT),
                         new String[]{"Identifier", "Size (Max: " + Connection.getMaxStorage()
                                 + " - Total: " + Connection.getStorageSize() + ")"});
+    }
+
+    /**
+     * Uploads a file (Under construction)
+     *
+     * @param e ActionEvent related with the action triggering the upload (Button press)
+     */
+    private static void uploadFile(ActionEvent e) {
+        final JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showDialog(gui, "Upload") == JFileChooser.APPROVE_OPTION) {
+            JProgressBar progress = new JProgressBar();
+            gui.add(progress);
+
+            //Connection.uploadFile(PORT, progress, chooser.getSelectedFile().getPath());
+        }
     }
 }

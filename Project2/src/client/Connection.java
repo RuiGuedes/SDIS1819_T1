@@ -43,7 +43,7 @@ public class Connection {
     /**
      * Connects to the local peer and outputs the result of a single command
      *
-     * @param args Command being sent to the peer
+     * @param args Space split values to be used (Port then the command)
      */
     public static void main(String[] args) {
         if (args.length < 1)  {
@@ -76,16 +76,6 @@ public class Connection {
     private static BufferedReader connectAndSend(String[] args) throws IOException {
         final SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
-        /*for (String s : socketFactory.getSupportedCipherSuites()) {
-            System.out.println(s);
-        }
-
-        System.out.println();
-
-        for (String s : socketFactory.getDefaultCipherSuites()) {
-            System.out.println(s);
-        }*/
-
         final SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", Integer.parseInt(args[0]));
         socket.setEnabledCipherSuites(new String[] {
                 "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
@@ -101,11 +91,13 @@ public class Connection {
         return in;
     }
 
-    static void uploadFile(String port, JProgressBar progress, String filePath) {
-        // TODO Upload File
-        //final BufferedReader in connectAndSend(new String[]{port, "BACKUP", filePath});
-    }
-
+    /**
+     * Retrieves the Owner Files on the peer
+     *
+     * @param port Port where the peer is listening on
+     *
+     * @return List of Owner Files
+     */
     static String[][] getFiles(String port) {
         ArrayList<String[]> files = new ArrayList<>();
 
@@ -128,6 +120,13 @@ public class Connection {
         return files.toArray(new String[0][2]);
     }
 
+    /**
+     * Retrieves the chunk files on the peer
+     *
+     * @param port Port where the peer is listening on
+     *
+     * @return List of chunk files
+     */
     static String[][] getChunks(String port) {
         ArrayList<String[]> chunks = new ArrayList<>();
 
@@ -150,10 +149,16 @@ public class Connection {
         return chunks.toArray(new String[0][2]);
     }
 
+    /**
+     * @return Peer's max storage in Bytes
+     */
     static String getMaxStorage() {
         return maxStorage;
     }
 
+    /**
+     * @return Peer's used storage in Bytes
+     */
     static String getStorageSize() {
         return storageSize;
     }

@@ -127,6 +127,13 @@ public class ChunkStorage {
         }
     }
 
+    /**
+     * Deletes a chunk from the peer's filesystem
+     *
+     * @param chunkId Identifier of the chunk
+     *
+     * @throws IOException on error deleting the file
+     */
     public static void delete(String chunkId) throws IOException {
         final Path chunkFile = chunkDir.resolve(chunkId);
 
@@ -171,6 +178,13 @@ public class ChunkStorage {
         }
     }
 
+    /**
+     * Sets the max storage to be used for storing chunks, releasing chunks to accommodate the new limits
+     *
+     * @param newMaxStorage The nex max storage to be set in Bytes
+     *
+     * @throws IOException on error deleting released chunks
+     */
     public static void setMaxStorage(long newMaxStorage) throws IOException {
         synchronized (storageLock) {
             maxStorage = newMaxStorage;

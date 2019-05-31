@@ -23,9 +23,6 @@ import java.util.concurrent.Executors;
  *
  * @see RequestHandler
  */
-
-// TODO Setup Protocols and Cyphers
-
 public class RequestListener implements Runnable {
     private final static ExecutorService requestPool = Executors.newCachedThreadPool();
     private final SSLServerSocket serverSocket;
@@ -225,6 +222,14 @@ public class RequestListener implements Runnable {
             }
         }
 
+        /**
+         * Processes a storage reclaim request
+         *
+         * @param commandArgs storage specific request
+         * @param out Connection OutputStream
+         *
+         * @return whether the request's syntax is valid or not.
+         */
         private boolean storageCommand(String[] commandArgs, PrintWriter out) {
             if (commandArgs.length > 1) return false;
 

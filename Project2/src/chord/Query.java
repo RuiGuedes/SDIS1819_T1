@@ -37,6 +37,15 @@ public class Query {
         return nonNullsList(target, predecessor, successor);
     }
 
+    /**
+     * Creates a list containing all the non null addresses of the three provided
+     *
+     * @param target Address of the query target node
+     * @param predecessor Address of the query target predecessor node
+     * @param successor Address of the query target successor node
+     *
+     * @return List containing all the non null addresses of the three provided
+     */
     private static List<CustomInetAddress> nonNullsList(CustomInetAddress target, CustomInetAddress predecessor,
                                                         CustomInetAddress successor) {
         if (target != null && successor != null) {

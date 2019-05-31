@@ -23,9 +23,6 @@ import java.util.concurrent.Executors;
 /**
  * Responsible for listening to Chunk Transfer request by other Peers and requesting chunks to other peers
  */
-
-// TODO Setup Cyphers
-
 public class ChunkTransfer implements Runnable {
     private static int TRANSMIT = 0;
     private static int RECEIVE = 1;
@@ -53,6 +50,9 @@ public class ChunkTransfer implements Runnable {
         });
     }
 
+    /**
+     * Method responsible for accepting requests and processing them
+     */
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -98,6 +98,14 @@ public class ChunkTransfer implements Runnable {
         }
     }
 
+    /**
+     * Uploads a Chunk to the Network
+     *
+     * @param chunkId Chunk Identifier
+     * @param chunkData Chunk Contents
+     *
+     * @throws IOException on failure to upload the chunk
+     */
     public static void uploadChunk(String chunkId, ByteBuffer chunkData) throws IOException {
         boolean uploaded = false;
         final List<CustomInetAddress> candidateNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
@@ -121,6 +129,13 @@ public class ChunkTransfer implements Runnable {
         if (!uploaded) throw new IOException();
     }
 
+    /**
+     * Downloads a Chunk from the Network
+     *
+     * @param chunkId Chunk Identifier
+     *
+     * @throws IOException on failure to download the chunk
+     */
     public static ByteBuffer downloadChunk(String chunkId) throws IOException {
         final List<CustomInetAddress> candidateNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
 
@@ -142,6 +157,13 @@ public class ChunkTransfer implements Runnable {
         throw new IOException();
     }
 
+    /**
+     * Deletes a Chunk from the Network
+     *
+     * @param chunkId Chunk Identifier
+     *
+     * @throws IOException on failure to delete the chunk
+     */
     public static void deleteChunk(String chunkId) throws IOException {
         final List<CustomInetAddress> targetNodes = Query.findTargetAddress(Utilities.hashCode(chunkId));
 
@@ -156,6 +178,14 @@ public class ChunkTransfer implements Runnable {
         }
     }
 
+    /**
+     * Transmits a Chunk to a target peer
+     *
+     * @param targetPeer Address of the target peer
+     * @param chunkData Chunk's contents
+     *
+     * @return Whether the Transmission was successful or not
+     */
     public static boolean transmitChunk(CustomInetAddress targetPeer, ByteBuffer chunkData) {
         final SSLSocket socket;
         try {
@@ -183,6 +213,14 @@ public class ChunkTransfer implements Runnable {
         }
     }
 
+    /**
+     * Retrieves a Chunk from a peer
+     *
+     * @param targetPeer Address of the peer to retrieve the chunk from
+     * @param chunkId Chunk Identifier
+     *
+     * @return Chunk's contents
+     */
     private static ByteBuffer receiveChunk(CustomInetAddress targetPeer, String chunkId) {
         final SSLSocket socket;
         try {
