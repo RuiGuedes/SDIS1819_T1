@@ -12,10 +12,9 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-
-// TODO Use some file info for generating the hash
 
 /**
  * Represents a Owner File
@@ -94,7 +93,7 @@ public class OwnerFile {
             chunkList.add(chunkHashes.substring(i, i + 64));
         }
 
-        return chunkList.toArray(String[]::new);
+        return chunkList.toArray(new String[0]);
     }
 
     /**

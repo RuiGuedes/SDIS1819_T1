@@ -79,8 +79,9 @@ public class FileManager {
             bf.readLine(); // file length
             final String[] chunkIds = OwnerFile.detachChunks(bf.readLine());
 
-            if (filePath.endsWith(".own") && OwnerFile.validate(bf.readLine(), bf.readLine()))
+            if (filePath.endsWith(".own") && !OwnerFile.validate(bf.readLine(), bf.readLine())) {
                 return false;
+            }
 
             try (AsynchronousFileChannel afc = AsynchronousFileChannel.open(
                     Paths.get(fileName),
