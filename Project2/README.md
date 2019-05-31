@@ -31,7 +31,7 @@ Client Requests can be made using the `client.bat` script in the following manne
 - `<REQUEST ARGUMENTS>` Arguments for the request, as specified below
     - `BACKUP (-s | --share)? <FILE_PATH>` The peer backs up the given file in its network.
 
-        - When the -s / --share option is given, a metadata file is generated, which can be 
+        When the -s / --share option is given, a metadata file is generated, which can be 
         shared to other users so they can download the file as well.
 
     - `DOWNLOAD (<META_PATH> | <OWNER_PATH>)`
