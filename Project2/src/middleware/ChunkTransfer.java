@@ -10,17 +10,11 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +43,7 @@ public class ChunkTransfer implements Runnable {
      */
     public ChunkTransfer(int port) throws IOException {
         final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-        listenerSocket = (SSLServerSocket) ssf.createServerSocket(port);
+        listenerSocket = (SSLServerSocket) ssf.createServerSocket(port, 200);
         listenerSocket.setNeedClientAuth(true);
     }
 

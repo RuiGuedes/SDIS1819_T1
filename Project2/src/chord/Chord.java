@@ -31,8 +31,9 @@ public class Chord {
      */
     public boolean initialize(String[] args) {
         // Declare and initialize variables
-        CustomInetAddress peerAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
-        CustomInetAddress contactAddress = new CustomInetAddress(Utilities.getHostAddress(), Integer.parseInt(args[0]));
+        String[] peerInfo = args[0].split(":");
+        CustomInetAddress peerAddress = new CustomInetAddress(peerInfo[0], Integer.parseInt(peerInfo[1]));
+        CustomInetAddress contactAddress = new CustomInetAddress(peerInfo[0], Integer.parseInt(peerInfo[1]));
 
         // Initializes contact peer address
         if(args.length > 2) {
