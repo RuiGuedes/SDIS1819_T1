@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd1e01fa-c5f4-4f09-ab2c-7d05fc24d3ed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/chord/CustomInetAddress.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/CustomInetAddress.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chord/Query.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/chord/Query.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/client/Connection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/Connection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/GUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/GUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/RequestListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/RequestListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/storage/ChunkStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage/ChunkStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/peer/Peer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/peer/Peer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,15 +18,48 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1556">
+            <state relative-caret-position="17">
               <caret line="50" column="29" selection-start-line="50" selection-start-column="29" selection-end-line="50" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#435#436#0" expanded="true" />
                 <element signature="e#477#478#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="839">
+                <caret line="58" column="100" selection-start-line="58" selection-start-column="100" selection-end-line="58" selection-end-column="100" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="102">
+              <caret line="6" column="33" lean-forward="true" selection-start-line="6" selection-start-column="33" selection-end-line="6" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="371">
+              <caret line="32" column="79" lean-forward="true" selection-start-line="32" selection-start-column="79" selection-end-line="32" selection-end-column="79" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -90,7 +119,6 @@
         <option value="$PROJECT_DIR$/src/storage/OwnerStorage.java" />
         <option value="$PROJECT_DIR$/client.bat" />
         <option value="$PROJECT_DIR$/src/chord/Chord.java" />
-        <option value="$PROJECT_DIR$/src/peer/Peer.java" />
         <option value="$PROJECT_DIR$/gui.bat" />
         <option value="$PROJECT_DIR$/peer.bat" />
         <option value="$PROJECT_DIR$/src/storage/OwnerFile.java" />
@@ -98,11 +126,13 @@
         <option value="$PROJECT_DIR$/src/peer/FileManager.java" />
         <option value="$PROJECT_DIR$/src/middleware/ChunkTransfer.java" />
         <option value="$PROJECT_DIR$/src/middleware/RequestListener.java" />
-        <option value="$PROJECT_DIR$/src/client/Connection.java" />
         <option value="$PROJECT_DIR$/src/client/GUI.java" />
         <option value="$PROJECT_DIR$/src/storage/ChunkStorage.java" />
         <option value="$PROJECT_DIR$/src/chord/CustomInetAddress.java" />
         <option value="$PROJECT_DIR$/src/chord/Query.java" />
+        <option value="$PROJECT_DIR$/src/peer/Peer.java" />
+        <option value="$PROJECT_DIR$/src/client/Connection.java" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -120,8 +150,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -310,11 +340,12 @@
       <workItem from="1559222391286" duration="15543000" />
       <workItem from="1559289648222" duration="7230000" />
       <workItem from="1559309028616" duration="9256000" />
+      <workItem from="1559323344727" duration="2263000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="178379000" />
+    <option name="totallyTimeSpent" value="180642000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -327,8 +358,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2553305" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25799572" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -431,20 +463,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="45" column="72" selection-start-line="45" selection-start-column="72" selection-end-line="45" selection-end-column="72" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#4674#4675#0" expanded="true" />
-            <element signature="e#4707#4708#0" expanded="true" />
-            <element signature="e#4745#4746#0" expanded="true" />
-            <element signature="e#4779#4780#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/peer/FileManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="229">
@@ -469,16 +487,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="8" column="133" selection-start-line="8" selection-start-column="133" selection-end-line="8" selection-end-column="133" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1037">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -600,13 +608,40 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/chord/Utilities.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1556">
+        <state relative-caret-position="17">
           <caret line="50" column="29" selection-start-line="50" selection-start-column="29" selection-end-line="50" selection-end-column="29" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#435#436#0" expanded="true" />
             <element signature="e#477#478#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/peer/Peer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="32" column="79" lean-forward="true" selection-start-line="32" selection-start-column="79" selection-end-line="32" selection-end-column="79" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/Connection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="33" lean-forward="true" selection-start-line="6" selection-start-column="33" selection-end-line="6" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="839">
+            <caret line="58" column="100" selection-start-line="58" selection-start-column="100" selection-end-line="58" selection-end-column="100" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

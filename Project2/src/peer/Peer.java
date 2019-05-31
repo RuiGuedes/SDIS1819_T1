@@ -29,8 +29,8 @@ public class Peer {
     public static void main(String[] args) {
         // Validate arguments
         if(args.length < 2 || args.length > 3) {
-            System.out.println(
-                    "Usage: java Peer [options] <PEER_ADDRESS:PEER_PORT> (<PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT>)? <CLIENT-PORT>"
+            System.out.println("Usage: java Peer [options] <PEER_ADDRESS:PEER_PORT> " +
+                    "(<PEER_CONTACT_ADDRESS:PEER_CONTACT_PORT>)? <CLIENT_PORT>"
             );
             System.exit(1);
         }
