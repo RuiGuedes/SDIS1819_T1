@@ -118,7 +118,8 @@ class DecryptMessage extends Thread {
                 response = this.node.findSuccessor(Integer.parseInt(message[1])).toString();
                 break;
             case "YOUR_SUCCESSOR":
-                response = this.node.getSuccessor().toString();
+                if(this.node.getSuccessor() != null)
+                    response = this.node.getSuccessor().toString();
                 break;
             case "YOUR_PREDECESSOR":
                 response = this.node.getPredecessor() == null ? null : this.node.getPredecessor().toString();
