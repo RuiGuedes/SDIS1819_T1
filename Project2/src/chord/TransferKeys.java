@@ -32,7 +32,7 @@ public class TransferKeys extends Thread {
      * TransferKeys class constructor
      * @param node Associated node
      */
-    public TransferKeys(Node node) {
+    TransferKeys(Node node) {
         this.node = node;
         this.oldPredecessor = this.node.getPredecessor();
         this.online = true;

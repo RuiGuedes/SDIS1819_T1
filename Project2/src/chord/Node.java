@@ -50,6 +50,11 @@ class Node {
     private PredecessorPolling predecessorPolling;
 
     /**
+     * Class responsible to ensure transference of keys
+     */
+    private TransferKeys transferKeys;
+
+    /**
      * Chord status
      */
     private Status status;
@@ -72,6 +77,7 @@ class Node {
         this.stabilizer = new Stabilizer(this);
         this.nodeListener = new NodeListener(this);
         this.predecessorPolling = new PredecessorPolling(this);
+        this.transferKeys = new TransferKeys(this);
         this.status = new Status(this);
     }
 
@@ -107,6 +113,7 @@ class Node {
         this.stabilizer.start();
         this.fixFingers.start();
         this.predecessorPolling.start();
+        this.transferKeys.start();
         if(initStatus) this.status.start();
     }
 
@@ -382,6 +389,7 @@ class Node {
         if(this.stabilizer != null) this.stabilizer.terminate();
         if(this.fixFingers != null) this.fixFingers.terminate();
         if(this.predecessorPolling != null) this.predecessorPolling.terminate();
+        if(this.transferKeys != null) this.transferKeys.terminate();
         if(this.status != null) this.status.terminate();
     }
 
